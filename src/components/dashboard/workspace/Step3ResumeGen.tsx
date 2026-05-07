@@ -82,14 +82,14 @@ const Step3ResumeGen = () => {
               templateId === tpl.id ? 'border-primary shadow-2xl scale-105' : 'border-transparent hover:border-primary/20'
             }`}
           >
-            <div className="aspect-[3/4] relative">
+            <div className="aspect-3/4 relative">
               <Image 
                 src={tpl.image} 
                 alt={tpl.name} 
                 fill 
                 className="object-cover group-hover:scale-110 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
               <div className="absolute bottom-6 left-6 text-white">
                 <h4 className="font-bold text-lg">{tpl.name}</h4>
                 <p className="text-xs text-white/70">ATS-Optimized Standard</p>

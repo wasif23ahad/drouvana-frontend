@@ -32,7 +32,7 @@ const WorkspacePage = () => {
 
       {/* Stepper */}
       <div className="flex justify-between items-center relative px-4">
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[1px] bg-border/50 -z-10" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-px bg-border/50 -z-10" />
         {STEPS.map((s) => (
           <div key={s.id} className="flex flex-col items-center gap-3 bg-background px-4">
             <div className={cn(

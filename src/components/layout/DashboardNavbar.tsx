@@ -1,14 +1,36 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Bell, Search, Menu } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import NotificationDrawer from '../dashboard/NotificationDrawer';
+import { toast } from 'sonner';
 
 const DashboardNavbar = () => {
   const { data: session } = useSession();
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [hasUnread, setHasUnread] = useState(true);
+
+  useEffect(() => {
+    if (!session) return;
+
+    const eventSource = new EventSource('/api/notifications/stream');
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'connected') return;
+
+      toast.success(data.title, {
+        description: data.message,
+      });
+      setHasUnread(true);
+    };
+
+    return () => eventSource.close();
+  }, [session]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -43,10 +65,25 @@ const DashboardNavbar = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="relative hover:bg-primary/10 hover:text-primary rounded-xl transition-all">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => {
+              setIsNotifOpen(true);
+              setHasUnread(false);
+            }}
+            className="relative hover:bg-primary/10 hover:text-primary rounded-xl transition-all"
+          >
             <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background" />
+            {hasUnread && (
+              <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background animate-pulse" />
+            )}
           </Button>
+
+          <NotificationDrawer 
+            isOpen={isNotifOpen} 
+            onClose={() => setIsNotifOpen(false)} 
+          />
 
           <div className="h-8 w-px bg-border/50 mx-2" />
 
