@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Loader2, AlertCircle, Globe } from 'lucide-react';
-import axios from 'axios';
+import api from '@/lib/api';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -39,7 +39,6 @@ const AuthForm = ({ mode }: AuthFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Use a type union for the form values
   type FormValues = z.infer<typeof registerSchema>;
 
   const form = useForm<FormValues>({
@@ -57,8 +56,8 @@ const AuthForm = ({ mode }: AuthFormProps) => {
 
     try {
       if (mode === 'register') {
-        // Register logic via backend
-        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+        // Register logic via dynamic API
+        await api.post('/api/auth/register', {
           name: values.name,
           email: values.email,
           password: values.password,
@@ -98,7 +97,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto animate-in fade-in zoom-in duration-500">
       <div className="glass rounded-3xl p-8 shadow-2xl shadow-primary/5">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">
@@ -116,10 +115,10 @@ const AuthForm = ({ mode }: AuthFormProps) => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="flex-1 rounded-xl text-[10px] uppercase tracking-widest font-bold"
+              className="flex-1 rounded-xl text-[10px] uppercase tracking-widest font-black text-primary border-primary/20 bg-primary/5 hover:bg-primary/10"
               onClick={() => {
-                form.setValue('email', 'user@example.com');
-                form.setValue('password', 'password123');
+                form.setValue('email', 'demo@drouvana.com');
+                form.setValue('password', 'Demo@1234');
               }}
             >
               Demo User
@@ -127,10 +126,10 @@ const AuthForm = ({ mode }: AuthFormProps) => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="flex-1 rounded-xl text-[10px] uppercase tracking-widest font-bold"
+              className="flex-1 rounded-xl text-[10px] uppercase tracking-widest font-black text-emerald-500 border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10"
               onClick={() => {
-                form.setValue('email', 'admin@example.com');
-                form.setValue('password', 'admin123');
+                form.setValue('email', 'admin@drouvana.com');
+                form.setValue('password', 'Admin@1234');
               }}
             >
               Demo Admin
@@ -151,11 +150,11 @@ const AuthForm = ({ mode }: AuthFormProps) => {
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="John Doe" className="bg-background/50" {...field} />
+                      <Input placeholder="John Doe" className="bg-background/50 h-11 rounded-xl" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -166,11 +165,11 @@ const AuthForm = ({ mode }: AuthFormProps) => {
             <FormField
               control={form.control}
               name="email"
-              render={({ field }: { field: any }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="name@example.com" className="bg-background/50" {...field} />
+                    <Input placeholder="name@example.com" className="bg-background/50 h-11 rounded-xl" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -180,11 +179,11 @@ const AuthForm = ({ mode }: AuthFormProps) => {
             <FormField
               control={form.control}
               name="password"
-              render={({ field }: { field: any }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" className="bg-background/50" {...field} />
+                    <Input type="password" placeholder="••••••••" className="bg-background/50 h-11 rounded-xl" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -193,13 +192,13 @@ const AuthForm = ({ mode }: AuthFormProps) => {
 
             <Button 
               type="submit" 
-              className="w-full bg-primary hover:bg-primary/90 h-11 text-lg font-medium"
+              className="w-full bg-primary hover:bg-primary/90 h-11 text-lg font-black italic rounded-xl mt-6"
               disabled={isLoading}
             >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Please wait
+                  Processing...
                 </>
               ) : (
                 mode === 'login' ? 'Sign In' : 'Create Account'
@@ -212,28 +211,20 @@ const AuthForm = ({ mode }: AuthFormProps) => {
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t border-border/50" />
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-transparent px-2 text-muted-foreground">Or continue with</span>
+          <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
+            <span className="bg-background px-2 text-muted-foreground">Secure Authentication</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-4">
           <Button 
             variant="outline" 
-            className="h-11 border-border/50 hover:bg-primary/5 hover:border-primary/50 transition-all"
+            className="h-11 border-border/50 hover:bg-primary/5 hover:border-primary/50 transition-all rounded-xl gap-3"
             onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
             disabled={isLoading}
           >
-            <Globe className="mr-2 h-4 w-4 text-blue-500" />
-            Google
-          </Button>
-          <Button 
-            variant="outline" 
-            className="h-11 border-border/50 hover:bg-primary/5 hover:border-primary/50 transition-all"
-            disabled={true}
-          >
-            <Globe className="mr-2 h-4 w-4" />
-            Other
+            <Globe className="w-4 h-4 text-primary" />
+            Continue with Google
           </Button>
         </div>
 
@@ -242,7 +233,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
             {mode === 'login' ? "Don't have an account?" : "Already have an account?"}{' '}
             <button 
               onClick={() => router.push(mode === 'login' ? '/register' : '/login')}
-              className="text-primary font-semibold hover:underline"
+              className="text-primary font-bold hover:underline"
             >
               {mode === 'login' ? 'Sign up' : 'Sign in'}
             </button>

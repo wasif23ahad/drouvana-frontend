@@ -1,18 +1,15 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  Rocket, Target, Zap, Shield, Sparkles, 
-  CheckCircle, ArrowRight, Star, HelpCircle,
-  Briefcase, Users, Layout, BrainCircuit
+  Rocket, Target, Zap, Sparkles, 
+  ArrowRight, Star, HelpCircle,
+  Users, BrainCircuit, FileText, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-const STATS = [
-  { label: 'Resumes Tailored', value: '45k+', icon: FileText },
-  { label: 'Job Seekers', value: '12k+', icon: Users },
-  { label: 'Interview Rate', value: '3.5x', icon: Target },
-  { label: 'Avg Match Score', value: '88%', icon: Zap },
-];
+import api from '@/lib/api';
+import { cn } from '@/lib/utils';
 
 const FEATURES = [
   { 
@@ -41,48 +38,39 @@ const FEATURES = [
   },
 ];
 
-const TEMPLATES = [
-  { 
-    name: 'The Executive', 
-    category: 'Corporate', 
-    rating: 4.9, 
-    image: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400',
-    desc: 'Clean, professional, and authoritative. Perfect for senior leadership roles.'
-  },
-  { 
-    name: 'Silicon Valley', 
-    category: 'Tech', 
-    rating: 4.8, 
-    image: 'https://images.unsplash.com/photo-1626197031507-c17099753214?w=400',
-    desc: 'Modern, minimalist, and high-impact. Designed for fast-growing startups.'
-  },
-  { 
-    name: 'Creative Pulse', 
-    category: 'Design', 
-    rating: 4.7, 
-    image: 'https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=400',
-    desc: 'A bold, visually engaging layout for designers and creative thinkers.'
-  },
-  { 
-    name: 'Academic Star', 
-    category: 'Education', 
-    rating: 4.9, 
-    image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400',
-    desc: 'Structured for detail and depth. Ideal for researchers and academics.'
-  },
-];
-
 const FAQS = [
   { q: 'How does the AI tailoring work?', a: 'Our agentic AI analyzes the JD and your master resume, then intelligently rewrites bullet points to match requirements while preserving truthfulness.' },
   { q: 'Is my data safe?', a: 'Absolutely. We use industry-standard encryption and never share your data with third parties.' },
   { q: 'Can I track my applications?', a: 'Yes, Drouvana includes a full-featured CRM to track every application status from "Sent" to "Offer".' },
 ];
 
-import { FileText } from 'lucide-react';
-
 export default function LandingPage() {
+  const [stats, setStats] = useState<any>(null);
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchLandingData = async () => {
+    try {
+      setLoading(true);
+      const [statsRes, templatesRes] = await Promise.all([
+        api.get('/api/admin/stats'), // Reusing admin stats for public landing for now (filtered in real app)
+        api.get('/api/templates', { params: { limit: 4, sort: 'popular' } })
+      ]);
+      setStats(statsRes.data);
+      setTemplates(templatesRes.data.templates);
+    } catch (error) {
+      console.error('Failed to fetch landing data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLandingData();
+  }, []);
+
   return (
-    <div className="flex flex-col gap-32 pb-32">
+    <div className="flex flex-col gap-32 pb-32 animate-in fade-in duration-700">
       {/* 1. Hero Section */}
       <section className="relative min-h-[70vh] flex items-center justify-center pt-20 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-primary/5 -z-10" />
@@ -117,17 +105,26 @@ export default function LandingPage() {
 
       {/* 2. Stats Section */}
       <section className="container mx-auto px-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {STATS.map((s, i) => (
-            <div key={i} className="glass-card p-8 rounded-[32px] text-center space-y-2 border-white/5 bg-white/5">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto text-primary">
-                <s.icon className="w-6 h-6" />
+        {loading ? (
+          <div className="flex justify-center"><Loader2 className="animate-spin text-primary" /></div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { label: 'Resumes Tailored', value: stats?.tokensUsed ? `${(stats.tokensUsed / 1000).toFixed(0)}k+` : '45k+', icon: FileText },
+              { label: 'Active Seekers', value: stats?.totalUsers ? `${stats.totalUsers}+` : '12k+', icon: Users },
+              { label: 'Applications', value: stats?.totalApplications ? `${stats.totalApplications}+` : '3.5x', icon: Target },
+              { label: 'Avg Match Score', value: '88%', icon: Zap },
+            ].map((s, i) => (
+              <div key={i} className="glass-card p-8 rounded-[32px] text-center space-y-2 border-white/5 bg-white/5">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto text-primary">
+                  <s.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-4xl font-black italic">{s.value}</h3>
+                <p className="text-[10px] uppercase tracking-widest font-black text-muted-foreground">{s.label}</p>
               </div>
-              <h3 className="text-4xl font-black italic">{s.value}</h3>
-              <p className="text-[10px] uppercase tracking-widest font-black text-muted-foreground">{s.label}</p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* 3. Features Section */}
@@ -165,25 +162,27 @@ export default function LandingPage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {TEMPLATES.map((t, i) => (
-            <div key={i} className="glass-card rounded-[32px] overflow-hidden group border-white/5 bg-white/5 flex flex-col h-full">
+          {loading ? (
+             Array.from({ length: 4 }).map((_, i) => <div key={i} className="aspect-3/4 bg-white/5 rounded-[32px] animate-pulse" />)
+          ) : templates.map((t, i) => (
+            <Link href={`/templates/${t.id}`} key={i} className="glass-card rounded-[32px] overflow-hidden group border-white/5 bg-white/5 flex flex-col h-full">
               <div className="relative aspect-3/4 overflow-hidden">
-                <img src={t.image} alt={t.name} className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700" />
+                <img src={t.previewImage} alt={t.title} className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700" />
                 <div className="absolute top-4 right-4 px-3 py-1 bg-black/40 backdrop-blur-md rounded-lg flex items-center gap-1 text-white text-[10px] font-black">
-                  <Star className="w-3 h-3 text-amber-400 fill-amber-400" /> {t.rating}
+                  <Star className="w-3 h-3 text-amber-400 fill-amber-400" /> {t.atsScore / 20}
                 </div>
               </div>
               <div className="p-6 space-y-4 flex flex-1 flex-col">
                 <div>
                   <p className="text-[10px] uppercase tracking-widest font-black text-primary mb-1">{t.category}</p>
-                  <h4 className="text-lg font-bold">{t.name}</h4>
+                  <h4 className="text-lg font-bold">{t.title}</h4>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed flex-1">{t.desc}</p>
-                <Button className="w-full rounded-xl bg-white/5 hover:bg-primary hover:text-white border border-white/10 transition-all font-bold text-xs uppercase tracking-widest h-10">
+                <p className="text-xs text-muted-foreground leading-relaxed flex-1 truncate">{t.description}</p>
+                <Button className="w-full rounded-xl bg-white/5 group-hover:bg-primary group-hover:text-white border border-white/10 transition-all font-bold text-xs uppercase tracking-widest h-10">
                   Select Template
                 </Button>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -260,7 +259,7 @@ export default function LandingPage() {
           Ready to Claim Your <br />Next <span className="text-primary">Opportunity</span>?
         </h2>
         <p className="text-xl text-muted-foreground max-w-xl mx-auto relative z-10">
-          Join 12,000+ professionals who are outsmarting the modern hiring machine.
+          Join {stats?.totalUsers ? `${stats.totalUsers}+` : '12,000+'} professionals who are outsmarting the modern hiring machine.
         </p>
         <Link href="/register" className="inline-block relative z-10">
           <Button size="lg" className="h-16 px-12 rounded-2xl bg-primary text-xl font-black italic gap-3 shadow-2xl shadow-primary/30 hover:scale-105 transition-all">
@@ -271,5 +270,3 @@ export default function LandingPage() {
     </div>
   );
 }
-
-import { cn } from '@/lib/utils';

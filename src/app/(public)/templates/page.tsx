@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  Search, Filter, SlidersHorizontal, 
-  LayoutGrid, List, Star, ChevronLeft, ChevronRight 
+  Search, Star, ChevronLeft, ChevronRight 
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,22 +15,18 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
-
-const TEMPLATES = [
-  { id: 'exec', name: 'The Executive', category: 'Corporate', style: 'Modern', rating: 4.9, image: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400' },
-  { id: 'sv', name: 'Silicon Valley', category: 'Tech', style: 'Minimalist', rating: 4.8, image: 'https://images.unsplash.com/photo-1626197031507-c17099753214?w=400' },
-  { id: 'cp', name: 'Creative Pulse', category: 'Design', style: 'Bold', rating: 4.7, image: 'https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=400' },
-  { id: 'as', name: 'Academic Star', category: 'Academic', style: 'Classic', rating: 4.9, image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400' },
-  { id: 'gl', name: 'Global Leader', category: 'Corporate', style: 'Traditional', rating: 4.6, image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400' },
-  { id: 'dm', name: 'Digital Nomad', category: 'Tech', style: 'Minimalist', rating: 4.9, image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=400' },
-];
+import api from '@/lib/api';
+import { cn } from '@/lib/utils';
 
 export default function TemplatesExplorePage() {
   const [loading, setLoading] = useState(true);
+  const [templates, setTemplates] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [category, setCategory] = useState('ALL');
-  const [sortBy, setSortBy] = useState('RATING_DESC');
+  const [sortBy, setSortBy] = useState('newest');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Debounce search (Rule 84)
   useEffect(() => {
@@ -39,16 +34,32 @@ export default function TemplatesExplorePage() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1200);
-    return () => clearTimeout(timer);
-  }, []);
+  // Fetch templates from API
+  const fetchTemplates = async () => {
+    try {
+      setLoading(true);
+      const params: any = {
+        page,
+        limit: 8,
+        sort: sortBy === 'RATING_DESC' ? 'rating' : sortBy === 'POPULAR' ? 'popular' : 'newest',
+      };
+      
+      if (category !== 'ALL') params.category = category;
+      if (debouncedSearch) params.search = debouncedSearch;
 
-  const filtered = TEMPLATES.filter(t => {
-    const matchesSearch = t.name.toLowerCase().includes(debouncedSearch.toLowerCase());
-    const matchesCategory = category === 'ALL' || t.category === category;
-    return matchesSearch && matchesCategory;
-  });
+      const response = await api.get('/api/templates', { params });
+      setTemplates(response.data.templates);
+      setTotalPages(response.data.pagination.pages);
+    } catch (error) {
+      console.error('Failed to fetch templates:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTemplates();
+  }, [debouncedSearch, category, sortBy, page]);
 
   return (
     <div className="max-w-7xl mx-auto py-12 px-4 space-y-12 min-h-screen">
@@ -69,27 +80,27 @@ export default function TemplatesExplorePage() {
 
         {/* Filters & Sorting (Rule 85, 86) */}
         <div className="flex items-center gap-4 w-full md:w-auto">
-          <Select value={category} onValueChange={setCategory}>
+          <Select value={category} onValueChange={(val) => { setCategory(val); setPage(1); }}>
             <SelectTrigger className="w-48 h-12 rounded-xl bg-white/5 border-white/10">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent className="glass">
               <SelectItem value="ALL">All Categories</SelectItem>
-              <SelectItem value="Corporate">Corporate</SelectItem>
-              <SelectItem value="Tech">Tech</SelectItem>
-              <SelectItem value="Design">Design</SelectItem>
-              <SelectItem value="Academic">Academic</SelectItem>
+              <SelectItem value="TECH">Tech</SelectItem>
+              <SelectItem value="CREATIVE">Creative</SelectItem>
+              <SelectItem value="EXECUTIVE">Executive</SelectItem>
+              <SelectItem value="FINANCE">Finance</SelectItem>
             </SelectContent>
           </Select>
 
-          <Select value={sortBy} onValueChange={setSortBy}>
+          <Select value={sortBy} onValueChange={(val) => { setSortBy(val); setPage(1); }}>
             <SelectTrigger className="w-48 h-12 rounded-xl bg-white/5 border-white/10">
               <SelectValue placeholder="Sort By" />
             </SelectTrigger>
             <SelectContent className="glass">
-              <SelectItem value="RATING_DESC">Top Rated</SelectItem>
-              <SelectItem value="NEWEST">Newest First</SelectItem>
+              <SelectItem value="newest">Newest First</SelectItem>
               <SelectItem value="POPULAR">Most Popular</SelectItem>
+              <SelectItem value="RATING_DESC">Top Rated</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -100,33 +111,33 @@ export default function TemplatesExplorePage() {
         {loading ? (
           Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="space-y-4">
-              <Skeleton className="aspect-[3/4] rounded-[32px]" />
+              <Skeleton className="aspect-3/4 rounded-[32px]" />
               <div className="space-y-2">
                 <Skeleton className="h-4 w-1/2" />
                 <Skeleton className="h-3 w-3/4" />
               </div>
             </div>
           ))
-        ) : filtered.length > 0 ? (
-          filtered.map((t) => (
+        ) : templates.length > 0 ? (
+          templates.map((t) => (
             <Link href={`/templates/${t.id}`} key={t.id} className="group flex flex-col h-full">
               <div className="glass-card rounded-[32px] overflow-hidden border-white/5 bg-white/5 flex flex-col h-full hover:border-primary/40 transition-all">
                 <div className="relative aspect-3/4 overflow-hidden">
                   <img 
-                    src={t.image} 
-                    alt={t.name} 
+                    src={t.previewImage} 
+                    alt={t.title} 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                   />
                   <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-md px-3 py-1 rounded-lg flex items-center gap-1 text-white text-[10px] font-black">
-                    <Star className="w-3 h-3 text-amber-400 fill-amber-400" /> {t.rating}
+                    <Star className="w-3 h-3 text-amber-400 fill-amber-400" /> {t.atsScore / 20}
                   </div>
                 </div>
                 <div className="p-6 space-y-3 flex-1 flex flex-col">
                   <div>
                     <p className="text-[10px] uppercase tracking-widest font-black text-primary mb-1">{t.category}</p>
-                    <h4 className="text-lg font-bold group-hover:text-primary transition-colors">{t.name}</h4>
+                    <h4 className="text-lg font-bold group-hover:text-primary transition-colors">{t.title}</h4>
                   </div>
-                  <p className="text-xs text-muted-foreground flex-1 italic">{t.style} • Professional Layout</p>
+                  <p className="text-xs text-muted-foreground flex-1 italic truncate">{t.description}</p>
                   <Button className="w-full rounded-xl bg-white/5 group-hover:bg-primary transition-all font-bold text-xs uppercase tracking-widest h-10 group-hover:text-white">
                     View Details
                   </Button>
@@ -146,19 +157,36 @@ export default function TemplatesExplorePage() {
       </div>
 
       {/* Pagination (Rule 87) */}
-      {!loading && filtered.length > 0 && (
+      {!loading && totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 pt-12">
-          <Button variant="outline" size="icon" className="w-12 h-12 rounded-xl border-white/10 bg-white/5 disabled:opacity-50">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="w-12 h-12 rounded-xl border-white/10 bg-white/5 disabled:opacity-50"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
             <ChevronLeft className="w-5 h-5" />
           </Button>
           <div className="flex gap-2">
-            {[1, 2, 3].map(p => (
-              <Button key={p} variant={p === 1 ? 'default' : 'outline'} className={cn("w-12 h-12 rounded-xl border-white/10 font-bold", p === 1 ? "bg-primary" : "bg-white/5")}>
-                {p}
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <Button 
+                key={i} 
+                variant={page === i + 1 ? 'default' : 'outline'} 
+                className={cn("w-12 h-12 rounded-xl border-white/10 font-bold", page === i + 1 ? "bg-primary" : "bg-white/5")}
+                onClick={() => setPage(i + 1)}
+              >
+                {i + 1}
               </Button>
             ))}
           </div>
-          <Button variant="outline" size="icon" className="w-12 h-12 rounded-xl border-white/10 bg-white/5">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="w-12 h-12 rounded-xl border-white/10 bg-white/5 disabled:opacity-50"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
             <ChevronRight className="w-5 h-5" />
           </Button>
         </div>
@@ -166,5 +194,3 @@ export default function TemplatesExplorePage() {
     </div>
   );
 }
-
-import { cn } from '@/lib/utils';
