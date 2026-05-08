@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Sparkles, Loader2 } from 'lucide-react';
+import { Send, Bot, User, Sparkles, Loader2, Paperclip, Zap, MoreHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import axios from 'axios';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -12,10 +11,10 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  "Which applications need a follow-up?",
-  "How's my resume for a Backend Engineer role?",
-  "Write me a LinkedIn connection request",
-  "How should I prep for my next interview?",
+  { t: "Analyze applications", d: "Review recent rejections", icon: Zap },
+  { t: "Prep for interview", d: "Mock session for Google", icon: Bot },
+  { t: "Tailor my resume", d: "Adjust for Stripe role", icon: Sparkles },
+  { t: "Networking message", d: "Draft LinkedIn outreach", icon: Send },
 ];
 
 export default function ChatInterface() {
@@ -43,7 +42,7 @@ export default function ChatInterface() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // Adjust based on your auth
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({ message: text, history: messages }),
       });
@@ -82,54 +81,57 @@ export default function ChatInterface() {
       }
     } catch (error) {
       console.error('Chat Error:', error);
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Strategic assessment failed. System recalibrating. Please retry.' }]);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-[600px] glass-card rounded-[32px] overflow-hidden">
+    <div className="flex flex-col h-[700px] bg-surface-container-low/50 backdrop-blur-xl rounded-[32px] overflow-hidden border border-white/5 relative">
       {/* Header */}
-      <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/5">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+      <div className="px-8 py-5 border-b border-white/5 flex items-center justify-between bg-surface/50 backdrop-blur-md z-10">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center border border-primary/20">
             <Bot className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h3 className="font-bold">Career Coach AI</h3>
-            <p className="text-[10px] text-success flex items-center gap-1 uppercase tracking-widest font-bold">
+            <h3 className="font-heading font-bold text-on-surface italic">Career Assistant</h3>
+            <p className="font-mono text-[9px] text-success flex items-center gap-1.5 uppercase tracking-[0.2em] font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-              Online & Ready
+              Strategic Mode Active
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-white/40">
-          <Sparkles className="w-3 h-3" />
-          Powered by Llama 3
-        </div>
+        <button className="text-on-surface-variant hover:text-primary transition-colors">
+          <MoreHorizontal className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Messages area */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide"
+        className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide relative"
       >
         {messages.length === 0 && (
-          <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-60">
-            <Bot className="w-16 h-16 text-primary/40" />
-            <div className="space-y-2">
-              <p className="text-xl font-bold">How can I help your career today?</p>
-              <p className="text-sm max-w-xs mx-auto">I have access to your resume and all job applications to provide personalized advice.</p>
+          <div className="h-full flex flex-col items-center justify-center text-center space-y-10 animate-in fade-in duration-1000">
+            <div className="w-20 h-20 bg-gradient-primary rounded-[2rem] flex items-center justify-center shadow-[0_0_30px_rgba(192,193,255,0.2)]">
+              <Bot className="w-10 h-10 text-white" />
             </div>
-            <div className="grid grid-cols-2 gap-3 w-full max-w-md">
+            <div className="space-y-3">
+              <h2 className="text-4xl font-heading font-bold text-on-surface italic tracking-tight">Accelerate your search</h2>
+              <p className="text-on-surface-variant max-w-sm mx-auto font-sans">I am your AI career coach, equipped with your resume context and application data.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl">
               {SUGGESTIONS.map(s => (
                 <button 
-                  key={s}
-                  onClick={() => handleSend(s)}
-                  className="text-[10px] text-left p-3 rounded-xl border border-white/10 hover:border-primary/40 hover:bg-primary/5 transition-all uppercase font-bold tracking-wider leading-relaxed"
+                  key={s.t}
+                  onClick={() => handleSend(s.t)}
+                  className="bg-surface-container p-6 rounded-2xl border border-white/5 hover:border-primary/50 hover:bg-white/5 transition-all text-left group relative overflow-hidden"
                 >
-                  {s}
+                  <s.icon className="w-5 h-5 text-primary mb-3 group-hover:scale-110 transition-transform" />
+                  <h3 className="font-heading font-bold text-on-surface text-sm italic mb-1">{s.t}</h3>
+                  <p className="font-sans text-xs text-on-surface-variant">{s.d}</p>
                 </button>
               ))}
             </div>
@@ -140,63 +142,67 @@ export default function ChatInterface() {
           {messages.map((m, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
               className={cn(
-                "flex items-start gap-3",
+                "flex items-start gap-4",
                 m.role === 'user' ? "flex-row-reverse" : "flex-row"
               )}
             >
               <div className={cn(
-                "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-1",
-                m.role === 'user' ? "bg-white/10" : "bg-primary/20"
+                "w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border",
+                m.role === 'user' ? "bg-surface-container border-white/5" : "bg-primary/20 border-primary/20"
               )}>
-                {m.role === 'user' ? <User className="w-5 h-5 text-white/60" /> : <Bot className="w-5 h-5 text-primary" />}
+                {m.role === 'user' ? <User className="w-5 h-5 text-on-surface-variant" /> : <Bot className="w-5 h-5 text-primary" />}
               </div>
               <div className={cn(
-                "max-w-[80%] p-4 rounded-2xl text-sm leading-relaxed",
+                "max-w-[80%] p-5 rounded-2xl text-sm leading-relaxed",
                 m.role === 'user' 
-                  ? "bg-primary text-white rounded-tr-none" 
-                  : "bg-white/5 text-white/90 border border-white/5 rounded-tl-none"
+                  ? "bg-gradient-primary text-white rounded-tr-none shadow-lg shadow-primary/10 font-medium" 
+                  : "bg-surface-container text-on-surface-variant border border-white/5 rounded-tl-none font-sans"
               )}>
                 {m.content}
+                {i === messages.length - 1 && m.role === 'assistant' && isLoading && (
+                  <span className="inline-block w-1.5 h-4 bg-primary ml-2 animate-pulse align-middle" />
+                )}
               </div>
             </motion.div>
           ))}
         </AnimatePresence>
-        
-        {isLoading && (
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center animate-pulse">
-              <Bot className="w-5 h-5 text-primary" />
-            </div>
-            <div className="bg-white/5 p-4 rounded-2xl rounded-tl-none border border-white/5">
-              <Loader2 className="w-4 h-4 animate-spin text-primary" />
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Input area */}
-      <div className="p-6 bg-white/5 border-t border-white/5">
+      <div className="p-8 bg-background border-t border-white/5 z-10 relative">
+        <div className="absolute inset-x-8 top-8 bottom-8 bg-primary/5 blur-2xl rounded-full -z-10" />
         <form 
           onSubmit={(e) => { e.preventDefault(); handleSend(input); }}
-          className="flex gap-3"
+          className="relative flex items-center bg-surface-container rounded-2xl border border-white/10 focus-within:border-primary focus-within:shadow-[0_0_20px_rgba(192,193,255,0.1)] transition-all overflow-hidden"
         >
+          <button type="button" className="p-4 text-on-surface-variant hover:text-primary transition-colors">
+            <Paperclip className="w-5 h-5" />
+          </button>
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask anything about your job search..."
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-white/20"
+            placeholder="Ask anything or type '/' for commands..."
+            className="flex-1 bg-transparent border-none text-on-surface focus:ring-0 placeholder:text-on-surface-variant/40 py-5 px-2 font-sans text-sm"
           />
-          <button
-            type="submit"
-            disabled={isLoading || !input.trim()}
-            className="w-12 h-12 bg-primary text-white rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale"
-          >
-            <Send className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2 pr-2">
+            <button type="button" className="p-2 text-primary hover:scale-110 transition-transform">
+              <Sparkles className="w-5 h-5" />
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              className="bg-primary text-on-primary w-10 h-10 rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
         </form>
+        <p className="text-center mt-3 font-mono text-[9px] text-on-surface-variant/40 uppercase tracking-[0.3em]">
+          Drouvana AI may provide suboptimal strategies. Verify critical details.
+        </p>
       </div>
     </div>
   );

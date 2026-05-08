@@ -7,59 +7,78 @@ import Step2JDAnalysis from '@/components/dashboard/workspace/Step2JDAnalysis';
 import Step3ResumeGen from '@/components/dashboard/workspace/Step3ResumeGen';
 import Step4HealthScore from '@/components/dashboard/workspace/Step4HealthScore';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, ChevronRight, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 const STEPS = [
-  { id: 1, title: 'Job Details', description: 'Paste the JD' },
-  { id: 2, title: 'AI Analysis', description: 'Extract insights' },
-  { id: 3, title: 'Resume Gen', description: 'Tailor content' },
-  { id: 4, title: 'Match Score', description: 'ATS check' },
+  { id: 1, title: 'Job Target', description: 'JD Acquisition' },
+  { id: 2, title: 'AI Extraction', description: 'Requirement Mapping' },
+  { id: 3, title: 'Optimization', description: 'Strategic Tailoring' },
+  { id: 4, title: 'Verification', description: 'ATS Score Loop' },
 ];
 
 const WorkspacePage = () => {
   const { step } = useWorkspaceStore();
 
   return (
-    <div className="max-w-5xl mx-auto space-y-10 pb-20">
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">AI Intelligence Workspace</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Our advanced AI analyzes your job description and builds a high-performance, ATS-optimized resume in minutes.
-        </p>
-      </div>
-
-      {/* Stepper */}
-      <div className="flex justify-between items-center relative px-4">
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-px bg-border/50 -z-10" />
-        {STEPS.map((s) => (
-          <div key={s.id} className="flex flex-col items-center gap-3 bg-background px-4">
-            <div className={cn(
-              "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 border-2",
-              step > s.id ? "bg-success border-success text-white" :
-              step === s.id ? "bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-110" :
-              "bg-muted border-border text-muted-foreground"
-            )}>
-              {step > s.id ? <Check className="w-6 h-6" /> : <span>{s.id}</span>}
-            </div>
-            <div className="text-center">
-              <p className={cn("text-sm font-bold", step === s.id ? "text-primary" : "text-foreground/70")}>{s.title}</p>
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">{s.description}</p>
-            </div>
+    <div className="max-w-spacing-container-max mx-auto space-y-12 pb-20 animate-in fade-in duration-700">
+      {/* Breadcrumbs & Header */}
+      <div className="space-y-4">
+        <div className="flex items-center text-xs text-on-surface-variant gap-2 font-mono uppercase tracking-widest">
+          <Link href="/dashboard" className="hover:text-primary transition-colors">Workspace</Link>
+          <ChevronRight className="w-3 h-3" />
+          <span className="text-primary font-bold">Optimization Protocol</span>
+        </div>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-4xl font-heading font-bold text-on-surface italic tracking-tight flex items-center gap-4">
+              Intelligence Workspace
+              <span className="bg-primary/10 text-primary text-[9px] uppercase tracking-[0.2em] font-black px-3 py-1 rounded-full border border-primary/20">v4.2 Tactical</span>
+            </h1>
+            <p className="font-sans text-on-surface-variant italic">Augmenting resume architecture through high-fidelity AI alignment.</p>
           </div>
-        ))}
+        </div>
       </div>
 
-      {/* Content Area */}
-      <div className="glass-card rounded-[40px] p-8 md:p-12 min-h-[500px]">
+      {/* Modern Stepper */}
+      <div className="bg-surface-container-low/50 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-3xl pointer-events-none -z-10" />
+        <div className="flex justify-between items-center relative px-4">
+          <div className="absolute left-10 right-10 top-1/2 -translate-y-1/2 h-0.5 bg-white/5 -z-10" />
+          {STEPS.map((s) => (
+            <div key={s.id} className="flex flex-col items-center gap-4 relative">
+              <div className={cn(
+                "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-700 border-2 relative z-10",
+                step > s.id ? "bg-secondary border-secondary text-white shadow-lg shadow-secondary/20" :
+                step === s.id ? "bg-primary border-primary text-white shadow-xl shadow-primary/30 scale-110" :
+                "bg-surface-container border-white/5 text-on-surface-variant/40"
+              )}>
+                {step > s.id ? <Check className="w-6 h-6 stroke-[3]" /> : <span className="font-heading font-bold italic text-lg">{s.id}</span>}
+                {step === s.id && (
+                   <div className="absolute -inset-2 bg-primary/20 rounded-[1.2rem] blur-lg animate-pulse -z-10" />
+                )}
+              </div>
+              <div className="text-center space-y-1">
+                <p className={cn("text-sm font-heading font-bold italic tracking-tight", step === s.id ? "text-on-surface" : "text-on-surface-variant/60")}>{s.title}</p>
+                <p className="font-mono text-[8px] uppercase tracking-[0.2em] text-on-surface-variant/40 font-black">{s.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="bg-surface-container-low/50 backdrop-blur-2xl border border-white/5 rounded-[3rem] p-10 md:p-16 min-h-[600px] shadow-2xl relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4 }}
+            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -30, filter: 'blur(10px)' }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="h-full"
           >
             {step === 1 && <Step1JobDetails />}
             {step === 2 && <Step2JDAnalysis />}

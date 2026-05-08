@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Loader2, AlertCircle, Globe } from 'lucide-react';
+import { Loader2, AlertCircle, Globe, Mail, Lock, Eye, EyeOff, ArrowRight, Zap, User } from 'lucide-react';
 import api from '@/lib/api';
 
 const loginSchema = z.object({
@@ -37,6 +37,7 @@ interface AuthFormProps {
 const AuthForm = ({ mode }: AuthFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   type FormValues = z.infer<typeof registerSchema>;
@@ -56,14 +57,12 @@ const AuthForm = ({ mode }: AuthFormProps) => {
 
     try {
       if (mode === 'register') {
-        // Register logic via dynamic API
         await api.post('/api/auth/register', {
           name: values.name,
           email: values.email,
           password: values.password,
         });
         
-        // Auto sign in after registration
         const result = await signIn('credentials', {
           email: values.email,
           password: values.password,
@@ -76,7 +75,6 @@ const AuthForm = ({ mode }: AuthFormProps) => {
           router.push('/dashboard');
         }
       } else {
-        // Login logic via NextAuth
         const result = await signIn('credentials', {
           email: values.email,
           password: values.password,
@@ -97,64 +95,87 @@ const AuthForm = ({ mode }: AuthFormProps) => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto animate-in fade-in zoom-in duration-500">
-      <div className="glass rounded-3xl p-8 shadow-2xl shadow-primary/5">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">
-            {mode === 'login' ? 'Welcome Back' : 'Create Account'}
+    <div className="relative z-10 w-full max-w-[1000px] min-h-[600px] bg-surface-container/50 backdrop-blur-2xl rounded-[24px] border border-white/5 flex flex-col md:flex-row shadow-[0_0_40px_rgba(0,0,0,0.5)] overflow-hidden animate-in fade-in zoom-in duration-500">
+      
+      {/* Left Side: Branding / Abstract */}
+      <div className="hidden md:flex w-1/2 relative p-12 flex-col justify-between overflow-hidden">
+        <div className="absolute inset-0 z-0 opacity-40 mix-blend-overlay bg-gradient-to-br from-primary/20 via-transparent to-secondary/20" />
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-8">
+            <span className="text-2xl font-heading font-bold text-primary">Drouvana</span>
+          </div>
+          <h1 className="text-4xl font-heading font-bold text-on-surface mt-12 mb-6 italic leading-tight">
+            Accelerate your career trajectory.
           </h1>
-          <p className="text-muted-foreground text-sm">
-            {mode === 'login' 
-              ? 'Enter your credentials to access your workspace' 
-              : 'Join Drouvana and elevate your career search'}
+          <p className="font-sans text-sm text-on-surface-variant max-w-md leading-relaxed">
+            Harness the power of AI to navigate the modern job market, optimize your resume, and land your dream role faster.
+          </p>
+        </div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-surface-container-low/50 backdrop-blur-md border border-white/5 inline-flex">
+            <Zap className="w-4 h-4 text-secondary fill-secondary" />
+            <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Intelligent. Empowering. High-Velocity.</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side: Auth Card */}
+      <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-surface-container border-l border-white/5 relative z-10">
+        {/* Mobile Logo */}
+        <div className="flex md:hidden items-center justify-center gap-2 mb-8">
+          <span className="text-2xl font-heading font-bold text-primary">Drouvana</span>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex space-x-1 p-1 bg-surface-container-highest rounded-lg mb-8">
+          <button 
+            onClick={() => router.push('/login')}
+            className={`w-1/2 py-2.5 rounded-md font-mono text-[10px] uppercase tracking-widest transition-all ${
+              mode === 'login' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            Login
+          </button>
+          <button 
+            onClick={() => router.push('/register')}
+            className={`w-1/2 py-2.5 rounded-md font-mono text-[10px] uppercase tracking-widest transition-all ${
+              mode === 'register' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            Sign Up
+          </button>
+        </div>
+
+        <div className="mb-8">
+          <h2 className="text-xl font-heading font-bold text-on-surface mb-2 italic">
+            {mode === 'login' ? 'Welcome back' : 'Create Account'}
+          </h2>
+          <p className="font-sans text-sm text-on-surface-variant">
+            {mode === 'login' ? 'Enter your details to access your dashboard.' : 'Start your journey towards a smarter career search.'}
           </p>
         </div>
 
-        {mode === 'login' && (
-          <div className="flex gap-2 mb-8">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex-1 rounded-xl text-[10px] uppercase tracking-widest font-black text-primary border-primary/20 bg-primary/5 hover:bg-primary/10"
-              onClick={() => {
-                form.setValue('email', 'demo@drouvana.com');
-                form.setValue('password', 'Demo@1234');
-              }}
-            >
-              Demo User
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex-1 rounded-xl text-[10px] uppercase tracking-widest font-black text-emerald-500 border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10"
-              onClick={() => {
-                form.setValue('email', 'admin@drouvana.com');
-                form.setValue('password', 'Admin@1234');
-              }}
-            >
-              Demo Admin
-            </Button>
-          </div>
-        )}
-
         {error && (
-          <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-xl flex items-center gap-3 text-destructive text-sm animate-in fade-in slide-in-from-top-1">
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+          <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl flex items-center gap-3 text-error text-xs animate-in fade-in slide-in-from-top-1">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <p>{error}</p>
           </div>
         )}
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             {mode === 'register' && (
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant ml-1">Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="John Doe" className="bg-background/50 h-11 rounded-xl" {...field} />
+                      <div className="relative">
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
+                        <Input placeholder="John Doe" className="bg-surface-container-lowest border-outline-variant rounded-xl h-12 pl-12 pr-4 font-sans focus:border-primary transition-all" {...field} />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -167,9 +188,12 @@ const AuthForm = ({ mode }: AuthFormProps) => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email Address</FormLabel>
+                  <FormLabel className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant ml-1">Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="name@example.com" className="bg-background/50 h-11 rounded-xl" {...field} />
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
+                      <Input placeholder="name@company.com" className="bg-surface-container-lowest border-outline-variant rounded-xl h-12 pl-12 pr-4 font-sans focus:border-primary transition-all" {...field} />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -181,9 +205,24 @@ const AuthForm = ({ mode }: AuthFormProps) => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant ml-1">Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" className="bg-background/50 h-11 rounded-xl" {...field} />
+                    <div className="relative">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
+                      <Input 
+                        type={showPassword ? "text" : "password"} 
+                        placeholder="••••••••" 
+                        className="bg-surface-container-lowest border-outline-variant rounded-xl h-12 pl-12 pr-12 font-sans focus:border-primary transition-all" 
+                        {...field} 
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -192,52 +231,64 @@ const AuthForm = ({ mode }: AuthFormProps) => {
 
             <Button 
               type="submit" 
-              className="w-full bg-primary hover:bg-primary/90 h-11 text-lg font-black italic rounded-xl mt-6"
+              className="w-full bg-gradient-primary hover:opacity-90 h-12 text-white rounded-xl font-heading font-bold italic tracking-wide shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 border-none mt-6"
               disabled={isLoading}
             >
               {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
+                <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
-                mode === 'login' ? 'Sign In' : 'Create Account'
+                <>
+                  {mode === 'login' ? 'Sign In' : 'Create Account'}
+                  <ArrowRight className="w-5 h-5" />
+                </>
               )}
             </Button>
           </form>
         </Form>
 
-        <div className="relative my-8">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border/50" />
-          </div>
-          <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest">
-            <span className="bg-background px-2 text-muted-foreground">Secure Authentication</span>
-          </div>
+        <div className="mt-6 flex items-center justify-center gap-4">
+          <div className="h-px bg-white/5 flex-1" />
+          <span className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant">OR</span>
+          <div className="h-px bg-white/5 flex-1" />
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="mt-6 flex flex-col gap-3">
           <Button 
             variant="outline" 
-            className="h-11 border-border/50 hover:bg-primary/5 hover:border-primary/50 transition-all rounded-xl gap-3"
+            className="h-12 border-outline-variant hover:border-secondary hover:bg-secondary/5 rounded-xl font-sans text-sm transition-all gap-3"
             onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
             disabled={isLoading}
           >
             <Globe className="w-4 h-4 text-primary" />
             Continue with Google
           </Button>
-        </div>
-
-        <div className="mt-8 text-center text-sm">
-          <p className="text-muted-foreground">
-            {mode === 'login' ? "Don't have an account?" : "Already have an account?"}{' '}
-            <button 
-              onClick={() => router.push(mode === 'login' ? '/register' : '/login')}
-              className="text-primary font-bold hover:underline"
-            >
-              {mode === 'login' ? 'Sign up' : 'Sign in'}
-            </button>
-          </p>
+          
+          {mode === 'login' && (
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1 h-10 border-outline-variant rounded-xl font-mono text-[10px] uppercase tracking-widest"
+                onClick={() => {
+                  form.setValue('email', 'demo@drouvana.com');
+                  form.setValue('password', 'Demo@1234');
+                }}
+              >
+                Demo User
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1 h-10 border-outline-variant rounded-xl font-mono text-[10px] uppercase tracking-widest"
+                onClick={() => {
+                  form.setValue('email', 'admin@drouvana.com');
+                  form.setValue('password', 'Admin@1234');
+                }}
+              >
+                Demo Admin
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

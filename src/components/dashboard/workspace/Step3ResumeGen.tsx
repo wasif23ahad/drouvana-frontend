@@ -3,14 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { Button } from '@/components/ui/button';
-import { Rocket, Loader2, CheckCircle2, Layout } from 'lucide-react';
+import { Rocket, Loader2, CheckCircle2, Layout, Sparkles } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 const TEMPLATES = [
-  { id: 'classic', name: 'The Executive', image: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400' },
-  { id: 'modern', name: 'Silicon Valley', image: 'https://images.unsplash.com/photo-1626197031507-c17099753214?w=400' },
+  { id: 'classic', name: 'The Executive', image: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&q=80', desc: 'Minimalist high-density architecture.' },
+  { id: 'modern', name: 'Silicon Valley', image: 'https://images.unsplash.com/photo-1626197031507-c17099753214?auto=format&fit=crop&q=80', desc: 'Bold visual hierarchy for tech roles.' },
 ];
 
 const Step3ResumeGen = () => {
@@ -20,7 +21,7 @@ const Step3ResumeGen = () => {
 
   const startGeneration = async () => {
     if (!templateId) {
-      toast.error('Please select a template');
+      toast.error('Selection required: Please choose a design blueprint.');
       return;
     }
 
@@ -33,12 +34,11 @@ const Step3ResumeGen = () => {
       setJobId(res.data.data.jobId);
     } catch (error) {
       console.error(error);
-      toast.error('Failed to start generation');
+      toast.error('Generation sequence failed. System recalibrating.');
       setLoading(false);
     }
   };
 
-  // Polling for job status
   useEffect(() => {
     if (!jobId) return;
 
@@ -51,12 +51,12 @@ const Step3ResumeGen = () => {
           clearInterval(interval);
           setResumeData(result);
           setLoading(false);
-          toast.success('Resume Generated Successfully!');
+          toast.success('Resume Architecture Optimized');
           setStep(4);
         } else if (status === 'failed') {
           clearInterval(interval);
           setLoading(false);
-          toast.error('Generation failed. Please try again.');
+          toast.error('Optimization failed. Please retry protocol.');
         }
       } catch (error) {
         console.error('Polling error:', error);
@@ -67,65 +67,66 @@ const Step3ResumeGen = () => {
   }, [jobId]);
 
   return (
-    <div className="space-y-10">
-      <div className="text-center space-y-2">
-        <h3 className="text-2xl font-bold">Select Your Template</h3>
-        <p className="text-muted-foreground text-sm">Choose the style that best fits your professional brand.</p>
+    <div className="space-y-16 max-w-5xl mx-auto">
+      <div className="text-center space-y-4">
+        <h3 className="text-4xl font-heading font-bold text-on-surface italic tracking-tight">Design Architecture</h3>
+        <p className="font-sans text-on-surface-variant italic text-lg max-w-xl mx-auto">Choose the structural blueprint for your tailored strategic profile.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {TEMPLATES.map((tpl) => (
           <div 
             key={tpl.id}
             onClick={() => setTemplateId(tpl.id)}
-            className={`group cursor-pointer relative rounded-[32px] overflow-hidden border-4 transition-all duration-300 ${
-              templateId === tpl.id ? 'border-primary shadow-2xl scale-105' : 'border-transparent hover:border-primary/20'
-            }`}
+            className={cn(
+              "group cursor-pointer relative rounded-[3rem] overflow-hidden border-4 transition-all duration-700 bg-surface-container-low shadow-2xl",
+              templateId === tpl.id ? "border-primary scale-[1.02] shadow-primary/20" : "border-white/5 hover:border-primary/30"
+            )}
           >
-            <div className="aspect-3/4 relative">
-              <Image 
+            <div className="aspect-[3/4] relative">
+              <img 
                 src={tpl.image} 
                 alt={tpl.name} 
-                fill 
-                className="object-cover group-hover:scale-110 transition-transform duration-700"
+                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-1000 opacity-60 group-hover:opacity-100"
               />
-              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 text-white">
-                <h4 className="font-bold text-lg">{tpl.name}</h4>
-                <p className="text-xs text-white/70">ATS-Optimized Standard</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+              <div className="absolute bottom-8 left-8 right-8 space-y-2">
+                <h4 className="font-heading font-bold text-2xl text-on-surface italic tracking-tight">{tpl.name}</h4>
+                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-primary font-black">{tpl.desc}</p>
               </div>
             </div>
             {templateId === tpl.id && (
-              <div className="absolute top-4 right-4 bg-primary text-white p-2 rounded-full shadow-lg">
-                <CheckCircle2 className="w-5 h-5" />
+              <div className="absolute top-6 right-6 bg-primary text-on-primary w-12 h-12 rounded-2xl flex items-center justify-center shadow-2xl animate-in zoom-in duration-300">
+                <CheckCircle2 className="w-6 h-6 stroke-[3]" />
               </div>
             )}
           </div>
         ))}
       </div>
 
-      <div className="flex flex-col items-center gap-6">
+      <div className="flex flex-col items-center gap-8 pt-8">
         <Button 
           onClick={startGeneration}
           disabled={loading || !templateId}
-          className="w-full max-w-md h-14 rounded-2xl bg-primary text-lg font-bold gap-3 shadow-xl shadow-primary/20"
+          className="w-full max-w-lg h-16 rounded-[2rem] bg-gradient-primary text-white text-lg font-heading font-bold italic gap-4 shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group"
         >
           {loading ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              AI is writing your resume...
-            </>
+            <div className="flex items-center gap-3">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span className="animate-pulse">AI Optimization Protocol Active...</span>
+            </div>
           ) : (
             <>
-              <Rocket className="w-5 h-5" />
-              Generate Tailored Resume
+              <Rocket className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+              Initialize High-Impact Generation
             </>
           )}
         </Button>
+        
         {loading && (
-          <div className="flex items-center gap-2 text-primary animate-pulse">
-            <Layout className="w-4 h-4" />
-            <span className="text-sm font-medium tracking-wide">Magic is happening in the background</span>
+          <div className="flex items-center gap-3 text-secondary animate-pulse font-mono text-[10px] uppercase tracking-[0.3em] font-black">
+            <Sparkles className="w-4 h-4" />
+            Injecting semantic alignment layers
           </div>
         )}
       </div>

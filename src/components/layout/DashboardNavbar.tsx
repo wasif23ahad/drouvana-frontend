@@ -1,99 +1,60 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { Bell, Search, Menu } from 'lucide-react';
+import React from 'react';
+import { usePathname } from 'next/navigation';
+import { 
+  Bell, 
+  Search, 
+  ChevronRight,
+  Menu
+} from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import NotificationDrawer from '../dashboard/NotificationDrawer';
-import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 const DashboardNavbar = () => {
+  const pathname = usePathname();
   const { data: session } = useSession();
-  const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [hasUnread, setHasUnread] = useState(true);
 
-  useEffect(() => {
-    if (!session) return;
-
-    const eventSource = new EventSource('/api/notifications/stream');
-
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'connected') return;
-
-      toast.success(data.title, {
-        description: data.message,
-      });
-      setHasUnread(true);
-    };
-
-    return () => eventSource.close();
-  }, [session]);
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+  const getPageTitle = () => {
+    const parts = pathname.split('/').filter(Boolean);
+    if (parts.length <= 1) return 'Dashboard';
+    const lastPart = parts[parts.length - 1];
+    return lastPart.charAt(0).toUpperCase() + lastPart.slice(1);
   };
 
   return (
-    <header className="h-20 border-b border-border/50 bg-background/30 backdrop-blur-md sticky top-0 z-30 px-8 flex items-center justify-between">
+    <header className="h-16 flex items-center justify-between px-8 border-b border-white/5 shrink-0 bg-surface/50 backdrop-blur-md sticky top-0 z-40 w-full">
       <div className="flex items-center gap-4">
-        <button className="lg:hidden p-2 hover:bg-muted rounded-lg">
-          <Menu className="w-6 h-6" />
+        {/* Mobile menu toggle (visible only on mobile) */}
+        <button className="lg:hidden text-on-surface-variant hover:text-primary">
+          <Menu className="w-5 h-5" />
         </button>
-        <div>
-          <h2 className="text-xl font-bold tracking-tight">
-            {getGreeting()}, {session?.user?.name?.split(' ')[0] || 'User'} 👋
-          </h2>
-          <p className="text-sm text-muted-foreground hidden sm:block">
-            Here's what's happening with your job search today.
-          </p>
+        <div className="flex items-center text-xs text-on-surface-variant gap-2 font-mono uppercase tracking-widest">
+          <span className="hover:text-primary transition-colors cursor-pointer">Workspace</span>
+          <ChevronRight className="w-3 h-3" />
+          <span className="text-primary font-bold">{getPageTitle()}</span>
         </div>
       </div>
 
       <div className="flex items-center gap-6">
-        <div className="relative hidden md:block w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input 
+        <div className="relative hidden sm:block w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant w-4 h-4" />
+          <input 
+            className="w-full bg-surface-container-high border border-outline-variant/50 text-on-surface text-xs rounded-lg pl-10 pr-4 py-2 focus:border-primary focus:outline-none transition-all placeholder:text-on-surface-variant/50" 
             placeholder="Search applications..." 
-            className="pl-10 bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary/50"
+            type="text"
           />
         </div>
-
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => {
-              setIsNotifOpen(true);
-              setHasUnread(false);
-            }}
-            className="relative hover:bg-primary/10 hover:text-primary rounded-xl transition-all"
-          >
-            <Bell className="w-5 h-5" />
-            {hasUnread && (
-              <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background animate-pulse" />
-            )}
-          </Button>
-
-          <NotificationDrawer 
-            isOpen={isNotifOpen} 
-            onClose={() => setIsNotifOpen(false)} 
-          />
-
-          <div className="h-8 w-px bg-border/50 mx-2" />
-
-          <Avatar className="h-10 w-10 border border-primary/20 shadow-lg shadow-primary/5 cursor-pointer hover:scale-105 transition-transform">
-            <AvatarImage src={session?.user?.image || ''} alt={session?.user?.name || ''} />
-            <AvatarFallback className="bg-primary/10 text-primary">
-              {session?.user?.name?.charAt(0) || 'U'}
-            </AvatarFallback>
-          </Avatar>
-        </div>
+        <button className="text-on-surface-variant hover:text-primary transition-colors relative">
+          <Bell className="w-5 h-5" />
+          <span className="absolute top-0 right-0 w-2 h-2 bg-error rounded-full border border-background"></span>
+        </button>
+        <Avatar className="w-8 h-8 border border-white/10 ring-2 ring-primary/10">
+          <AvatarImage src={session?.user?.image || ''} />
+          <AvatarFallback className="bg-primary/20 text-primary text-[10px] font-bold">
+            {session?.user?.name?.charAt(0) || 'U'}
+          </AvatarFallback>
+        </Avatar>
       </div>
     </header>
   );

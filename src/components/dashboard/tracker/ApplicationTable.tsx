@@ -10,39 +10,50 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Search, Filter, Loader2 } from 'lucide-react';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Search, 
+  Filter, 
+  Loader2, 
+  LayoutGrid, 
+  List,
+  MoreHorizontal,
+  Calendar,
+  ExternalLink,
+  Target
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import api from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 const STATUS_COLORS: Record<string, string> = {
   SAVED: 'bg-slate-500/10 text-slate-500',
-  APPLIED: 'bg-blue-500/10 text-blue-500',
-  SCREENING: 'bg-yellow-500/10 text-yellow-500',
-  INTERVIEW: 'bg-purple-500/10 text-purple-500',
-  OFFER: 'bg-emerald-500/10 text-emerald-500',
-  REJECTED: 'bg-destructive/10 text-destructive',
+  APPLIED: 'bg-secondary/10 text-secondary',
+  SCREENING: 'bg-primary/10 text-primary',
+  INTERVIEW: 'bg-tertiary/10 text-tertiary',
+  OFFER: 'bg-success/10 text-success',
+  REJECTED: 'bg-error/10 text-error',
 };
 
-export default function ApplicationTable() {
+const KANBAN_COLUMNS = [
+  { id: 'SAVED', title: 'Saved', color: 'bg-slate-500' },
+  { id: 'APPLIED', title: 'Applied', color: 'bg-secondary' },
+  { id: 'INTERVIEW', title: 'Interviewing', color: 'bg-primary' },
+  { id: 'OFFER', title: 'Offer', color: 'bg-success' },
+];
+
+export default function ApplicationTracker() {
+  const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
   const [page, setPage] = useState(1);
   const [applications, setApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 500);
     return () => clearTimeout(timer);
@@ -53,10 +64,9 @@ export default function ApplicationTable() {
       setLoading(true);
       const params: any = {
         page,
-        limit: 10,
+        limit: viewMode === 'list' ? 10 : 50, // More for board view
       };
       
-      if (statusFilter !== 'ALL') params.status = statusFilter;
       if (debouncedSearch) params.search = debouncedSearch;
 
       const response = await api.get('/api/applications', { params });
@@ -72,129 +82,204 @@ export default function ApplicationTable() {
 
   useEffect(() => {
     fetchApplications();
-  }, [debouncedSearch, statusFilter, page]);
+  }, [debouncedSearch, page, viewMode]);
+
+  const renderKanban = () => {
+    return (
+      <div className="flex-1 overflow-x-auto pb-6 flex gap-6 min-h-[600px]">
+        {KANBAN_COLUMNS.map((col) => {
+          const colApps = applications.filter(app => {
+             if (col.id === 'APPLIED') return app.status === 'APPLIED' || app.status === 'SCREENING';
+             return app.status === col.id;
+          });
+
+          return (
+            <div key={col.id} className="w-80 shrink-0 flex flex-col h-full bg-surface-container-low/30 rounded-xl border border-white/5">
+              <div className="p-4 flex items-center justify-between border-b border-white/5 shrink-0">
+                <div className="flex items-center gap-2">
+                  <div className={cn("w-2 h-2 rounded-full", col.color)} />
+                  <h3 className="font-heading font-bold text-sm text-on-surface italic">{col.title}</h3>
+                  <span className="bg-surface-container text-on-surface-variant text-[10px] font-mono px-2 py-0.5 rounded-full">{colApps.length}</span>
+                </div>
+                <button className="text-on-surface-variant hover:text-on-surface"><MoreHorizontal className="w-4 h-4" /></button>
+              </div>
+              
+              <div className="p-3 flex-1 overflow-y-auto space-y-3 custom-scrollbar">
+                {colApps.map((app) => (
+                  <div key={app.id} className="bg-surface-container/80 backdrop-blur-lg p-4 rounded-xl border border-white/10 hover:border-primary/50 transition-all group relative cursor-pointer shadow-sm hover:shadow-primary/5">
+                    <div className="absolute top-3 right-3 bg-secondary/10 text-secondary border border-secondary/20 px-2 py-0.5 rounded font-mono text-[9px] uppercase font-bold tracking-tighter">
+                      92% MATCH
+                    </div>
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0 border border-white/5">
+                        <span className="text-primary font-bold text-lg">{app.company.charAt(0)}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-heading font-bold text-sm text-on-surface group-hover:text-primary transition-colors truncate italic pr-12">{app.jobTitle}</h4>
+                        <p className="text-xs text-on-surface-variant mt-0.5 font-sans">{app.company} • {app.location || 'Remote'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between mt-4 text-[10px] font-mono text-on-surface-variant uppercase tracking-widest border-t border-white/5 pt-3">
+                      <div className="flex items-center gap-1.5 opacity-70">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(app.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      </div>
+                      <div className="flex items-center gap-1 bg-surface-variant/50 px-2 py-0.5 rounded text-[9px]">
+                        {app.platform || 'Direct'}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {colApps.length === 0 && (
+                  <div className="py-12 flex flex-col items-center justify-center text-center opacity-30 border border-dashed border-white/10 rounded-xl">
+                    <Target className="w-8 h-8 mb-2" />
+                    <p className="text-[10px] uppercase font-mono tracking-widest">No Applications</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderList = () => {
+    return (
+      <div className="bg-surface-container-low border border-white/10 rounded-xl overflow-hidden min-h-[400px] flex flex-col">
+        <Table>
+          <TableHeader className="bg-surface/50">
+            <TableRow className="border-white/5 hover:bg-transparent">
+              <TableHead className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant p-6">Company</TableHead>
+              <TableHead className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant">Role</TableHead>
+              <TableHead className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant">Status</TableHead>
+              <TableHead className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant">Applied</TableHead>
+              <TableHead className="text-right p-6 font-mono text-[10px] uppercase tracking-widest text-on-surface-variant">Match</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {applications.map((app) => (
+              <TableRow key={app.id} className="border-white/5 hover:bg-white/5 transition-colors group">
+                <TableCell className="p-6">
+                  <div className="font-heading font-bold text-on-surface italic">{app.company}</div>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm font-medium text-on-surface-variant">{app.jobTitle}</div>
+                </TableCell>
+                <TableCell>
+                  <Badge className={cn("rounded-lg border-none font-mono text-[10px] uppercase tracking-widest px-2 py-0.5", STATUS_COLORS[app.status])}>
+                    {app.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="text-xs font-mono text-on-surface-variant uppercase">
+                    {new Date(app.createdAt).toLocaleDateString()}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right p-6">
+                   <div className="flex items-center justify-end gap-2">
+                      <span className="text-secondary font-mono text-[10px] font-bold">92%</span>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-on-surface-variant hover:text-primary">
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                   </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        {/* Pagination only for list view */}
+        <div className="p-6 border-t border-white/5 flex items-center justify-between mt-auto">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant">
+            Showing {applications.length} of {totalCount} records
+          </p>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="w-8 h-8 rounded-lg border-white/10 bg-surface disabled:opacity-50" 
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <span className="font-mono text-xs w-8 text-center">{page}</span>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="w-8 h-8 rounded-lg border-white/10 bg-surface disabled:opacity-50"
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Filters Bar */}
+    <div className="space-y-6 flex flex-col h-full animate-in fade-in duration-500">
+      {/* Toolbar */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant" />
           <Input 
-            placeholder="Search company or role..." 
-            className="pl-10 rounded-xl bg-white/5 border-white/10 h-11"
+            placeholder="Filter by company or role..." 
+            className="pl-10 rounded-xl bg-surface-container border-white/10 h-11 font-sans text-sm focus:border-primary transition-all"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+        
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <div className="flex-1 md:w-48">
-            <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val); setPage(1); }}>
-              <SelectTrigger className="rounded-xl h-11 bg-white/5 border-white/10">
-                <SelectValue placeholder="All Statuses" />
-              </SelectTrigger>
-              <SelectContent className="glass">
-                <SelectItem value="ALL">All Statuses</SelectItem>
-                <SelectItem value="SAVED">Saved</SelectItem>
-                <SelectItem value="APPLIED">Applied</SelectItem>
-                <SelectItem value="SCREENING">Screening</SelectItem>
-                <SelectItem value="INTERVIEW">Interview</SelectItem>
-                <SelectItem value="OFFER">Offer</SelectItem>
-                <SelectItem value="REJECTED">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="bg-surface-container rounded-lg p-1 flex items-center border border-white/5 h-11">
+            <button 
+              onClick={() => setViewMode('board')}
+              className={cn(
+                "px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all h-full",
+                viewMode === 'board' ? "bg-surface-bright text-primary shadow-sm" : "text-on-surface-variant hover:text-on-surface"
+              )}
+            >
+              <LayoutGrid className="w-4 h-4" />
+              Board
+            </button>
+            <button 
+              onClick={() => setViewMode('list')}
+              className={cn(
+                "px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all h-full",
+                viewMode === 'list' ? "bg-surface-bright text-primary shadow-sm" : "text-on-surface-variant hover:text-on-surface"
+              )}
+            >
+              <List className="w-4 h-4" />
+              List
+            </button>
           </div>
-          <Button variant="outline" size="icon" className="h-11 w-11 rounded-xl border-white/10 bg-white/5">
+          <Button variant="outline" className="h-11 border-white/10 bg-surface-container text-on-surface-variant gap-2 rounded-xl font-mono text-[10px] uppercase tracking-widest">
             <Filter className="w-4 h-4" />
+            Filters
           </Button>
         </div>
       </div>
 
-      {/* Table Area */}
-      <div className="glass-card rounded-[32px] overflow-hidden border-white/5 bg-white/5 min-h-[400px] flex flex-col">
-        {loading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          </div>
-        ) : applications.length > 0 ? (
-          <>
-            <Table>
-              <TableHeader className="bg-white/5">
-                <TableRow className="border-white/5 hover:bg-transparent">
-                  <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground p-6">Company</TableHead>
-                  <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Role</TableHead>
-                  <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Status</TableHead>
-                  <TableHead className="font-bold text-xs uppercase tracking-widest text-muted-foreground">Date Created</TableHead>
-                  <TableHead className="text-right p-6 font-bold text-xs uppercase tracking-widest text-muted-foreground">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {applications.map((item) => (
-                  <TableRow key={item.id} className="border-white/5 hover:bg-white/5 transition-colors">
-                    <TableCell className="p-6">
-                      <div className="font-bold text-lg">{item.company}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm font-medium text-white/70">{item.jobTitle}</div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={cn("rounded-lg border-none", STATUS_COLORS[item.status])}>
-                        {item.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm text-muted-foreground">
-                        {new Date(item.createdAt).toLocaleDateString()}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right p-6">
-                      <Button variant="ghost" size="sm" className="rounded-lg text-primary hover:text-primary hover:bg-primary/10 font-bold uppercase tracking-widest text-[10px]">
-                        View Details
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-
-            {/* Pagination */}
-            <div className="p-6 border-t border-white/5 flex items-center justify-between mt-auto">
-              <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">
-                Showing {applications.length} of {totalCount} applications
-              </p>
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="w-8 h-8 rounded-lg border-white/10 bg-white/5 disabled:opacity-50" 
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <span className="text-xs font-bold w-8 text-center">{page}</span>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="w-8 h-8 rounded-lg border-white/10 bg-white/5 disabled:opacity-50"
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center py-20 text-center space-y-4">
-             <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center">
-               <Search className="w-6 h-6 text-muted-foreground" />
-             </div>
-             <h3 className="text-xl font-bold">No applications found</h3>
-             <p className="text-muted-foreground text-sm">Start by adding your first job application.</p>
-          </div>
-        )}
-      </div>
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-10 h-10 text-primary animate-spin" />
+        </div>
+      ) : applications.length > 0 ? (
+        viewMode === 'board' ? renderKanban() : renderList()
+      ) : (
+        <div className="flex-1 flex flex-col items-center justify-center py-20 text-center space-y-4 bg-surface-container-low rounded-3xl border border-white/10">
+           <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center border border-white/5">
+             <Target className="w-8 h-8 text-on-surface-variant" />
+           </div>
+           <div className="space-y-1">
+             <h3 className="text-xl font-heading font-bold text-on-surface italic">No results found</h3>
+             <p className="text-on-surface-variant text-sm font-sans">Try adjusting your search or filters.</p>
+           </div>
+        </div>
+      )}
     </div>
   );
 }

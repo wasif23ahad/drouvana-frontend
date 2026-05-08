@@ -1,64 +1,98 @@
-import React from 'react';
-import { Target, Users, Zap, Shield } from 'lucide-react';
+"use client";
 
-const FEATURES = [
-  { icon: Zap, title: 'Efficiency', desc: 'Reduce your application time by 80% with automated tailoring.' },
-  { icon: Target, title: 'Precision', desc: 'AI-driven ATS optimization ensures your resume lands on the right desks.' },
-  { icon: Users, title: 'Growth', desc: 'Dedicated career coaching to help you navigate interviews and negotiations.' },
-  { icon: Shield, title: 'Reliability', desc: 'Your data is encrypted and protected with industry-standard security.' },
+import React from 'react';
+import { Target, Users, Zap, Shield, Brain, Rocket, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+
+const PRINCIPLES = [
+  { icon: Brain, title: 'Intelligence', desc: 'We build systems that understand context, nuance, and potential—moving beyond keyword matching to true semantic comprehension.', color: 'primary' },
+  { icon: Rocket, title: 'Velocity', desc: 'Time is the ultimate currency. We ruthlessly automate the administrative burden so you can focus on the interview.', color: 'secondary' },
+  { icon: Shield, title: 'Empowerment', desc: 'Data should work for the candidate. We prioritize transparency and user control, ensuring you own your professional narrative.', color: 'tertiary' },
 ];
 
 export default function AboutPage() {
   return (
-    <div className="max-w-6xl mx-auto space-y-20 py-20 px-4">
-      {/* Hero Section */}
-      <div className="text-center space-y-6 max-w-3xl mx-auto">
-        <h1 className="text-5xl md:text-6xl font-black tracking-tight italic">
-          Elevating the <span className="text-primary">Human</span> in Job Search
-        </h1>
-        <p className="text-xl text-muted-foreground leading-relaxed">
-          Drouvana was built with a single mission: to eliminate the frustration of the modern job search through intelligent, agentic AI that works for you, not against you.
-        </p>
-      </div>
+    <div className="max-w-spacing-container-max mx-auto py-12 px-spacing-margin-desktop space-y-24 animate-in fade-in duration-700">
+      {/* Background Decor */}
+      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[120px] pointer-events-none -z-10"></div>
+      <div className="fixed bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-secondary/5 blur-[150px] pointer-events-none -z-10"></div>
 
-      {/* Grid Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {FEATURES.map((f, i) => (
-          <div key={i} className="glass-card p-8 rounded-[32px] space-y-4 hover:border-primary/40 transition-all group">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <f.icon className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="text-xl font-bold">{f.title}</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-          </div>
-        ))}
-      </div>
+      {/* Hero Section */}
+      <section className="text-center space-y-8 max-w-4xl mx-auto py-12">
+        <div className="flex justify-center items-center text-xs text-on-surface-variant gap-2 font-mono uppercase tracking-widest mb-4">
+          <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+          <ChevronRight className="w-3 h-3" />
+          <span className="text-primary font-bold">About</span>
+        </div>
+        <h1 className="text-5xl md:text-7xl font-heading font-bold text-on-surface italic leading-tight tracking-tight">
+          Our Mission to <span className="bg-gradient-primary bg-clip-text text-transparent">Humanize</span> Job Hunting
+        </h1>
+        <p className="text-xl text-on-surface-variant leading-relaxed font-sans italic max-w-3xl mx-auto">
+          We believe finding your next career move shouldn't feel like speaking to a void. Drouvana leverages advanced AI to understand your unique value, connecting you with opportunities where you'll thrive.
+        </p>
+      </section>
 
       {/* Narrative Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-        <div className="space-y-6">
-          <h2 className="text-4xl font-bold tracking-tight">The Drouvana Philosophy</h2>
-          <p className="text-muted-foreground leading-relaxed">
-            In an era where companies use AI to filter candidates out, we believe candidates should have their own AI to get filtered in. Drouvana is your personal agent in the competitive world of high-tech hiring.
-          </p>
-          <div className="space-y-4">
-            {[
-              "100% Free Tier AI Access",
-              "Agentic Architecture for Multi-Tasking",
-              "Data-Driven Career Insights",
-              "Real-Time Response Generation"
-            ].map(item => (
-              <div key={item} className="flex items-center gap-3 font-bold text-sm">
-                <div className="w-2 h-2 rounded-full bg-primary" />
-                {item}
-              </div>
-            ))}
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="bg-surface-container-low/50 backdrop-blur-xl rounded-[2.5rem] p-10 md:p-14 border border-white/10 relative overflow-hidden shadow-2xl">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[50px] rounded-full"></div>
+          <h2 className="text-4xl font-heading font-bold text-on-surface italic mb-8 relative z-10 tracking-tight">The Drouvana Story</h2>
+          <div className="space-y-6 font-sans text-on-surface-variant leading-relaxed italic relative z-10 text-lg">
+            <p>
+              Founded in 2023 by a team of frustrated tech professionals and AI researchers, Drouvana was born from a simple realization: the modern job search is fundamentally broken. It's a high-friction, low-transparency process that treats human potential as mere data points.
+            </p>
+            <p>
+              We set out to build an intelligent engine that acts as a tireless advocate. By combining generative AI with deep market analytics, we created a platform that not only matches skills to requirements but aligns ambitions with culture.
+            </p>
           </div>
         </div>
-        <div className="glass-card aspect-square rounded-[40px] bg-primary/5 flex items-center justify-center border-primary/20">
-          <Target className="w-32 h-32 text-primary/20 animate-pulse" />
+        <div className="h-[500px] md:h-[600px] rounded-[2.5rem] overflow-hidden border border-white/10 relative shadow-2xl group">
+          <img 
+            alt="Modern tech office" 
+            className="w-full h-full object-cover opacity-80 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-1000 scale-105 group-hover:scale-100" 
+            src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80" 
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent"></div>
         </div>
-      </div>
+      </section>
+
+      {/* Principles Section */}
+      <section className="space-y-16 py-12">
+        <div className="text-center space-y-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-secondary font-black">Strategic Core</p>
+          <h2 className="text-4xl font-heading font-bold text-on-surface italic tracking-tight">Core Principles</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {PRINCIPLES.map((p, i) => (
+            <div key={i} className="bg-surface-container-low/50 backdrop-blur-xl rounded-[2rem] p-8 border border-white/5 hover:border-primary/40 transition-all duration-500 hover:-translate-y-2 group shadow-xl">
+              <div className="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center mb-8 border border-white/10 group-hover:border-primary/50 transition-colors">
+                <p.icon className={cn("w-7 h-7", p.color === 'primary' ? 'text-primary' : p.color === 'secondary' ? 'text-secondary' : 'text-tertiary')} />
+              </div>
+              <h3 className="text-2xl font-heading font-bold text-on-surface italic mb-4">{p.title}</h3>
+              <p className="font-sans text-on-surface-variant leading-relaxed text-sm italic">{p.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-surface-container-low border border-white/10 rounded-[3rem] p-12 md:p-20 text-center space-y-8 relative overflow-hidden shadow-2xl">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+        <h2 className="text-4xl md:text-5xl font-heading font-bold text-on-surface italic tracking-tight leading-tight">Ready to evolve your career strategy?</h2>
+        <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
+          <Link href="/register">
+            <button className="h-14 px-10 rounded-2xl bg-gradient-primary text-white font-heading font-bold italic text-lg shadow-xl shadow-primary/20 hover:scale-105 transition-all">
+              Initialize Account
+            </button>
+          </Link>
+          <Link href="/templates">
+            <button className="h-14 px-10 rounded-2xl bg-surface-container-highest text-on-surface font-heading font-bold italic text-lg border border-white/10 hover:bg-white/5 transition-all">
+              Explore Blueprints
+            </button>
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

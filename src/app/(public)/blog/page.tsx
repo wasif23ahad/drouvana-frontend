@@ -1,78 +1,125 @@
+"use client";
+
 import React from 'react';
-import { Calendar, Clock, ArrowRight } from 'lucide-react';
-import Image from 'next/image';
+import { Calendar, Clock, ArrowRight, ChevronRight, Search } from 'lucide-react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
 
 const POSTS = [
   {
     title: "Mastering the AI-Driven Job Market",
-    excerpt: "How to leverage agentic AI to gain a competitive edge in 2026.",
+    excerpt: "How to leverage agentic AI to gain a competitive edge in the evolving professional landscape of 2026.",
     date: "May 12, 2026",
     readTime: "5 min",
     category: "Strategy",
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800"
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80"
   },
   {
     title: "ATS Optimization: Beyond Keywords",
-    excerpt: "Why the context of your achievements matters more than simple keyword stuffing.",
+    excerpt: "Why the context of your achievements matters more than simple keyword stuffing in modern algorithms.",
     date: "May 08, 2026",
     readTime: "8 min",
     category: "Technical",
-    image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800"
+    image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&q=80"
   },
   {
-    title: "The Future of Professional Networking",
-    excerpt: "Using AI to craft personalized LinkedIn outreach that actually gets responses.",
+    title: "Future of Professional Networking",
+    excerpt: "Using generative intelligence to craft personalized outreach that actually builds human connections.",
     date: "May 05, 2026",
     readTime: "4 min",
     category: "Networking",
-    image: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=800"
+    image: "https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&q=80"
   },
 ];
 
 export default function BlogPage() {
   return (
-    <div className="max-w-6xl mx-auto py-20 px-4 space-y-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-4">
-          <h1 className="text-5xl font-black tracking-tight italic">Career <span className="text-primary">Insights</span></h1>
-          <p className="text-xl text-muted-foreground max-w-xl">Deep dives into the intersection of artificial intelligence and professional growth.</p>
+    <div className="max-w-spacing-container-max mx-auto py-12 px-spacing-margin-desktop space-y-16 animate-in fade-in duration-700">
+      {/* Header & Category Filter */}
+      <div className="space-y-10">
+        <div className="flex items-center text-xs text-on-surface-variant gap-2 font-mono uppercase tracking-widest">
+          <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+          <ChevronRight className="w-3 h-3" />
+          <span className="text-primary font-bold">Blog</span>
         </div>
-        <div className="flex gap-4">
-          {['All', 'Strategy', 'Technical', 'Networking'].map(c => (
-            <button key={c} className="px-4 py-2 rounded-xl border border-border/50 text-xs font-bold uppercase tracking-widest hover:border-primary transition-colors">
-              {c}
-            </button>
-          ))}
+        
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
+          <div className="space-y-4 max-w-2xl">
+            <h1 className="text-5xl md:text-6xl font-heading font-bold text-on-surface italic leading-tight tracking-tight">Career Insights</h1>
+            <p className="text-xl text-on-surface-variant font-sans italic leading-relaxed">Deep dives into the intersection of artificial intelligence and professional evolution.</p>
+          </div>
+          
+          <div className="flex flex-wrap gap-3">
+            {['All', 'Strategy', 'Technical', 'Networking'].map((c, i) => (
+              <button 
+                key={c} 
+                className={cn(
+                  "px-6 py-2 rounded-xl border font-mono text-[10px] uppercase tracking-widest transition-all",
+                  i === 0 
+                    ? "bg-primary text-on-primary border-primary shadow-lg shadow-primary/20" 
+                    : "border-white/10 text-on-surface-variant hover:border-primary/50 hover:text-on-surface"
+                )}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+      {/* Featured Search */}
+      <div className="relative max-w-xl">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
+        <Input 
+          placeholder="Search articles, insights, or guides..." 
+          className="h-14 pl-12 rounded-2xl bg-surface-container-low border-white/5 text-on-surface focus:border-primary transition-all shadow-xl"
+        />
+      </div>
+
+      {/* Grid Listing */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 pb-20">
         {POSTS.map((post, i) => (
-          <div key={i} className="glass-card rounded-[32px] overflow-hidden group border-white/5 bg-white/5 hover:border-primary/20 transition-all flex flex-col h-full">
+          <div key={i} className="bg-surface-container-low/50 backdrop-blur-xl rounded-[2.5rem] overflow-hidden group border border-white/5 hover:border-primary/40 transition-all duration-500 flex flex-col h-full shadow-2xl">
             <div className="relative aspect-video overflow-hidden">
               <img 
                 src={post.image} 
                 alt={post.title} 
-                className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
+                className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-1000 opacity-80 mix-blend-luminosity group-hover:mix-blend-normal group-hover:opacity-100"
               />
-              <div className="absolute top-4 left-4 px-3 py-1 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-lg">
+              <div className="absolute top-6 left-6 px-4 py-1.5 bg-background/60 backdrop-blur-md text-primary text-[9px] font-mono font-black uppercase tracking-[0.2em] rounded-lg border border-primary/20">
                 {post.category}
               </div>
             </div>
-            <div className="p-8 flex-1 flex flex-col space-y-4">
-              <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {post.date}</span>
-                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {post.readTime}</span>
+            <div className="p-10 flex-1 flex flex-col space-y-6">
+              <div className="flex items-center gap-6 font-mono text-[9px] text-on-surface-variant uppercase tracking-[0.2em] font-bold">
+                <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> {post.date}</span>
+                <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary" /> {post.readTime}</span>
               </div>
-              <h3 className="text-xl font-bold group-hover:text-primary transition-colors leading-tight">{post.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed flex-1">{post.excerpt}</p>
-              <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary group/btn">
-                Read Full Article <ArrowRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
+              <h3 className="text-2xl font-heading font-bold text-on-surface group-hover:text-primary transition-colors leading-tight italic tracking-tight">{post.title}</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed flex-1 font-sans italic">{post.excerpt}</p>
+              <button className="flex items-center gap-3 font-mono text-[10px] font-black uppercase tracking-[0.2em] text-primary group/btn transition-all hover:gap-5">
+                Full Protocol <ArrowRight className="w-4 h-4 transition-transform" />
               </button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Newsletter Section */}
+      <section className="bg-surface-container-low border border-white/10 rounded-[3rem] p-12 md:p-20 text-center space-y-8 relative overflow-hidden shadow-2xl">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="space-y-4 max-w-2xl mx-auto relative z-10">
+          <h2 className="text-4xl font-heading font-bold text-on-surface italic tracking-tight">Stay ahead of the curve</h2>
+          <p className="font-sans text-on-surface-variant italic">Join 10,000+ professionals receiving weekly AI-driven career strategies.</p>
+        </div>
+        <form className="flex flex-col sm:flex-row justify-center gap-4 relative z-10 max-w-lg mx-auto">
+          <Input placeholder="Enter your email" className="h-14 bg-surface-container rounded-2xl border-white/10 px-6 font-sans" />
+          <button className="h-14 px-10 rounded-2xl bg-gradient-primary text-white font-heading font-bold italic shadow-xl shadow-primary/20 whitespace-nowrap">
+            Join Protocol
+          </button>
+        </form>
+      </section>
     </div>
   );
 }
