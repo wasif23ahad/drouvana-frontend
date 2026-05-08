@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import PipelineHealthCard from '@/components/ai/PipelineHealthCard';
 
 const DashboardOverview = () => {
   return (
@@ -76,6 +77,11 @@ const DashboardOverview = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <ApplicationsOverTimeChart />
         <ApplicationStatusChart />
+      </div>
+
+      {/* AI Pipeline Health */}
+      <div className="w-full">
+        <PipelineHealthCard />
       </div>
 
       {/* Recent Activity Section (Simplified for now) */}

@@ -35,7 +35,7 @@ const Step1JobDetails = () => {
       setApplicationId(appId);
 
       // 2. Analyze JD
-      const res = await axios.post('/api/ai/analyze-jd', { 
+      const res = await axios.post('/api/ai/parse-jd', { 
         jd: jdText,
         applicationId: appId
       });

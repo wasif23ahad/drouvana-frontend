@@ -59,9 +59,9 @@ export default function AdminDashboard() {
           <div className="space-y-6">
             {[
               { name: 'API Server', status: 'Healthy', latency: '42ms', load: '12%' },
+              { name: 'NVIDIA NIM (Primary)', status: 'Healthy', latency: '850ms', load: '18%' },
+              { name: 'Google Gemini (Fallback)', status: 'Healthy', latency: '1.4s', load: '8%' },
               { name: 'Redis Cache', status: 'Healthy', latency: '2ms', load: '4%' },
-              { name: 'Prisma DB', status: 'Slow', latency: '240ms', load: '68%' },
-              { name: 'AI Service (Gemini)', status: 'Healthy', latency: '1.2s', load: '22%' },
             ].map((sys) => (
               <div key={sys.name} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
                 <div className="flex items-center gap-4">
