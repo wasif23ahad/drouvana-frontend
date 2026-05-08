@@ -69,8 +69,8 @@ const Step3ResumeGen = () => {
   return (
     <div className="space-y-16 max-w-5xl mx-auto">
       <div className="text-center space-y-4">
-        <h3 className="text-4xl font-heading font-bold text-on-surface italic tracking-tight">Design Architecture</h3>
-        <p className="font-sans text-on-surface-variant italic text-lg max-w-xl mx-auto">Choose the structural blueprint for your tailored strategic profile.</p>
+        <h3 className="text-4xl font-hanken font-bold text-text-main italic tracking-tight">Design Architecture</h3>
+        <p className="text-text-sub italic text-lg max-w-xl mx-auto">Choose the structural blueprint for your tailored strategic profile.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -79,25 +79,25 @@ const Step3ResumeGen = () => {
             key={tpl.id}
             onClick={() => setTemplateId(tpl.id)}
             className={cn(
-              "group cursor-pointer relative rounded-[3rem] overflow-hidden border-4 transition-all duration-700 bg-surface-container-low shadow-2xl",
+              "group cursor-pointer relative rounded-[3rem] overflow-hidden border-4 transition-all duration-700 bg-surface shadow-2xl",
               templateId === tpl.id ? "border-primary scale-[1.02] shadow-primary/20" : "border-white/5 hover:border-primary/30"
             )}
           >
-            <div className="aspect-[3/4] relative">
+            <div className="aspect-3/4 relative">
               <img 
                 src={tpl.image} 
                 alt={tpl.name} 
                 className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-1000 opacity-60 group-hover:opacity-100"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-bg-base/90 via-bg-base/20 to-transparent" />
               <div className="absolute bottom-8 left-8 right-8 space-y-2">
-                <h4 className="font-heading font-bold text-2xl text-on-surface italic tracking-tight">{tpl.name}</h4>
-                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-primary font-black">{tpl.desc}</p>
+                <h4 className="font-hanken font-bold text-2xl text-text-main italic tracking-tight">{tpl.name}</h4>
+                <p className="font-jetbrains text-[9px] uppercase tracking-[0.2em] text-primary font-black">{tpl.desc}</p>
               </div>
             </div>
             {templateId === tpl.id && (
-              <div className="absolute top-6 right-6 bg-primary text-on-primary w-12 h-12 rounded-2xl flex items-center justify-center shadow-2xl animate-in zoom-in duration-300">
-                <CheckCircle2 className="w-6 h-6 stroke-[3]" />
+              <div className="absolute top-6 right-6 bg-primary text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-2xl animate-in zoom-in duration-300">
+                <CheckCircle2 className="w-6 h-6 stroke-3" />
               </div>
             )}
           </div>
@@ -108,7 +108,7 @@ const Step3ResumeGen = () => {
         <Button 
           onClick={startGeneration}
           disabled={loading || !templateId}
-          className="w-full max-w-lg h-16 rounded-[2rem] bg-gradient-primary text-white text-lg font-heading font-bold italic gap-4 shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group"
+          className="w-full max-w-lg h-16 rounded-4xl bg-primary text-white text-lg font-hanken font-bold italic gap-4 shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group"
         >
           {loading ? (
             <div className="flex items-center gap-3">
@@ -124,7 +124,7 @@ const Step3ResumeGen = () => {
         </Button>
         
         {loading && (
-          <div className="flex items-center gap-3 text-secondary animate-pulse font-mono text-[10px] uppercase tracking-[0.3em] font-black">
+          <div className="flex items-center gap-3 text-secondary animate-pulse font-jetbrains text-[10px] uppercase tracking-[0.3em] font-black">
             <Sparkles className="w-4 h-4" />
             Injecting semantic alignment layers
           </div>

@@ -29,14 +29,14 @@ const Step2JDAnalysis = () => {
   return (
     <div className="space-y-12 max-w-4xl mx-auto">
       {/* Neural Insight Header */}
-      <div className="flex flex-col md:flex-row items-center gap-8 p-10 bg-surface-container-high/50 rounded-[2.5rem] border border-white/5 relative overflow-hidden shadow-2xl">
+      <div className="flex flex-col md:flex-row items-center gap-8 p-10 bg-surface-2/30 rounded-4xl border border-white/5 relative overflow-hidden shadow-2xl">
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[50px] rounded-full pointer-events-none"></div>
         <div className="w-20 h-20 rounded-3xl bg-primary/20 flex items-center justify-center shrink-0 border border-primary/20">
           <ShieldCheck className="text-primary w-10 h-10" />
         </div>
         <div className="space-y-2">
-          <h3 className="font-heading font-bold text-2xl text-on-surface italic tracking-tight">Semantic Extraction Result</h3>
-          <p className="font-sans text-on-surface-variant leading-relaxed italic">{analysis.roleInsights}</p>
+          <h3 className="font-hanken font-bold text-2xl text-text-main italic tracking-tight">Semantic Extraction Result</h3>
+          <p className="text-text-sub leading-relaxed italic">{analysis.roleInsights}</p>
         </div>
       </div>
 
@@ -52,13 +52,13 @@ const Step2JDAnalysis = () => {
           >
             <div className="flex items-center gap-3">
               <section.icon className={cn("w-5 h-5", section.color)} />
-              <h4 className="font-mono text-[10px] uppercase tracking-[0.3em] text-on-surface-variant font-bold">{section.title}</h4>
+              <h4 className="font-jetbrains text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">{section.title}</h4>
             </div>
             <div className="flex flex-wrap gap-2">
               {section.data.map((item: string, i: number) => (
                 <span 
                   key={i} 
-                  className="px-4 py-2 rounded-xl bg-surface-container border border-white/5 text-xs font-mono text-on-surface-variant hover:border-primary/50 hover:text-on-surface transition-all cursor-default shadow-md"
+                  className="px-4 py-2 rounded-xl bg-surface-2 border border-white/5 text-xs font-jetbrains text-text-sub hover:border-primary/50 hover:text-text-main transition-all cursor-default shadow-md"
                 >
                   {item}
                 </span>
@@ -69,12 +69,12 @@ const Step2JDAnalysis = () => {
       </div>
 
       {/* Intelligence Summary */}
-      <div className="p-10 bg-surface-container-low rounded-[2.5rem] border border-white/5 space-y-4 relative overflow-hidden shadow-xl">
+      <div className="p-10 bg-surface-2/50 rounded-4xl border border-white/5 space-y-4 relative overflow-hidden shadow-xl">
         <div className="flex items-center gap-3">
           <Info className="w-5 h-5 text-primary" />
-          <h4 className="font-heading font-bold text-lg text-on-surface italic tracking-tight">Organization Profile Summary</h4>
+          <h4 className="font-hanken font-bold text-lg text-text-main italic tracking-tight">Organization Profile Summary</h4>
         </div>
-        <p className="font-sans text-on-surface-variant leading-relaxed italic text-lg">
+        <p className="text-text-sub leading-relaxed italic text-lg">
           {analysis.companySummary}
         </p>
       </div>
@@ -84,13 +84,13 @@ const Step2JDAnalysis = () => {
         <Button 
           variant="outline" 
           onClick={() => setStep(1)} 
-          className="rounded-2xl h-14 px-8 border-white/10 bg-surface-container-low hover:bg-white/5 text-on-surface font-heading font-bold italic shadow-lg gap-2"
+          className="rounded-2xl h-14 px-8 border-white/10 bg-surface-2 hover:bg-white/5 text-text-main font-hanken font-bold italic shadow-lg gap-2"
         >
           <ChevronLeft className="w-4 h-4" /> Back to Parameters
         </Button>
         <Button 
           onClick={() => setStep(3)} 
-          className="rounded-2xl bg-gradient-primary text-white gap-3 h-16 px-10 font-heading font-bold italic text-lg shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group"
+          className="rounded-2xl bg-primary text-white gap-3 h-16 px-10 font-hanken font-bold italic text-lg shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group"
         >
           Next: Optimization Protocol <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </Button>

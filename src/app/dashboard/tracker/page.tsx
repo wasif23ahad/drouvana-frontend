@@ -1,61 +1,60 @@
-"use client";
+'use client';
 
-import React, { useState } from 'react';
-import KanbanBoard from '@/components/dashboard/tracker/KanbanBoard';
-import ApplicationTable from '@/components/dashboard/tracker/ApplicationTable';
-import { LayoutGrid, List, ChevronRight, Briefcase } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
+import { useState } from 'react';
+import { KanbanSquare, List, Plus, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { KanbanBoard } from '@/components/dashboard/tracker/KanbanBoard';
+import { ApplicationList } from '@/components/dashboard/tracker/ApplicationList';
 
 export default function TrackerPage() {
-  const [view, setView] = useState<'board' | 'table'>('board');
+  const [view, setView] = useState<'kanban' | 'list'>('kanban');
+  const [search, setSearch] = useState('');
 
   return (
-    <div className="h-full flex flex-col space-y-12 animate-in fade-in duration-700 pb-20 max-w-spacing-container-max mx-auto">
-      {/* Breadcrumbs & Header */}
-      <div className="space-y-4">
-        <div className="flex items-center text-xs text-on-surface-variant gap-2 font-mono uppercase tracking-widest">
-          <Link href="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link>
-          <ChevronRight className="w-3 h-3" />
-          <span className="text-primary font-bold">Tactical Tracker</span>
+    <div className="flex h-full flex-col gap-8 pb-20">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold font-hanken text-text-main">Job Tracker</h1>
+          <p className="text-text-sub text-sm">Visualize and manage your multi-vector deployment performance.</p>
         </div>
         
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
-          <div className="space-y-1">
-            <h1 className="text-4xl md:text-5xl font-heading font-bold text-on-surface italic tracking-tight flex items-center gap-4">
-              Mission Pipeline
-              <span className="bg-secondary/10 text-secondary text-[9px] uppercase tracking-[0.2em] font-black px-3 py-1 rounded-full border border-secondary/20">Active Vectors</span>
-            </h1>
-            <p className="font-sans text-on-surface-variant italic text-lg leading-relaxed">Simulating deployment trajectories across target organizations.</p>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
+            <Input 
+              placeholder="Filter nodes..." 
+              className="pl-10 bg-surface-2 border-none rounded-xl h-11 focus-visible:ring-primary" 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
-
-          <div className="flex bg-surface-container-low/50 p-1.5 rounded-[1.5rem] border border-white/5 backdrop-blur-xl shadow-xl">
-            <button 
-              onClick={() => setView('board')}
-              className={cn(
-                "flex items-center gap-3 px-6 py-2.5 rounded-2xl font-mono text-[10px] uppercase tracking-widest font-black transition-all",
-                view === 'board' ? "bg-gradient-primary text-white shadow-lg shadow-primary/20" : "text-on-surface-variant hover:text-on-surface"
-              )}
+          <div className="flex bg-surface rounded-xl border border-white/5 p-1 shadow-lg">
+            <button
+              onClick={() => setView('kanban')}
+              className={`p-2.5 rounded-lg transition-all ${view === 'kanban' ? 'bg-surface-2 text-primary shadow-sm' : 'text-text-muted hover:text-text-main'}`}
             >
-              <LayoutGrid className="w-4 h-4" /> Board
+              <KanbanSquare className="h-4 w-4" />
             </button>
-            <button 
-              onClick={() => setView('table')}
-              className={cn(
-                "flex items-center gap-3 px-6 py-2.5 rounded-2xl font-mono text-[10px] uppercase tracking-widest font-black transition-all",
-                view === 'table' ? "bg-gradient-primary text-white shadow-lg shadow-primary/20" : "text-on-surface-variant hover:text-on-surface"
-              )}
+            <button
+              onClick={() => setView('list')}
+              className={`p-2.5 rounded-lg transition-all ${view === 'list' ? 'bg-surface-2 text-primary shadow-sm' : 'text-text-muted hover:text-text-main'}`}
             >
-              <List className="w-4 h-4" /> Table
+              <List className="h-4 w-4" />
             </button>
           </div>
+          <Button className="shrink-0 gap-2 rounded-xl h-11 px-6 border-none shadow-lg shadow-primary/20">
+            <Plus className="h-4 w-4" /> Add Node
+          </Button>
         </div>
       </div>
 
-      <div className="flex-1 min-h-[600px] relative">
-         {/* Background Decor */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary/2 rounded-full blur-[120px] pointer-events-none -z-10"></div>
-        {view === 'board' ? <KanbanBoard /> : <ApplicationTable />}
+      <div className="flex-1 overflow-hidden">
+        {view === 'kanban' ? (
+           <KanbanBoard searchQuery={search} />
+        ) : (
+           <ApplicationList searchQuery={search} />
+        )}
       </div>
     </div>
   );

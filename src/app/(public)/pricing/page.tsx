@@ -49,13 +49,13 @@ export default function PricingPage() {
     <div className="max-w-spacing-container-max mx-auto py-12 px-spacing-margin-desktop space-y-24 animate-in fade-in duration-700">
       {/* Header */}
       <header className="text-center space-y-6 max-w-3xl mx-auto">
-        <div className="flex justify-center items-center text-xs text-on-surface-variant gap-2 font-mono uppercase tracking-widest mb-4">
+        <div className="flex justify-center items-center text-xs text-text-muted gap-2 font-jetbrains uppercase tracking-widest mb-4">
           <Link href="/" className="hover:text-primary transition-colors">Home</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-primary font-bold">Pricing</span>
         </div>
-        <h1 className="text-5xl md:text-6xl font-heading font-bold text-on-surface italic leading-tight tracking-tight">Flexible Plans for Every Career Stage</h1>
-        <p className="font-sans text-on-surface-variant text-lg italic">Supercharge your job search with AI-driven insights, tailored resumes, and intelligent tracking. Choose the plan that fits your momentum.</p>
+        <h1 className="text-5xl md:text-6xl font-hanken font-bold text-text-main italic leading-tight tracking-tight">Flexible Plans for Every Career Stage</h1>
+        <p className="text-text-sub text-lg italic">Supercharge your job search with AI-driven insights, tailored resumes, and intelligent tracking. Choose the plan that fits your momentum.</p>
       </header>
 
       {/* Pricing Cards */}
@@ -64,25 +64,25 @@ export default function PricingPage() {
           <div 
             key={plan.name}
             className={cn(
-              "bg-surface-container-low/50 backdrop-blur-xl border rounded-[2rem] p-10 flex flex-col relative overflow-hidden transition-all duration-500 hover:scale-[1.02]",
+              "bg-surface-2/50 backdrop-blur-xl border rounded-4xl p-10 flex flex-col relative overflow-hidden transition-all duration-500 hover:scale-[1.02]",
               plan.highlight ? "border-primary/50 shadow-2xl shadow-primary/10 md:-translate-y-4" : "border-white/5 shadow-xl"
             )}
           >
             {plan.highlight && (
-              <div className="absolute top-0 right-0 bg-primary text-on-primary font-mono text-[9px] font-black px-6 py-2 rounded-bl-2xl uppercase tracking-[0.2em] shadow-lg">
+              <div className="absolute top-0 right-0 bg-primary text-white font-jetbrains text-[9px] font-black px-6 py-2 rounded-bl-2xl uppercase tracking-[0.2em] shadow-lg">
                 Most Popular
               </div>
             )}
             
             <div className="space-y-2 mb-8">
-              <h3 className={cn("text-3xl font-heading font-bold italic", plan.highlight ? "text-primary" : "text-on-surface")}>{plan.name}</h3>
-              <p className="text-sm text-on-surface-variant font-sans h-10">{plan.desc}</p>
+              <h3 className={cn("text-3xl font-hanken font-bold italic", plan.highlight ? "text-primary" : "text-text-main")}>{plan.name}</h3>
+              <p className="text-sm text-text-sub font-sans h-10">{plan.desc}</p>
             </div>
 
             <div className="mb-10">
               <div className="flex items-baseline gap-2">
-                <span className="text-6xl font-heading font-bold text-on-surface italic tracking-tighter">{plan.price}</span>
-                <span className="text-on-surface-variant font-mono text-sm uppercase">/mo</span>
+                <span className="text-6xl font-hanken font-bold text-text-main italic tracking-tighter">{plan.price}</span>
+                <span className="text-text-sub font-jetbrains text-sm uppercase">/mo</span>
               </div>
             </div>
 
@@ -92,14 +92,14 @@ export default function PricingPage() {
                   <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                     <Check className="w-3 h-3 text-primary" />
                   </div>
-                  <span className="text-sm text-on-surface font-sans">{f}</span>
+                  <span className="text-sm text-text-main font-sans">{f}</span>
                 </li>
               ))}
             </ul>
 
             <Button className={cn(
-              "w-full h-14 rounded-2xl font-heading font-bold italic text-lg shadow-lg border-none transition-all active:scale-95",
-              plan.highlight ? "bg-gradient-primary text-white shadow-primary/20" : "bg-surface-container-highest text-on-surface hover:bg-white/5"
+              "w-full h-14 rounded-2xl font-hanken font-bold italic text-lg shadow-lg border-none transition-all active:scale-95",
+              plan.highlight ? "bg-primary text-white shadow-primary/20" : "bg-surface-2 text-text-main hover:bg-white/5"
             )}>
               {plan.button}
             </Button>
@@ -110,31 +110,31 @@ export default function PricingPage() {
       {/* Comparison Table */}
       <div className="space-y-12 py-12">
         <div className="text-center space-y-2">
-           <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-secondary font-black">Strategic Breakdown</p>
-           <h2 className="text-4xl font-heading font-bold text-on-surface italic tracking-tight">Compare Plan Capabilities</h2>
+           <p className="font-jetbrains text-[10px] uppercase tracking-[0.4em] text-secondary font-black">Strategic Breakdown</p>
+           <h2 className="text-4xl font-hanken font-bold text-text-main italic tracking-tight">Compare Plan Capabilities</h2>
         </div>
-        <div className="bg-surface-container-low rounded-[32px] border border-white/5 overflow-hidden shadow-2xl">
+        <div className="bg-surface-2 rounded-4xl border border-white/5 overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-white/10 bg-surface/50">
-                  <th className="py-6 px-10 font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">Capabilities</th>
-                  <th className="py-6 px-10 font-heading font-bold text-lg text-on-surface italic">Free</th>
-                  <th className="py-6 px-10 font-heading font-bold text-lg text-primary italic bg-primary/5">Pro</th>
-                  <th className="py-6 px-10 font-heading font-bold text-lg text-on-surface italic">Executive</th>
+                  <th className="py-6 px-10 font-jetbrains text-[10px] uppercase tracking-[0.2em] text-text-muted">Capabilities</th>
+                  <th className="py-6 px-10 font-hanken font-bold text-lg text-text-main italic">Free</th>
+                  <th className="py-6 px-10 font-hanken font-bold text-lg text-primary italic bg-primary/5">Pro</th>
+                  <th className="py-6 px-10 font-hanken font-bold text-lg text-text-main italic">Executive</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {COMPARISON.map((row) => (
                   <tr key={row.f} className="hover:bg-white/5 transition-colors">
-                    <td className="py-6 px-10 font-sans text-on-surface">{row.f}</td>
-                    <td className="py-6 px-10 font-mono text-[11px] text-on-surface-variant uppercase tracking-wider">
+                    <td className="py-6 px-10 font-sans text-text-main">{row.f}</td>
+                    <td className="py-6 px-10 font-jetbrains text-[11px] text-text-muted uppercase tracking-wider">
                       {typeof row.free === 'boolean' ? (row.free ? <Check className="w-5 h-5 text-primary" /> : <X className="w-5 h-5 text-error opacity-30" />) : row.free}
                     </td>
-                    <td className="py-6 px-10 font-mono text-[11px] text-primary uppercase tracking-wider bg-primary/5">
+                    <td className="py-6 px-10 font-jetbrains text-[11px] text-primary uppercase tracking-wider bg-primary/5">
                       {typeof row.pro === 'boolean' ? (row.pro ? <Check className="w-5 h-5 text-primary" /> : <X className="w-5 h-5 text-error opacity-30" />) : row.pro}
                     </td>
-                    <td className="py-6 px-10 font-mono text-[11px] text-on-surface-variant uppercase tracking-wider">
+                    <td className="py-6 px-10 font-jetbrains text-[11px] text-text-muted uppercase tracking-wider">
                       {typeof row.exec === 'boolean' ? (row.exec ? <Check className="w-5 h-5 text-primary" /> : <X className="w-5 h-5 text-error opacity-30" />) : row.exec}
                     </td>
                   </tr>
@@ -147,7 +147,7 @@ export default function PricingPage() {
 
       {/* FAQ */}
       <div className="max-w-4xl mx-auto space-y-12">
-        <h2 className="text-4xl font-heading font-bold text-center text-on-surface italic tracking-tight">Frequently Asked Questions</h2>
+        <h2 className="text-4xl font-hanken font-bold text-center text-text-main italic tracking-tight">Frequently Asked Questions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[
             { q: 'Can I switch plans later?', a: 'Yes, you can upgrade or downgrade at any time. Prorated charges will be applied to your account automatically.' },
@@ -155,9 +155,9 @@ export default function PricingPage() {
             { q: 'Is there a free trial?', a: 'Our Free plan is free forever. You can experience the core platform without any commitment.' },
             { q: 'How do I cancel?', a: 'Cancel anytime from your account settings. You will maintain access until the end of your billing cycle.' }
           ].map((item) => (
-            <div key={item.q} className="bg-surface-container-low/50 border border-white/5 rounded-2xl p-8 space-y-4 hover:border-primary/30 transition-all shadow-lg">
-              <h4 className="font-heading font-bold text-on-surface italic">{item.q}</h4>
-              <p className="font-sans text-sm text-on-surface-variant leading-relaxed italic">{item.a}</p>
+            <div key={item.q} className="bg-surface-2/50 border border-white/5 rounded-2xl p-8 space-y-4 hover:border-primary/30 transition-all shadow-lg">
+              <h4 className="font-hanken font-bold text-text-main italic">{item.q}</h4>
+              <p className="text-sm text-text-sub leading-relaxed italic">{item.a}</p>
             </div>
           ))}
         </div>

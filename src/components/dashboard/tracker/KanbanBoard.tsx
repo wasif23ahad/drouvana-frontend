@@ -1,176 +1,207 @@
-"use client";
+'use client';
 
-import React, { useState } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import { 
-  MoreVertical, 
-  MapPin, 
-  Clock, 
-  DollarSign, 
-  Calendar,
-  Plus,
-  Search
-} from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import React, { useMemo } from 'react';
+import { JobStatus, useAppStore } from '@/lib/store';
+import { formatDistanceToNow } from 'date-fns';
+import {
+  DndContext,
+  DragOverlay,
+  closestCorners,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragStartEvent,
+  DragEndEvent,
+  DragOverEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Card, CardContent } from '@/components/ui/card';
+import { Briefcase, Building2, Calendar, MoreHorizontal } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 
-const COLUMNS = [
-  { id: 'SAVED', title: 'Saved', color: 'bg-slate-500' },
-  { id: 'APPLYING', title: 'Applying', color: 'bg-blue-500' },
-  { id: 'APPLIED', title: 'Applied', color: 'bg-indigo-500' },
-  { id: 'INTERVIEW', title: 'Interview', color: 'bg-emerald-500' },
-  { id: 'OFFER', title: 'Offer', color: 'bg-amber-500' },
+const COLUMNS: { id: JobStatus; title: string; colorClass: string }[] = [
+  { id: 'SAVED', title: 'Saved', colorClass: 'border-l-[var(--color-status-saved)]' },
+  { id: 'APPLIED', title: 'Applied', colorClass: 'border-l-[var(--color-status-applied)]' },
+  { id: 'SCREENING', title: 'Screening', colorClass: 'border-l-[var(--color-status-screening)]' },
+  { id: 'INTERVIEW', title: 'Interview', colorClass: 'border-l-[var(--color-status-interview)]' },
+  { id: 'OFFER', title: 'Offer', colorClass: 'border-l-[var(--color-status-offer)]' },
+  { id: 'REJECTED', title: 'Rejected', colorClass: 'border-l-[var(--color-status-rejected)]' },
+  { id: 'WITHDRAWN', title: 'Withdrawn', colorClass: 'border-l-[var(--color-status-withdrawn)]' },
 ];
 
-const INITIAL_DATA: any = {
-  SAVED: [
-    { id: '1', company: 'Google', title: 'Senior Frontend Engineer', location: 'Remote', salary: '150k - 200k', appliedAt: '2024-05-01' },
-    { id: '2', company: 'Meta', title: 'Software Engineer III', location: 'London', salary: '£120k', appliedAt: '2024-05-02' },
-  ],
-  APPLYING: [],
-  APPLIED: [
-    { id: '3', company: 'Vercel', title: 'Product Engineer', location: 'Global', salary: 'Competitive', appliedAt: '2024-04-28' },
-  ],
-  INTERVIEW: [
-    { id: '4', company: 'Airbnb', title: 'Staff Engineer', location: 'San Francisco', salary: '$220k', appliedAt: '2024-04-20' },
-  ],
-  OFFER: [],
-};
+function SortableItem({ app }: { app: any }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: app.id, data: { type: 'Application', app } });
 
-const KanbanBoard = () => {
-  const [data, setData] = useState(INITIAL_DATA);
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
 
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination } = result;
-    if (!destination) return;
+  const today = React.useMemo(() => new Date().getTime(), []);
+  const daysSinceApplied = Math.floor((today - new Date(app.dateApplied).getTime()) / (1000 * 60 * 60 * 24));
+  let dateColor = 'text-text-muted';
+  if (app.status === 'APPLIED') {
+    if (daysSinceApplied > 14) dateColor = 'text-error';
+    else if (daysSinceApplied > 7) dateColor = 'text-warning';
+  }
 
-    if (
-      source.droppableId === destination.droppableId &&
-      source.index === destination.index
-    ) {
-      return;
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="touch-none pb-3">
+      <Card className="hover:border-primary/50 transition-colors bg-surface border-border-subtle cursor-grab active:cursor-grabbing">
+        <CardContent className="p-4 flex flex-col gap-3">
+          <div className="flex justify-between items-start gap-2">
+            <div>
+              <h4 className="font-semibold text-sm leading-tight mb-1">{app.jobTitle}</h4>
+              <div className="flex items-center text-xs text-text-sub">
+                <Building2 className="h-3 w-3 mr-1" /> {app.company}
+              </div>
+            </div>
+            <Link href={`/dashboard/applications/${app.id}`} className="text-text-muted hover:text-text-main pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+              <MoreHorizontal className="h-4 w-4" />
+            </Link>
+          </div>
+          
+          <div className="flex items-center justify-between mt-1">
+            <span className={`text-[10px] font-medium flex items-center ${dateColor}`}>
+              <Calendar className="h-3 w-3 mr-1" />
+              {daysSinceApplied}d ago
+            </span>
+            {app.platform && (
+              <span className="text-[10px] bg-surface-2 text-text-sub px-2 py-0.5 rounded-full">
+                {app.platform}
+              </span>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function Column({ col, applications }: { col: typeof COLUMNS[0], applications: any[] }) {
+  const { setNodeRef } = useSortable({
+    id: col.id,
+    data: { type: 'Column', col },
+  });
+
+  return (
+    <div className="shrink-0 w-72 flex flex-col bg-surface-2/30 rounded-2xl h-full border border-border-subtle overflow-hidden">
+      <div className={`p-4 border-b border-border-subtle bg-surface-2 flex items-center justify-between border-l-4 ${col.colorClass}`}>
+        <h3 className="font-semibold text-sm">{col.title}</h3>
+        <Badge variant="outline" className="bg-surface bg-opacity-50 text-[10px] py-0">{applications.length}</Badge>
+      </div>
+      <div ref={setNodeRef} className="flex-1 p-3 overflow-y-auto min-h-[150px]">
+        <SortableContext items={applications.map(a => a.id)} strategy={verticalListSortingStrategy}>
+          {applications.map(app => (
+            <SortableItem key={app.id} app={app} />
+          ))}
+        </SortableContext>
+      </div>
+    </div>
+  );
+}
+
+export function KanbanBoard({ searchQuery }: { searchQuery: string }) {
+  const { applications, updateApplicationStatus } = useAppStore();
+  const [activeId, setActiveId] = React.useState<string | null>(null);
+
+  const filteredApps = useMemo(() => {
+    return applications.filter(app => {
+      if (!searchQuery) return true;
+      const lower = searchQuery.toLowerCase();
+      return app.jobTitle.toLowerCase().includes(lower) || app.company.toLowerCase().includes(lower);
+    });
+  }, [applications, searchQuery]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActiveId(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeApp = applications.find(a => a.id === active.id);
+    const overId = over.id as string;
+    
+    let targetStatus: JobStatus | undefined;
+    
+    if (COLUMNS.find(c => c.id === overId)) {
+      targetStatus = overId as JobStatus;
+    } else {
+      const overApp = applications.find(a => a.id === overId);
+      if (overApp) targetStatus = overApp.status;
     }
 
-    const sourceColumn = [...data[source.droppableId]];
-    const destColumn = [...data[destination.droppableId]];
-    const [movedItem] = sourceColumn.splice(source.index, 1);
-
-    if (source.droppableId === destination.droppableId) {
-      sourceColumn.splice(destination.index, 0, movedItem);
-      setData({ ...data, [source.droppableId]: sourceColumn });
-    } else {
-      destColumn.splice(destination.index, 0, movedItem);
-      setData({
-        ...data,
-        [source.droppableId]: sourceColumn,
-        [destination.droppableId]: destColumn,
-      });
+    if (activeApp && targetStatus && activeApp.status !== targetStatus) {
+      updateApplicationStatus(activeApp.id, targetStatus);
     }
   };
 
+  const activeApp = useMemo(() => applications.find(a => a.id === activeId), [activeId, applications]);
+
   return (
-    <div className="space-y-6 overflow-hidden flex flex-col h-full">
-      {/* Search & Filter Bar */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-1">
-        <div className="relative w-full sm:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search company, position..." 
-            className="pl-10 bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary/50"
-          />
-        </div>
-        <Button className="bg-primary hover:bg-primary/90 gap-2 rounded-xl">
-          <Plus className="w-4 h-4" /> Add Application
-        </Button>
-      </div>
-
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide min-h-[600px]">
-          {COLUMNS.map((col) => (
-            <div key={col.id} className="shrink-0 w-80">
-              <div className="flex items-center justify-between mb-4 px-2">
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${col.color}`} />
-                  <h3 className="font-bold">{col.title}</h3>
-                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                    {data[col.id].length}
-                  </span>
-                </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted">
-                  <MoreVertical className="w-4 h-4" />
-                </Button>
-              </div>
-
-              <Droppable droppableId={col.id}>
-                {(provided, snapshot) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className={`flex flex-col gap-4 p-2 rounded-2xl min-h-[500px] transition-colors ${
-                      snapshot.isDraggingOver ? 'bg-primary/5 border border-dashed border-primary/20' : ''
-                    }`}
-                  >
-                    {data[col.id].map((item: any, index: number) => (
-                      <Draggable key={item.id} draggableId={item.id} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={{ ...provided.draggableProps.style }}
-                            className={`glass-card rounded-2xl p-4 transition-all duration-200 hover:shadow-xl ${
-                              snapshot.isDragging ? 'shadow-2xl ring-2 ring-primary/50' : ''
-                            }`}
-                          >
-                            <div className="flex justify-between items-start mb-4">
-                              <div className="flex gap-3">
-                                <Avatar className="h-10 w-10 rounded-xl border border-border/50">
-                                  <AvatarFallback className="bg-primary/10 text-primary font-bold">
-                                    {item.company.charAt(0)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <h4 className="font-bold text-sm leading-none mb-1 group-hover:text-primary transition-colors">{item.company}</h4>
-                                  <p className="text-xs text-muted-foreground">{item.title}</p>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="space-y-3">
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <MapPin className="w-3 h-3" />
-                                <span>{item.location}</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <DollarSign className="w-3 h-3" />
-                                <span>{item.salary}</span>
-                              </div>
-                              
-                              <div className="pt-3 border-t border-border/50 flex items-center justify-between mt-4">
-                                <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-muted-foreground">
-                                  <Clock className="w-3 h-3" />
-                                  <span>Applied {item.appliedAt}</span>
-                                </div>
-                                <div className="flex -space-x-2">
-                                  <div className="w-6 h-6 rounded-full border-2 border-background bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">AI</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </div>
+    <div className="h-full overflow-x-auto pb-4 custom-scrollbar">
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="flex h-full gap-4 items-start pb-4 px-2">
+          {COLUMNS.map(col => (
+            <Column
+              key={col.id}
+              col={col}
+              applications={filteredApps.filter(app => app.status === col.id)}
+            />
           ))}
         </div>
-      </DragDropContext>
+        
+        <DragOverlay>
+          {activeApp ? (
+             <Card className="bg-surface border-primary outline outline-2 outline-primary shadow-2xl opacity-80 cursor-grabbing w-72">
+               <CardContent className="p-4 flex flex-col gap-3">
+                 <div>
+                   <h4 className="font-semibold text-sm leading-tight mb-1">{activeApp.jobTitle}</h4>
+                   <div className="flex items-center text-xs text-text-sub">
+                     <Building2 className="h-3 w-3 mr-1" /> {activeApp.company}
+                   </div>
+                 </div>
+               </CardContent>
+             </Card>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
     </div>
   );
-};
-
-export default KanbanBoard;
+}

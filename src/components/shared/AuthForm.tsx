@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Loader2, AlertCircle, Globe, Mail, Lock, Eye, EyeOff, ArrowRight, Zap, User } from 'lucide-react';
+import { Loader2, AlertCircle, Globe, Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, User, Briefcase } from 'lucide-react';
 import api from '@/lib/api';
 
 const loginSchema = z.object({
@@ -95,51 +95,53 @@ const AuthForm = ({ mode }: AuthFormProps) => {
   };
 
   return (
-    <div className="relative z-10 w-full max-w-[1000px] min-h-[600px] bg-surface-container/50 backdrop-blur-2xl rounded-[24px] border border-white/5 flex flex-col md:flex-row shadow-[0_0_40px_rgba(0,0,0,0.5)] overflow-hidden animate-in fade-in zoom-in duration-500">
+    <div className="relative z-10 w-full max-w-[1000px] min-h-[600px] bg-surface/50 backdrop-blur-2xl rounded-[24px] border border-white/5 flex flex-col md:flex-row shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-500">
       
       {/* Left Side: Branding / Abstract */}
-      <div className="hidden md:flex w-1/2 relative p-12 flex-col justify-between overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-40 mix-blend-overlay bg-gradient-to-br from-primary/20 via-transparent to-secondary/20" />
+      <div className="hidden md:flex w-1/2 relative p-12 flex-col justify-between overflow-hidden bg-surface-2/30">
+        <div className="absolute inset-0 z-0 opacity-40 mix-blend-overlay bg-linear-to-br from-primary/20 via-transparent to-accent/20" />
         <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-8">
-            <span className="text-2xl font-heading font-bold text-primary">Drouvana</span>
+          <div className="flex items-center gap-2 mb-8">
+            <Briefcase className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold font-hanken text-text-main">Drouvana</span>
           </div>
-          <h1 className="text-4xl font-heading font-bold text-on-surface mt-12 mb-6 italic leading-tight">
-            Accelerate your career trajectory.
+          <h1 className="text-4xl font-bold font-hanken text-text-main mt-12 mb-6 tracking-tight">
+            Accelerate your career <span className="text-primary italic">trajectory.</span>
           </h1>
-          <p className="font-sans text-sm text-on-surface-variant max-w-md leading-relaxed">
+          <p className="text-text-sub text-sm max-w-md leading-relaxed">
             Harness the power of AI to navigate the modern job market, optimize your resume, and land your dream role faster.
           </p>
         </div>
         <div className="relative z-10">
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-surface-container-low/50 backdrop-blur-md border border-white/5 inline-flex">
-            <Zap className="w-4 h-4 text-secondary fill-secondary" />
-            <span className="font-mono text-[10px] uppercase tracking-widest text-secondary">Intelligent. Empowering. High-Velocity.</span>
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-surface/50 backdrop-blur-md border border-white/5 inline-flex">
+            <Sparkles className="w-4 h-4 text-primary fill-primary/20" />
+            <span className="font-jetbrains text-[10px] uppercase tracking-widest text-primary font-bold">Operational AI Ecosystem</span>
           </div>
         </div>
       </div>
 
       {/* Right Side: Auth Card */}
-      <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-surface-container border-l border-white/5 relative z-10">
+      <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-surface border-l border-white/5 relative z-10">
         {/* Mobile Logo */}
         <div className="flex md:hidden items-center justify-center gap-2 mb-8">
-          <span className="text-2xl font-heading font-bold text-primary">Drouvana</span>
+          <Briefcase className="h-6 w-6 text-primary" />
+          <span className="text-2xl font-bold font-hanken text-text-main">Drouvana</span>
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 p-1 bg-surface-container-highest rounded-lg mb-8">
+        <div className="flex space-x-1 p-1 bg-surface-2 rounded-xl mb-8">
           <button 
             onClick={() => router.push('/login')}
-            className={`w-1/2 py-2.5 rounded-md font-mono text-[10px] uppercase tracking-widest transition-all ${
-              mode === 'login' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+            className={`w-1/2 py-2.5 rounded-lg font-jetbrains text-[10px] uppercase tracking-widest transition-all ${
+              mode === 'login' ? 'bg-surface text-text-main shadow-sm border border-white/5' : 'text-text-muted hover:text-text-main'
             }`}
           >
             Login
           </button>
           <button 
             onClick={() => router.push('/register')}
-            className={`w-1/2 py-2.5 rounded-md font-mono text-[10px] uppercase tracking-widest transition-all ${
-              mode === 'register' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+            className={`w-1/2 py-2.5 rounded-lg font-jetbrains text-[10px] uppercase tracking-widest transition-all ${
+              mode === 'register' ? 'bg-surface text-text-main shadow-sm border border-white/5' : 'text-text-muted hover:text-text-main'
             }`}
           >
             Sign Up
@@ -147,10 +149,10 @@ const AuthForm = ({ mode }: AuthFormProps) => {
         </div>
 
         <div className="mb-8">
-          <h2 className="text-xl font-heading font-bold text-on-surface mb-2 italic">
+          <h2 className="text-2xl font-bold font-hanken text-text-main mb-2">
             {mode === 'login' ? 'Welcome back' : 'Create Account'}
           </h2>
-          <p className="font-sans text-sm text-on-surface-variant">
+          <p className="text-text-sub text-sm">
             {mode === 'login' ? 'Enter your details to access your dashboard.' : 'Start your journey towards a smarter career search.'}
           </p>
         </div>
@@ -170,11 +172,11 @@ const AuthForm = ({ mode }: AuthFormProps) => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant ml-1">Full Name</FormLabel>
+                    <FormLabel className="font-jetbrains text-[10px] uppercase tracking-widest text-text-muted ml-1">Full Identity</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
-                        <Input placeholder="John Doe" className="bg-surface-container-lowest border-outline-variant rounded-xl h-12 pl-12 pr-4 font-sans focus:border-primary transition-all" {...field} />
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                        <Input placeholder="John Doe" className="bg-surface-2 border-none rounded-xl h-12 pl-12 pr-4 focus-visible:ring-primary transition-all" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -188,11 +190,11 @@ const AuthForm = ({ mode }: AuthFormProps) => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant ml-1">Email</FormLabel>
+                  <FormLabel className="font-jetbrains text-[10px] uppercase tracking-widest text-text-muted ml-1">Communication Node</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
-                      <Input placeholder="name@company.com" className="bg-surface-container-lowest border-outline-variant rounded-xl h-12 pl-12 pr-4 font-sans focus:border-primary transition-all" {...field} />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                      <Input placeholder="name@company.com" className="bg-surface-2 border-none rounded-xl h-12 pl-12 pr-4 focus-visible:ring-primary transition-all" {...field} />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -205,22 +207,22 @@ const AuthForm = ({ mode }: AuthFormProps) => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant ml-1">Password</FormLabel>
+                  <FormLabel className="font-jetbrains text-[10px] uppercase tracking-widest text-text-muted ml-1">Security Key</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                       <Input 
                         type={showPassword ? "text" : "password"} 
                         placeholder="••••••••" 
-                        className="bg-surface-container-lowest border-outline-variant rounded-xl h-12 pl-12 pr-12 font-sans focus:border-primary transition-all" 
+                        className="bg-surface-2 border-none rounded-xl h-12 pl-12 pr-12 focus-visible:ring-primary transition-all" 
                         {...field} 
                       />
                       <button 
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-main transition-colors"
                       >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
                   </FormControl>
@@ -231,64 +233,49 @@ const AuthForm = ({ mode }: AuthFormProps) => {
 
             <Button 
               type="submit" 
-              className="w-full bg-gradient-primary hover:opacity-90 h-12 text-white rounded-xl font-heading font-bold italic tracking-wide shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 border-none mt-6"
+              className="w-full rounded-xl h-12 font-bold shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 border-none mt-6"
               disabled={isLoading}
             >
               {isLoading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 <>
-                  {mode === 'login' ? 'Sign In' : 'Create Account'}
-                  <ArrowRight className="w-5 h-5" />
+                  {mode === 'login' ? 'Initialize Session' : 'Create Profile'}
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </Button>
           </form>
         </Form>
 
-        <div className="mt-6 flex items-center justify-center gap-4">
+        <div className="mt-8 flex items-center justify-center gap-4">
           <div className="h-px bg-white/5 flex-1" />
-          <span className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant">OR</span>
+          <span className="font-jetbrains text-[10px] uppercase tracking-widest text-text-muted">Vector Access</span>
           <div className="h-px bg-white/5 flex-1" />
         </div>
 
-        <div className="mt-6 flex flex-col gap-3">
+        <div className="mt-6 grid grid-cols-2 gap-3">
           <Button 
             variant="outline" 
-            className="h-12 border-outline-variant hover:border-secondary hover:bg-secondary/5 rounded-xl font-sans text-sm transition-all gap-3"
+            className="h-11 rounded-xl text-xs gap-2"
             onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
             disabled={isLoading}
           >
             <Globe className="w-4 h-4 text-primary" />
-            Continue with Google
+            Google
           </Button>
-          
-          {mode === 'login' && (
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex-1 h-10 border-outline-variant rounded-xl font-mono text-[10px] uppercase tracking-widest"
-                onClick={() => {
-                  form.setValue('email', 'demo@drouvana.com');
-                  form.setValue('password', 'Demo@1234');
-                }}
-              >
-                Demo User
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex-1 h-10 border-outline-variant rounded-xl font-mono text-[10px] uppercase tracking-widest"
-                onClick={() => {
-                  form.setValue('email', 'admin@drouvana.com');
-                  form.setValue('password', 'Admin@1234');
-                }}
-              >
-                Demo Admin
-              </Button>
-            </div>
-          )}
+          <Button 
+            variant="outline" 
+            className="h-11 rounded-xl text-xs gap-2"
+            onClick={() => {
+                form.setValue('email', 'demo@drouvana.com');
+                form.setValue('password', 'Demo@1234');
+            }}
+            disabled={isLoading}
+          >
+            <Sparkles className="w-4 h-4 text-primary" />
+            Demo
+          </Button>
         </div>
       </div>
     </div>

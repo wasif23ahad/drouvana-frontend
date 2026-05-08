@@ -13,78 +13,82 @@ import {
   Plus,
   HelpCircle,
   LogOut,
-  Zap
+  Zap,
+  MessageSquare,
+  ListTodo
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { signOut } from 'next-auth/react';
-
-const navLinks = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Tracker', href: '/dashboard/tracker', icon: Briefcase },
-  { name: 'Master Profile', href: '/dashboard/resume', icon: FileText },
-  { name: 'AI Optimization', href: '/dashboard/workspace', icon: Zap },
-  { name: 'AI Assistant', href: '/dashboard/assistant', icon: Sparkles },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
-];
+import { signOut, useSession } from 'next-auth/react';
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  const userNavLinks = [
+    { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Job Tracker', href: '/dashboard/tracker', icon: ListTodo },
+    { name: 'Master Profile', href: '/dashboard/resume', icon: FileText },
+    { name: 'AI Coach', href: '/dashboard/assistant', icon: MessageSquare },
+  ];
+
+  const adminNavLinks = [
+    ...userNavLinks,
+    { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+  ];
+
+  const isAdmin = session?.user?.role === 'ADMIN';
+  const navLinks = isAdmin ? adminNavLinks : userNavLinks;
 
   return (
-    <aside className="bg-surface-container backdrop-blur-xl border-r border-white/10 w-72 flex flex-col h-screen fixed left-0 top-0 z-50 overflow-y-auto hidden lg:flex shrink-0">
-      <div className="p-6">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center text-primary">
-             <Zap className="w-5 h-5 fill-primary/20" />
-          </div>
-          <div>
-            <h1 className="text-lg font-heading font-bold text-primary italic leading-none">Drouvana</h1>
-            <p className="font-mono text-[8px] uppercase tracking-widest text-on-surface-variant">AI Job Tracker</p>
-          </div>
-        </div>
+    <aside className="bg-[var(--color-surface)] border-r border-[#334155] w-72 flex flex-col h-screen fixed left-0 top-0 z-50 overflow-y-auto hidden lg:flex shrink-0">
+      <div className="p-6 border-b border-[#334155]">
+        <Link href="/dashboard" className="flex items-center gap-2 group">
+          <Briefcase className="h-6 w-6 text-primary group-hover:scale-110 transition-transform" />
+          <span className="text-xl font-bold font-hanken tracking-tight text-text-main">Drouvana</span>
+        </Link>
       </div>
 
-      <div className="px-4 mb-6">
-        <Link href="/dashboard/tracker?new=true">
-          <Button className="w-full bg-gradient-primary text-white py-2.5 px-4 rounded-xl font-heading font-bold italic text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(128,131,255,0.2)] border-none h-11">
+      <div className="px-4 py-6">
+        <Link href="/dashboard/tracker">
+          <Button className="w-full rounded-xl font-bold gap-2 border-none h-11 shadow-lg shadow-primary/10">
             <Plus className="w-4 h-4" />
             New Application
           </Button>
         </Link>
       </div>
 
-      <nav className="flex-1 px-2 space-y-1">
+      <nav className="flex-1 px-3 space-y-1">
         {navLinks.map((link) => {
-          const isActive = pathname === link.href;
+          const isActive = pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href));
           return (
             <Link
               key={link.name}
               href={link.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 isActive 
                   ? 'bg-primary/10 text-primary' 
-                  : 'text-on-surface-variant hover:bg-white/5 hover:text-on-surface'
+                  : 'text-text-sub hover:bg-surface-2 hover:text-text-main'
               }`}
             >
-              <link.icon className={`w-5 h-5 ${isActive ? 'fill-primary/10' : ''}`} />
+              <link.icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-text-muted'}`} />
               {link.name}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-white/5 mt-auto space-y-1">
+      <div className="p-4 border-t border-[#334155] mt-auto space-y-1">
         <Link 
           href="/help"
-          className="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-on-surface transition-colors rounded-lg text-sm"
+          className="flex items-center gap-3 px-4 py-2 text-text-muted hover:text-text-main transition-colors rounded-xl text-sm font-medium"
         >
           <HelpCircle className="w-4 h-4" />
-          Help
+          Help Center
         </Link>
         <button 
           onClick={() => signOut()}
-          className="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-error transition-colors rounded-lg text-sm w-full text-left"
+          className="flex items-center gap-3 px-4 py-2 text-text-muted hover:text-error transition-colors rounded-xl text-sm font-medium w-full text-left"
         >
           <LogOut className="w-4 h-4" />
           Logout

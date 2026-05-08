@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, X, User, LogOut, LayoutDashboard, 
-  Sparkles, Bell, Settings 
+  Sparkles, Bell, Settings, Briefcase, ChevronRight 
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSession, signOut } from 'next-auth/react';
@@ -34,10 +34,10 @@ const Navbar = () => {
   }, []);
 
   const publicLinks = [
-    { name: 'Features', href: '#features' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'About', href: '#about' },
-    { name: 'Blog', href: '#blog' },
+    { name: 'Features', href: '/#features' },
+    { name: 'How it Works', href: '/#how-it-works' },
+    { name: 'Testimonials', href: '/#testimonials' },
+    { name: 'Pricing', href: '/#pricing' },
   ];
 
   const privateLinks = [
@@ -51,13 +51,14 @@ const Navbar = () => {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled ? 'bg-surface/80 backdrop-blur-lg border-b border-white/10' : 'bg-transparent'
+      scrolled ? 'bg-[#0F172A]/80 backdrop-blur-md border-b border-[#334155]' : 'bg-transparent'
     }`}>
-      <div className="max-w-spacing-container-max mx-auto px-spacing-margin-desktop py-4 flex items-center justify-between">
+      <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-8">
           {/* Logo */}
-          <Link href="/" className="text-xl font-heading font-bold text-primary">
-            Drouvana
+          <Link href="/" className="flex items-center gap-2 group">
+            <Briefcase className="h-6 w-6 text-primary group-hover:scale-110 transition-transform" />
+            <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-linear-to-r from-white to-slate-400 font-hanken">Drouvana</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -66,8 +67,8 @@ const Navbar = () => {
               <Link 
                 key={link.name} 
                 href={link.href}
-                className={`text-sm font-sans font-medium transition-colors hover:text-primary ${
-                  pathname === link.href ? 'text-primary' : 'text-on-surface-variant'
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  pathname === link.href ? 'text-primary' : 'text-text-sub'
                 }`}
               >
                 {link.name}
@@ -79,7 +80,7 @@ const Navbar = () => {
         {/* Action Section */}
         <div className="flex items-center gap-4">
           {status === 'loading' ? (
-            <div className="w-8 h-8 rounded-full bg-surface-container animate-pulse" />
+            <div className="w-8 h-8 rounded-full bg-surface-2 animate-pulse" />
           ) : session ? (
             <div className="flex items-center gap-4">
               <button className="text-primary hover:opacity-80 transition-opacity">
@@ -87,48 +88,50 @@ const Navbar = () => {
               </button>
               <DropdownMenu>
                 <DropdownMenuTrigger className="outline-none">
-                  <Avatar className="h-9 w-9 border border-primary/20">
+                  <Avatar className="h-9 w-9 border border-primary/20 hover:border-primary/50 transition-colors">
                     <AvatarImage src={session.user?.image || ''} alt={session.user?.name || ''} />
-                    <AvatarFallback className="bg-primary-container/20 text-primary text-xs font-bold">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                       {session.user?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-64 glass p-2 rounded-xl mt-2" align="end">
+                <DropdownMenuContent className="w-64 glass-card p-2 rounded-xl mt-2 border-[var(--color-border-subtle)]" align="end">
                   <DropdownMenuLabel className="p-3">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-bold text-on-surface">{session.user?.name}</p>
-                      <p className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">{session.user?.email}</p>
+                      <p className="text-sm font-bold text-text-main">{session.user?.name}</p>
+                      <p className="text-[10px] font-jetbrains uppercase tracking-widest text-text-muted">{session.user?.email}</p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-white/5" />
                   <DropdownMenuItem onClick={() => router.push('/dashboard')} className="rounded-lg p-3 focus:bg-primary/10 cursor-pointer">
                     <LayoutDashboard className="mr-3 h-4 w-4 text-primary" />
-                    <span className="text-xs font-bold uppercase tracking-widest">Dashboard</span>
+                    <span className="text-xs font-bold uppercase tracking-widest font-jetbrains">Dashboard</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/profile')} className="rounded-lg p-3 focus:bg-primary/10 cursor-pointer">
+                  <DropdownMenuItem onClick={() => router.push('/dashboard/resume')} className="rounded-lg p-3 focus:bg-primary/10 cursor-pointer">
                     <User className="mr-3 h-4 w-4 text-primary" />
-                    <span className="text-xs font-bold uppercase tracking-widest">Profile</span>
+                    <span className="text-xs font-bold uppercase tracking-widest font-jetbrains">Profile</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => router.push('/dashboard/settings')} className="rounded-lg p-3 focus:bg-primary/10 cursor-pointer">
                     <Settings className="mr-3 h-4 w-4 text-primary" />
-                    <span className="text-xs font-bold uppercase tracking-widest">Settings</span>
+                    <span className="text-xs font-bold uppercase tracking-widest font-jetbrains">Settings</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-white/5" />
                   <DropdownMenuItem onClick={() => signOut()} className="rounded-lg p-3 text-error focus:bg-error/10 cursor-pointer">
                     <LogOut className="mr-3 h-4 w-4" />
-                    <span className="text-xs font-bold uppercase tracking-widest">Log out</span>
+                    <span className="text-xs font-bold uppercase tracking-widest font-jetbrains">Log out</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <Link href="/login" className="hidden md:block text-sm font-sans font-medium text-on-surface-variant hover:text-primary transition-colors">
-                Sign In
+              <Link href="/login">
+                <Button variant="ghost" className="hidden sm:inline-flex text-sm font-medium hover:text-primary transition-colors h-9">
+                  Sign In
+                </Button>
               </Link>
               <Link href="/register">
-                <Button className="bg-gradient-primary text-white px-6 py-2 rounded-xl text-sm font-sans font-medium hover:opacity-90 transition-opacity h-10 border-none">
+                <Button className="rounded-full px-6 h-10 text-sm font-medium">
                   Get Started
                 </Button>
               </Link>
@@ -137,7 +140,7 @@ const Navbar = () => {
 
           {/* Mobile Menu Toggle */}
           <button 
-            className="md:hidden text-primary"
+            className="md:hidden text-primary p-2"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -152,15 +155,15 @@ const Navbar = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="md:hidden absolute top-full left-0 right-0 bg-surface-container/95 backdrop-blur-xl border-b border-white/10 p-6 flex flex-col gap-4"
+            className="md:hidden absolute top-full left-0 right-0 bg-[#0F172A]/95 backdrop-blur-xl border-b border-[#334155] p-6 flex flex-col gap-4"
           >
             {currentLinks.map((link) => (
               <Link 
                 key={link.name} 
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className={`text-lg font-bold italic transition-all ${
-                  pathname === link.href ? 'text-primary' : 'text-on-surface-variant'
+                className={`text-lg font-bold font-hanken transition-all ${
+                  pathname === link.href ? 'text-primary' : 'text-text-sub'
                 }`}
               >
                 {link.name}
@@ -169,10 +172,10 @@ const Navbar = () => {
             {!session && (
               <div className="flex flex-col gap-3 pt-4 border-t border-white/5">
                 <Link href="/login" onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" className="w-full h-12 rounded-xl font-bold uppercase tracking-widest text-xs border-primary text-primary">Login</Button>
+                  <Button variant="outline" className="w-full h-12 rounded-full font-bold uppercase tracking-widest text-xs border-primary text-primary">Login</Button>
                 </Link>
                 <Link href="/register" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full h-12 rounded-xl bg-gradient-primary text-white font-bold uppercase tracking-widest text-xs border-none">Get Started</Button>
+                  <Button className="w-full h-12 rounded-full font-bold uppercase tracking-widest text-xs border-none">Get Started</Button>
                 </Link>
               </div>
             )}

@@ -1,221 +1,217 @@
-"use client";
-
-import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  Rocket, Target, Zap, Sparkles, 
-  ArrowRight, Star, HelpCircle,
-  Users, BrainCircuit, FileText, Loader2, PlayCircle
-} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import api from '@/lib/api';
-import { cn } from '@/lib/utils';
-
-const FEATURES = [
-  { 
-    title: 'AI JD Parsing', 
-    desc: 'Paste a job URL, and Drouvana extracts key requirements, skills, and salary data in seconds, adding it directly to your tracker.',
-    icon: BrainCircuit,
-    color: 'bg-primary/10 text-primary'
-  },
-  { 
-    title: 'Resume Tailoring', 
-    desc: 'Our engine compares your master resume against parsed job descriptions to suggest high-impact keyword optimizations instantly.',
-    icon: Target,
-    color: 'bg-secondary/10 text-secondary'
-  },
-  { 
-    title: 'Cover Letter Gen', 
-    desc: 'Generate highly personalized, context-aware cover letters based on your profile and the specific company\'s requirements.',
-    icon: FileText,
-    color: 'bg-tertiary/10 text-tertiary'
-  },
-];
-
-const FAQS = [
-  { q: 'How does the AI tailoring work?', a: 'Our agentic AI analyzes the JD and your master resume, then intelligently rewrites bullet points to match requirements while preserving truthfulness.' },
-  { q: 'Is my data safe?', a: 'Absolutely. We use industry-standard encryption and never share your data with third parties.' },
-  { q: 'Can I track my applications?', a: 'Yes, Drouvana includes a full-featured CRM to track every application status from "Sent" to "Offer".' },
-];
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { 
+  ArrowRight, BarChart3, Briefcase, CheckCircle2, 
+  FileText, LineChart, Mail, MessageSquare, 
+  ShieldCheck, Sparkles, Star 
+} from 'lucide-react';
 
 export default function LandingPage() {
-  const [stats, setStats] = useState<any>(null);
-  const [templates, setTemplates] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchLandingData = async () => {
-    try {
-      setLoading(true);
-      const [statsRes, templatesRes] = await Promise.all([
-        api.get('/api/admin/stats'), 
-        api.get('/api/templates', { params: { limit: 4, sort: 'popular' } })
-      ]);
-      setStats(statsRes.data);
-      setTemplates(templatesRes.data.templates);
-    } catch (error) {
-      console.error('Failed to fetch landing data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchLandingData();
-  }, []);
-
   return (
-    <div className="flex flex-col gap-24 pb-32">
-      {/* 1. Hero Section */}
-      <section className="relative min-h-[665px] flex items-center justify-center overflow-hidden py-24">
-        {/* Background Gradient Mesh */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[70%] bg-primary-container/20 blur-[120px] rounded-full mix-blend-screen"></div>
-          <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[80%] bg-tertiary-container/20 blur-[150px] rounded-full mix-blend-screen"></div>
-        </div>
-
-        <div className="relative z-10 max-w-spacing-container-max mx-auto px-spacing-margin-desktop flex flex-col lg:flex-row items-center gap-spacing-gutter">
-          <div className="lg:w-1/2 flex flex-col gap-6 text-center lg:text-left">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-on-surface leading-tight tracking-tight italic">
-              The AI-Powered Job Tracker of <span className="text-gradient">2026</span>
+    <div className="flex flex-col">
+      <main className="flex-1">
+        {/* 1. Hero Section */}
+        <section className="relative w-full py-20 md:py-32 lg:py-40 overflow-hidden flex items-center justify-center min-h-[60vh]">
+          <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
+            <Badge variant="outline" className="mb-6 py-1.5 px-4 rounded-full border-primary/30 bg-primary/10 text-primary">
+              <Sparkles className="h-3.5 w-3.5 mr-2" />
+              AI-Powered Job Tracker 1.0
+            </Badge>
+            <h1 className="max-w-4xl mx-auto text-4xl md:text-5xl lg:text-7xl font-hanken font-bold tracking-tight mb-8 text-text-main">
+              Land your dream job, <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-secondary">on autopilot.</span>
             </h1>
-            <p className="font-sans text-lg text-on-surface-variant max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              Stop manually updating spreadsheets. Drouvana intelligently tracks your applications across platforms, extracts job details automatically, and helps you tailor resumes with a single click.
+            <p className="max-w-2xl mx-auto text-lg md:text-xl text-text-sub mb-10">
+              Stop tracking jobs in spreadsheets. Drouvana uses AI to parse job descriptions, tailor your resume, write cover letters, and track your applications in one seamless board.
             </p>
-            <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-              <Link href="/register" className="w-full sm:w-auto">
-                <Button className="bg-gradient-primary text-white px-8 py-3 rounded-xl text-lg font-bold w-full h-14 hover:shadow-[0_0_30px_rgba(192,193,255,0.3)] transition-all border-none">
-                  Get Started Free
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/register">
+                <Button size="lg" className="w-full sm:w-auto rounded-full group">
+                  Start for free
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Button variant="outline" className="border-secondary text-secondary px-8 py-3 rounded-xl text-lg font-bold w-full sm:w-auto h-14 hover:bg-secondary/10 transition-colors flex items-center justify-center gap-2">
-                <PlayCircle className="w-5 h-5" /> Watch Demo
-              </Button>
-            </div>
-          </div>
-
-          <div className="lg:w-1/2 relative w-full aspect-video lg:aspect-auto lg:h-[500px]">
-            <div className="absolute inset-0 bg-surface-container rounded-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-3xl overflow-hidden flex flex-col">
-              {/* Mockup Header */}
-              <div className="h-12 border-b border-white/5 flex items-center px-4 gap-2 bg-surface-container-highest/50">
-                <div className="w-3 h-3 rounded-full bg-error"></div>
-                <div className="w-3 h-3 rounded-full bg-secondary-container"></div>
-                <div className="w-3 h-3 rounded-full bg-primary-container"></div>
-              </div>
-              {/* Mockup Body */}
-              <div className="flex-1 p-6 relative">
-                <div className="w-full h-full bg-surface-container-lowest/50 rounded-lg flex items-center justify-center border border-white/5">
-                   <div className="flex flex-col items-center gap-4">
-                      <Sparkles className="w-12 h-12 text-primary animate-pulse" />
-                      <p className="font-mono text-xs text-on-surface-variant uppercase tracking-widest">Infiltrating Pipeline...</p>
-                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Features Section */}
-      <section className="py-24 bg-surface-container-lowest" id="features">
-        <div className="max-w-spacing-container-max mx-auto px-spacing-margin-desktop">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-heading font-bold text-on-surface mb-4">Intelligent Workflows</h2>
-            <p className="font-sans text-lg text-on-surface-variant max-w-2xl mx-auto">
-              Automate the tedious parts of your job search. Our AI handles the heavy lifting so you can focus on interviewing.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-spacing-gutter">
-            {FEATURES.map((f, i) => (
-              <div key={i} className="bg-surface-container/50 backdrop-blur-xl border border-white/10 rounded-xl p-8 hover:border-primary/50 transition-colors group">
-                <div className={cn("w-12 h-12 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform", f.color)}>
-                  <f.icon className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-heading font-bold text-on-surface mb-3">{f.title}</h3>
-                <p className="font-sans text-sm text-on-surface-variant leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Stats Section */}
-      <section className="container mx-auto px-spacing-margin-desktop">
-        {loading ? (
-          <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary w-10 h-10" /></div>
-        ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { label: 'Resumes Tailored', value: stats?.tokensUsed ? `${(stats.tokensUsed / 1000).toFixed(0)}k+` : '45k+', icon: FileText },
-              { label: 'Active Seekers', value: stats?.totalUsers ? `${stats.totalUsers}+` : '12k+', icon: Users },
-              { label: 'Applications', value: stats?.totalApplications ? `${stats.totalApplications}+` : '150k+', icon: Target },
-              { label: 'Avg Match Score', value: '88%', icon: Zap },
-            ].map((s, i) => (
-              <div key={i} className="glass-card p-8 rounded-[32px] text-center space-y-2">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto text-primary">
-                  <s.icon className="w-6 h-6" />
-                </div>
-                <h3 className="text-4xl font-heading font-bold italic">{s.value}</h3>
-                <p className="font-mono text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* 4. Template Cards */}
-      <section className="container mx-auto px-spacing-margin-desktop space-y-12">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-6">
-          <div className="space-y-2">
-            <h2 className="text-4xl font-heading font-bold text-on-surface italic">Premium Designs</h2>
-            <p className="text-on-surface-variant">Every template is battle-tested against modern ATS algorithms.</p>
-          </div>
-          <Link href="/templates">
-            <Button variant="ghost" className="text-primary font-bold uppercase tracking-widest text-xs gap-2">
-              View All Templates <ArrowRight className="w-4 h-4" />
-            </Button>
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {loading ? (
-             Array.from({ length: 4 }).map((_, i) => <div key={i} className="aspect-3/4 bg-surface-container rounded-[32px] animate-pulse" />)
-          ) : templates.map((t, i) => (
-            <Link href={`/templates/${t.id}`} key={i} className="glass-card rounded-[32px] overflow-hidden group flex flex-col h-full">
-              <div className="relative aspect-3/4 overflow-hidden">
-                <img src={t.previewImage} alt={t.title} className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700" />
-                <div className="absolute top-4 right-4 px-3 py-1 bg-black/40 backdrop-blur-md rounded-lg flex items-center gap-1 text-white text-[10px] font-bold">
-                  <Star className="w-3 h-3 text-amber-400 fill-amber-400" /> {t.atsScore / 20}
-                </div>
-              </div>
-              <div className="p-6 space-y-4 flex flex-1 flex-col">
-                <div>
-                  <p className="font-mono text-[10px] uppercase tracking-widest font-bold text-primary mb-1">{t.category}</p>
-                  <h4 className="text-lg font-bold text-on-surface">{t.title}</h4>
-                </div>
-                <p className="text-xs text-on-surface-variant leading-relaxed flex-1 truncate">{t.description}</p>
-                <Button className="w-full rounded-xl bg-surface-container group-hover:bg-primary group-hover:text-white border border-white/10 transition-all font-bold text-xs uppercase tracking-widest h-10 border-none">
-                  Select Template
+              <Link href="#features">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto rounded-full">
+                  See how it works
                 </Button>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+              </Link>
+            </div>
+          </div>
+        </section>
 
-      {/* 5. Call to Action Footer */}
-      <section className="container mx-auto px-spacing-margin-desktop text-center py-20 bg-primary/5 rounded-[64px] border border-primary/20 space-y-8 relative overflow-hidden group">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-        <h2 className="text-5xl md:text-7xl font-heading font-bold italic leading-tight relative z-10 text-on-surface">
-          Ready to Claim Your <br />Next <span className="text-gradient">Opportunity</span>?
-        </h2>
-        <p className="text-xl text-on-surface-variant max-w-xl mx-auto relative z-10">
-          Join {stats?.totalUsers ? `${stats.totalUsers}+` : '12,000+'} professionals who are outsmarting the modern hiring machine.
-        </p>
-        <Link href="/register" className="inline-block relative z-10">
-          <Button size="lg" className="h-16 px-12 rounded-2xl bg-gradient-primary text-xl font-bold italic gap-3 shadow-2xl shadow-primary/30 hover:scale-105 transition-all border-none">
-            Join the Infiltration <Rocket className="w-6 h-6" />
-          </Button>
-        </Link>
-      </section>
+        {/* 2. Core Listing / Features Section */}
+        <section id="features" className="w-full py-20 bg-transparent">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-hanken font-bold mb-4">Everything you need to get hired</h2>
+              <p className="text-text-sub text-lg max-w-2xl mx-auto">Our AI toolset is designed specifically for modern job seekers.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { title: 'Job Tracker', desc: 'Kanban board for all applications with automated data parsing.', icon: BarChart3, price: 'Included', rating: '4.9/5' },
+                { title: 'AI Resume Builder', desc: 'Create tailored resumes instantly based on the job description.', icon: FileText, price: 'Included', rating: '4.8/5' },
+                { title: 'Cover Letters', desc: 'Generate keyword-optimized cover letters in seconds.', icon: Mail, price: 'Included', rating: '4.7/5' },
+                { title: 'AI Career Coach', desc: 'Get interview prep and actionable advice from an AI assistant.', icon: MessageSquare, price: 'Premium', rating: '5.0/5' }
+              ].map((feature, i) => (
+                <Card key={i} className="flex flex-col h-full hover:border-primary/50 transition-colors">
+                  <CardHeader>
+                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                      <feature.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-1">
+                    <CardDescription className="text-base text-text-sub">{feature.desc}</CardDescription>
+                  </CardContent>
+                  <CardFooter className="flex flex-col items-start gap-4 border-t border-border-subtle pt-6 mt-auto">
+                    <div className="flex w-full justify-between items-center text-sm">
+                      <span className="font-medium">{feature.price}</span>
+                      <span className="flex items-center text-amber-500 font-medium"><Star className="h-3 w-3 mr-1 fill-current" />{feature.rating}</span>
+                    </div>
+                    <Button variant="outline" className="w-full rounded-xl">View Details</Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 3. Highlights Section */}
+        <section className="w-full py-20 bg-transparent">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-3xl md:text-5xl font-hanken font-bold mb-6">Stop guessing. Start matching.</h2>
+                <ul className="space-y-4">
+                  {[
+                    'Instant ATS compatibility scoring',
+                    'Missing keyword identification',
+                    'One-click resume tailoring',
+                    'Real-time status updates'
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center text-lg text-text-main">
+                      <CheckCircle2 className="h-6 w-6 mr-3 text-success" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="glass-card rounded-2xl p-12 shadow-xl aspect-square flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2" />
+                <div className="text-center text-text-sub relative z-10">
+                  <LineChart className="h-20 w-20 mx-auto text-primary mb-4 opacity-50" />
+                  <p className="font-jetbrains uppercase tracking-widest text-xs">Intelligence Preview</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 4. Statistics Section */}
+        <section className="w-full py-20 glass-card mx-auto max-w-7xl rounded-3xl my-12 border-white/5 shadow-2xl">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div>
+                <div className="text-4xl md:text-5xl font-bold font-hanken mb-2 text-primary">3x</div>
+                <div className="text-text-sub text-sm uppercase tracking-widest font-jetbrains">More Interviews</div>
+              </div>
+              <div>
+                <div className="text-4xl md:text-5xl font-bold font-hanken mb-2 text-secondary">95%</div>
+                <div className="text-text-sub text-sm uppercase tracking-widest font-jetbrains">ATS Match Rate</div>
+              </div>
+              <div>
+                <div className="text-4xl md:text-5xl font-bold font-hanken mb-2 text-accent">10h+</div>
+                <div className="text-text-sub text-sm uppercase tracking-widest font-jetbrains">Saved Weekly</div>
+              </div>
+              <div>
+                <div className="text-4xl md:text-5xl font-bold font-hanken mb-2 text-success">10k+</div>
+                <div className="text-text-sub text-sm uppercase tracking-widest font-jetbrains">Jobs Tracked</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 5. How it Works */}
+        <section id="how-it-works" className="w-full py-20 bg-transparent">
+          <div className="container mx-auto px-4 md:px-6">
+             <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-hanken font-bold mb-4">How Drouvana Works</h2>
+              <p className="text-text-sub text-lg max-w-2xl mx-auto">Three simple steps to accelerate your career trajectory.</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+               {[
+                { step: '01', title: 'Save a Job', desc: 'Drop a URL from LinkedIn or Indeed. AI extracts all the details instantly.' },
+                { step: '02', title: 'Tailor & Apply', desc: 'Get an AI-tailored resume and cover letter matching the job requirements.' },
+                { step: '03', title: 'Track Progress', desc: 'Move cards on your Kanban board and automate follow-up emails.' }
+               ].map((item, i) => (
+                 <div key={i} className="relative p-8 rounded-2xl glass-card group hover:border-primary/30 transition-all">
+                   <div className="text-6xl font-hanken font-black text-white/5 absolute top-4 right-4 group-hover:text-primary/10 transition-colors">{item.step}</div>
+                   <h3 className="text-xl font-bold mb-3 mt-8 relative z-10">{item.title}</h3>
+                   <p className="text-text-sub relative z-10 leading-relaxed">{item.desc}</p>
+                 </div>
+               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 6. Testimonials */}
+        <section id="testimonials" className="w-full py-20 bg-transparent">
+          <div className="container mx-auto px-4 md:px-6">
+            <h2 className="text-3xl md:text-4xl font-hanken font-bold mb-12 text-center">Loved by Job Seekers</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { quote: "I was spending hours tweaking my resume for every application. Drouvana does it in seconds.", author: "Sarah J.", role: "Software Engineer" },
+                { quote: "The Kanban board is a lifesaver. I finally know exactly where I stand with my 40+ applications.", author: "Michael T.", role: "Product Manager" },
+                { quote: "The AI coach helped me prep for my interview at Google and I got the offer!", author: "Elena R.", role: "UX Designer" }
+              ].map((test, i) => (
+                <Card key={i} className="glass-card hover:bg-white/5 transition-colors">
+                  <CardHeader>
+                    <div className="flex gap-1 mb-2">
+                       {[...Array(5)].map((_, j) => <Star key={j} className="h-4 w-4 fill-amber-500 text-amber-500" />)}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-text-main italic mb-6 leading-relaxed">&quot;{test.quote}&quot;</p>
+                    <div>
+                      <p className="font-semibold font-hanken text-primary">{test.author}</p>
+                      <p className="text-sm text-text-muted font-jetbrains uppercase tracking-widest">{test.role}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 7. Security / Privacy */}
+        <section className="w-full py-24 bg-transparent border-t border-white/5">
+          <div className="container mx-auto px-4 md:px-6 text-center">
+             <div className="h-16 w-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-8">
+               <ShieldCheck className="h-8 w-8 text-primary" />
+             </div>
+             <h2 className="text-3xl font-bold mb-4 font-hanken">Your Data is Secure</h2>
+             <p className="text-text-sub max-w-2xl mx-auto text-lg leading-relaxed">
+               We do not sell your personal data or resume information to third parties. Your job search is completely private and encrypted.
+             </p>
+          </div>
+        </section>
+
+        {/* 8. CTA Section */}
+        <section className="w-full py-24 bg-linear-to-br from-primary to-accent text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
+          <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
+             <h2 className="text-4xl md:text-6xl font-hanken font-bold mb-6">Ready to land your next role?</h2>
+             <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">Join thousands of job seekers who are getting hired faster with AI-powered intelligence.</p>
+             <Link href="/register">
+               <Button size="lg" className="bg-white text-primary hover:bg-white/90 rounded-full h-16 px-12 text-xl font-bold shadow-2xl">
+                 Create your free account
+               </Button>
+             </Link>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

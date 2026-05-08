@@ -93,22 +93,22 @@ export default function Step4HealthScore() {
         
         <div className="text-center space-y-6 max-w-lg">
           <div className="space-y-2">
-            <h3 className="text-3xl font-heading font-bold text-on-surface italic tracking-tight">Neural Verification...</h3>
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary font-black animate-pulse">
+            <h3 className="text-3xl font-hanken font-bold text-text-main italic tracking-tight">Neural Verification...</h3>
+            <p className="font-jetbrains text-[10px] uppercase tracking-[0.3em] text-primary font-black animate-pulse">
               PROTOCOL {progress < 30 ? '01: SEMANTIC_PARSING' : progress < 60 ? '02: VECTOR_ALIGNMENT' : '03: ATS_SIMULATION'}
             </p>
           </div>
           
           <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden shadow-inner">
             <motion.div 
-              className="bg-gradient-primary h-full"
+              className="bg-primary h-full"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
 
-          <div className="p-8 bg-surface-container rounded-[2rem] border border-white/5 text-[11px] text-left font-mono text-on-surface-variant/40 line-clamp-3 h-24 overflow-hidden italic shadow-lg">
+          <div className="p-8 bg-surface-2 rounded-4xl border border-white/5 text-[11px] text-left font-jetbrains text-text-muted/40 line-clamp-3 h-24 overflow-hidden italic shadow-lg">
             {streamingText || "Initializing ATS simulation engine: loading vector space..."}
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function Step4HealthScore() {
   return (
     <div className="space-y-16 max-w-5xl mx-auto animate-in slide-in-from-bottom-10 duration-700">
       {/* Score Header */}
-      <div className="flex flex-col md:flex-row items-center gap-12 bg-surface-container-high/50 p-12 rounded-[3rem] border border-white/5 relative overflow-hidden shadow-2xl">
+      <div className="flex flex-col md:flex-row items-center gap-12 bg-surface-2/30 p-12 rounded-[3rem] border border-white/5 relative overflow-hidden shadow-2xl">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] pointer-events-none -z-10" />
         
         <div className="relative w-56 h-56 flex items-center justify-center shrink-0">
@@ -139,21 +139,21 @@ export default function Step4HealthScore() {
             />
           </svg>
           <div className="absolute flex flex-col items-center">
-            <span className="text-6xl font-heading font-bold text-on-surface italic tracking-tighter">{score}%</span>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] font-black text-on-surface-variant">Strategic Match</span>
+            <span className="text-6xl font-hanken font-bold text-text-main italic tracking-tighter">{score}%</span>
+            <span className="font-jetbrains text-[9px] uppercase tracking-[0.2em] font-black text-text-muted">Strategic Match</span>
           </div>
         </div>
 
         <div className="flex-1 space-y-6 text-center md:text-left">
           <div className="space-y-2">
-            <h2 className="text-4xl font-heading font-bold text-on-surface italic tracking-tight leading-tight">Optimization Success 🚀</h2>
-            <p className="font-sans text-on-surface-variant text-lg leading-relaxed italic">
+            <h2 className="text-4xl font-hanken font-bold text-text-main italic tracking-tight leading-tight">Optimization Success 🚀</h2>
+            <p className="text-text-sub text-lg leading-relaxed italic">
               Your architectural profile demonstrates a <strong>{score}%</strong> probability of bypass-success through automated verification layers.
             </p>
           </div>
           <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-            <div className="px-5 py-2 bg-primary/10 text-primary rounded-xl font-mono text-[10px] uppercase tracking-widest font-black border border-primary/20">Vector Aligned</div>
-            <div className="px-5 py-2 bg-secondary/10 text-secondary rounded-xl font-mono text-[10px] uppercase tracking-widest font-black border border-secondary/20">Keywords Injected</div>
+            <div className="px-5 py-2 bg-primary/10 text-primary rounded-xl font-jetbrains text-[10px] uppercase tracking-widest font-black border border-primary/20">Vector Aligned</div>
+            <div className="px-5 py-2 bg-secondary/10 text-secondary rounded-xl font-jetbrains text-[10px] uppercase tracking-widest font-black border border-secondary/20">Keywords Injected</div>
           </div>
         </div>
       </div>
@@ -163,11 +163,11 @@ export default function Step4HealthScore() {
         <div className="space-y-8">
           <div className="flex items-center gap-3 px-2">
             <CheckCircle2 className="text-primary w-5 h-5" />
-            <h4 className="font-mono text-[10px] uppercase tracking-[0.3em] text-on-surface-variant font-bold">Strategic Strengths</h4>
+            <h4 className="font-jetbrains text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Strategic Strengths</h4>
           </div>
           <div className="space-y-4">
             {(healthScore.strengths || []).map((s: string, i: number) => (
-              <div key={i} className="p-6 rounded-[2rem] bg-surface-container-low border border-white/5 font-sans italic text-on-surface-variant text-sm shadow-lg">
+              <div key={i} className="p-6 rounded-4xl bg-surface-2 border border-white/5 italic text-text-sub text-sm shadow-lg">
                 {s}
               </div>
             ))}
@@ -177,11 +177,11 @@ export default function Step4HealthScore() {
         <div className="space-y-8">
           <div className="flex items-center gap-3 px-2">
             <AlertTriangle className="text-secondary w-5 h-5" />
-            <h4 className="font-mono text-[10px] uppercase tracking-[0.3em] text-on-surface-variant font-bold">Potential Friction Points</h4>
+            <h4 className="font-jetbrains text-[10px] uppercase tracking-[0.3em] text-text-muted font-bold">Potential Friction Points</h4>
           </div>
           <div className="flex flex-wrap gap-3">
             {(healthScore.missingSkills || healthScore.keyword_gap_analysis || []).map((s: string, i: number) => (
-              <span key={i} className="px-5 py-2.5 rounded-2xl bg-secondary/10 border border-secondary/20 font-mono text-[10px] text-secondary uppercase tracking-widest font-black shadow-md">
+              <span key={i} className="px-5 py-2.5 rounded-2xl bg-secondary/10 border border-secondary/20 font-jetbrains text-[10px] text-secondary uppercase tracking-widest font-black shadow-md">
                 {s}
               </span>
             ))}
@@ -190,17 +190,17 @@ export default function Step4HealthScore() {
       </div>
 
       {/* Recommendations */}
-      <div className="p-10 bg-surface-container-low rounded-[3rem] border border-white/5 space-y-8 relative overflow-hidden shadow-2xl">
+      <div className="p-10 bg-surface-2 rounded-4xl border border-white/5 space-y-8 relative overflow-hidden shadow-2xl">
         <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 blur-[60px] pointer-events-none" />
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
             <Trophy className="text-primary w-6 h-6" />
           </div>
-          <h4 className="text-2xl font-heading font-bold text-on-surface italic tracking-tight">Tactical Refinements</h4>
+          <h4 className="text-2xl font-hanken font-bold text-text-main italic tracking-tight">Tactical Refinements</h4>
         </div>
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
           {(healthScore.recommendations || healthScore.prioritized_improvement_suggestions || []).map((r: string | any, i: number) => (
-            <li key={i} className="flex gap-4 font-sans text-on-surface-variant leading-relaxed italic text-sm">
+            <li key={i} className="flex gap-4 text-text-sub leading-relaxed italic text-sm">
               <span className="w-2 h-2 rounded-full bg-primary mt-2 shrink-0 shadow-[0_0_8px_rgba(192,193,255,0.5)]" />
               {typeof r === 'string' ? r : r.suggestion || r.improved}
             </li>
@@ -213,19 +213,19 @@ export default function Step4HealthScore() {
         <Button 
           variant="outline" 
           onClick={startStreaming} 
-          className="rounded-2xl h-14 px-8 border-white/10 bg-surface-container-low hover:bg-white/5 text-on-surface font-heading font-bold italic shadow-lg gap-3"
+          className="rounded-2xl h-14 px-8 border-white/10 bg-surface-2 hover:bg-white/5 text-text-main font-hanken font-bold italic shadow-lg gap-3"
         >
           <RefreshCw className="w-4 h-4" /> Re-execute Verification
         </Button>
         <div className="flex gap-4 w-full sm:w-auto">
           <Button 
             variant="outline" 
-            className="flex-1 sm:flex-none rounded-2xl h-14 px-8 border-white/10 bg-surface-container-low text-on-surface font-heading font-bold italic" 
+            className="flex-1 sm:flex-none rounded-2xl h-14 px-8 border-white/10 bg-surface-2 text-text-main font-hanken font-bold italic" 
             onClick={() => setStep(1)}
           >
             Adjust Target
           </Button>
-          <Button className="flex-1 sm:flex-none rounded-[1.5rem] bg-gradient-primary text-white gap-3 h-16 px-10 font-heading font-bold italic text-lg shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group">
+          <Button className="flex-1 sm:flex-none rounded-3xl bg-primary text-white gap-3 h-16 px-10 font-hanken font-bold italic text-lg shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group">
             Final Preview Protocol <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

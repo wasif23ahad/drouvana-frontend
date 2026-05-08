@@ -1,146 +1,202 @@
-"use client";
+'use client';
 
-import React from 'react';
-import StatCard from '@/components/dashboard/StatCard';
-import ApplicationStatusChart from '@/components/dashboard/ApplicationStatusChart';
-import ApplicationsOverTimeChart from '@/components/dashboard/ApplicationsOverTimeChart';
-import { 
-  Briefcase, 
-  Target, 
-  Clock, 
-  CheckCircle2, 
-  ArrowRight,
-  Plus,
-  ChevronRight,
-  Zap,
-  LayoutDashboard
-} from 'lucide-react';
+import { useAppStore } from '@/lib/store';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { BarChart3, Briefcase, FileText, Target, Plus, ChevronRight, Activity } from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import PipelineHealthCard from '@/components/ai/PipelineHealthCard';
 
-const DashboardOverview = () => {
+export default function DashboardOverview() {
+  const { applications } = useAppStore();
+
+  const totalApps = applications.length;
+  const interviews = applications.filter(a => a.status === 'INTERVIEW').length;
+  const offers = applications.filter(a => a.status === 'OFFER').length;
+  const activeApps = applications.filter(a => !['REJECTED', 'WITHDRAWN', 'OFFER'].includes(a.status)).length;
+
+  const statusData = [
+    { name: 'Saved', value: applications.filter(a => a.status === 'SAVED').length },
+    { name: 'Applied', value: applications.filter(a => a.status === 'APPLIED').length },
+    { name: 'Screening', value: applications.filter(a => a.status === 'SCREENING').length },
+    { name: 'Interview', value: applications.filter(a => a.status === 'INTERVIEW').length },
+    { name: 'Offer', value: applications.filter(a => a.status === 'OFFER').length },
+    { name: 'Rejected', value: applications.filter(a => a.status === 'REJECTED').length },
+  ].filter(d => d.value > 0);
+
+  const COLORS = ['#64748B', '#3B82F6', '#F59E0B', '#8B5CF6', '#10B981', '#EF4444'];
+
   return (
-    <div className="space-y-12 pb-20 animate-in fade-in duration-700 max-w-spacing-container-max mx-auto">
-      {/* Header Section */}
+    <div className="flex flex-col gap-8 pb-12">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <div className="flex items-center text-xs text-text-muted gap-2 font-jetbrains uppercase tracking-widest mb-2">
+            <Link href="/dashboard" className="hover:text-primary transition-colors">Drouvana</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-primary font-bold">Terminal Overview</span>
+          </div>
+          <h1 className="text-3xl font-bold font-hanken">Intelligence Feed</h1>
+          <p className="text-text-sub text-sm">Aggregated performance vectors and neural application tracking.</p>
+        </div>
+        
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <Link href="/dashboard/tracker" className="flex-1 sm:flex-none">
+            <Button variant="outline" className="w-full rounded-xl">View Tracker</Button>
+          </Link>
+          <Link href="/dashboard/tracker" className="flex-1 sm:flex-none">
+            <Button className="w-full rounded-xl gap-2 shadow-lg shadow-primary/20 border-none">
+              <Plus className="h-4 w-4" /> Initialize Application
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="hover:border-primary/30 transition-colors group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-text-sub group-hover:text-primary transition-colors font-jetbrains uppercase tracking-widest">Total Applications</CardTitle>
+            <Briefcase className="h-4 w-4 text-text-muted group-hover:text-primary transition-all group-hover:scale-110" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold font-hanken mb-1">{totalApps}</div>
+            <p className="text-xs text-text-muted italic">+2 from last week</p>
+          </CardContent>
+        </Card>
+        <Card className="hover:border-secondary/30 transition-colors group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-text-sub group-hover:text-secondary transition-colors font-jetbrains uppercase tracking-widest">Active Pipelines</CardTitle>
+            <Target className="h-4 w-4 text-text-muted group-hover:text-secondary transition-all group-hover:scale-110" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold font-hanken mb-1">{activeApps}</div>
+            <p className="text-xs text-text-muted italic">Awaiting responses</p>
+          </CardContent>
+        </Card>
+        <Card className="hover:border-accent/30 transition-colors group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-text-sub group-hover:text-accent transition-colors font-jetbrains uppercase tracking-widest">Interviews</CardTitle>
+            <BarChart3 className="h-4 w-4 text-text-muted group-hover:text-accent transition-all group-hover:scale-110" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold font-hanken mb-1">{interviews}</div>
+            <p className="text-xs text-text-muted italic">2 coming up this week</p>
+          </CardContent>
+        </Card>
+        <Card className="hover:border-success/30 transition-colors group border-success/10 bg-success/5">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-text-sub group-hover:text-success transition-colors font-jetbrains uppercase tracking-widest">Total Offers</CardTitle>
+            <FileText className="h-4 w-4 text-success transition-all group-hover:scale-110" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold font-hanken mb-1 text-success">{offers}</div>
+            <p className="text-xs text-success/70 italic font-medium">Congratulations!</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card className="col-span-1 border-white/5 shadow-2xl">
+          <CardHeader>
+            <CardTitle className="text-lg font-hanken">Application Funnel</CardTitle>
+          </CardHeader>
+          <CardContent className="pl-2 h-80">
+             <ResponsiveContainer width="100%" height="100%">
+               <BarChart data={statusData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(255,255,255,0.05)" />
+                 <XAxis type="number" stroke="var(--color-text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                 <YAxis dataKey="name" type="category" stroke="var(--color-text-sub)" fontSize={12} tickLine={false} axisLine={false} width={80} />
+                 <Tooltip 
+                   cursor={{fill: 'rgba(255,255,255,0.02)'}} 
+                   contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '12px' }}
+                 />
+                 <Bar dataKey="value" fill="var(--color-primary)" radius={[0, 4, 4, 0]} />
+               </BarChart>
+             </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-1 border-white/5 shadow-2xl overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl pointer-events-none" />
+          <CardHeader>
+            <CardTitle className="text-lg font-hanken">Status Distribution</CardTitle>
+          </CardHeader>
+          <CardContent className="h-80 flex items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={statusData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={100}
+                  paddingAngle={8}
+                  dataKey="value"
+                >
+                  {statusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '12px' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Recent Applications Preview */}
       <div className="space-y-4">
-        <div className="flex items-center text-xs text-on-surface-variant gap-2 font-mono uppercase tracking-widest">
-          <Link href="/dashboard" className="hover:text-primary transition-colors">Drouvana</Link>
-          <ChevronRight className="w-3 h-3" />
-          <span className="text-primary font-bold">Terminal Overview</span>
+        <div className="flex justify-between items-center px-2">
+          <h2 className="text-xl font-bold font-hanken">Recent Applications</h2>
+          <Link href="/dashboard/tracker" className="text-sm text-primary hover:underline flex items-center gap-1 font-jetbrains uppercase tracking-widest text-[10px] font-bold">
+            View All <ChevronRight className="h-3 w-3" />
+          </Link>
         </div>
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
-          <div className="space-y-1">
-            <h1 className="text-4xl md:text-5xl font-heading font-bold text-on-surface italic tracking-tight flex items-center gap-4">
-              Intelligence Feed
-              <span className="bg-primary/10 text-primary text-[9px] uppercase tracking-[0.2em] font-black px-3 py-1 rounded-full border border-primary/20">Operational</span>
-            </h1>
-            <p className="font-sans text-on-surface-variant italic text-lg leading-relaxed">Aggregated performance vectors and neural application tracking.</p>
-          </div>
-          <div className="flex gap-4 w-full lg:w-auto">
-            <Link href="/dashboard/tracker" className="flex-1 lg:flex-none">
-              <Button variant="outline" className="w-full border-white/10 text-on-surface hover:bg-white/5 transition-all rounded-2xl h-14 px-8 font-heading font-bold italic shadow-lg">
-                View Tracker
-              </Button>
-            </Link>
-            <Link href="/dashboard/tracker?new=true" className="flex-1 lg:flex-none">
-              <Button className="w-full bg-gradient-primary text-white rounded-2xl shadow-2xl shadow-primary/20 gap-3 h-14 px-8 font-heading font-bold italic border-none transition-all hover:scale-105 active:scale-95">
-                <Plus className="w-5 h-5" />
-                Initialize Application
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        <StatCard 
-          title="Total Applications" 
-          value="24" 
-          icon={Briefcase} 
-          trend={{ value: 12, isUp: true }}
-        />
-        <StatCard 
-          title="Interviews" 
-          value="4" 
-          icon={Target} 
-          trend={{ value: 25, isUp: true }}
-          color="success"
-        />
-        <StatCard 
-          title="Offers" 
-          value="1" 
-          icon={CheckCircle2} 
-          color="warning"
-          description="Final stage offers"
-        />
-        <StatCard 
-          title="Response Time" 
-          value="5.2d" 
-          icon={Clock} 
-          trend={{ value: 8, isUp: false }}
-          color="primary"
-          description="Avg. days to first reply"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Charts Section */}
-        <div className="lg:col-span-8 space-y-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-surface-container-low/50 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-6 shadow-2xl overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl pointer-events-none" />
-              <ApplicationsOverTimeChart />
-            </div>
-            <div className="bg-surface-container-low/50 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-6 shadow-2xl overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-3xl pointer-events-none" />
-              <ApplicationStatusChart />
-            </div>
-          </div>
-
-          {/* AI Pipeline Health */}
-          <div className="w-full relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10 rounded-[3rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-            <PipelineHealthCard />
-          </div>
-        </div>
-
-        {/* Recent Activity Side */}
-        <div className="lg:col-span-4 bg-surface-container-low/50 backdrop-blur-xl border border-white/5 rounded-[3rem] overflow-hidden flex flex-col shadow-2xl h-fit">
-          <div className="p-10 border-b border-white/10 flex justify-between items-center">
-            <h3 className="text-2xl font-heading font-bold text-on-surface italic tracking-tight">Recent Activity</h3>
-          </div>
-          <div className="divide-y divide-white/5">
-            {[
-              { t: 'Interview Scheduled with Google', d: 'Technical Round: Senior Frontend', time: '2h ago', icon: Target },
-              { t: 'JD Parsed: Staff Engineer at Stripe', d: 'Requirements successfully extracted', time: '5h ago', icon: Briefcase },
-              { t: 'Resume Tailored for Meta', d: 'Match score optimized to 92%', time: 'Yesterday', icon: Zap },
-            ].map((activity, i) => (
-              <div key={i} className="flex items-start gap-5 p-8 hover:bg-white/5 transition-all group">
-                <div className="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center shrink-0 border border-white/5 group-hover:border-primary/50 transition-colors shadow-lg">
-                  <activity.icon className="text-primary w-5 h-5 group-hover:scale-110 transition-transform" />
-                </div>
-                <div className="flex-1 min-w-0 space-y-1">
-                  <p className="font-heading font-bold text-on-surface truncate italic tracking-tight">{activity.t}</p>
-                  <p className="text-[11px] text-on-surface-variant truncate font-sans italic opacity-60">{activity.d}</p>
-                  <div className="flex justify-between items-center pt-2">
-                     <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-primary font-black">System Event</span>
-                     <span className="font-mono text-[8px] text-on-surface-variant uppercase font-black">{activity.time}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="p-8 mt-auto">
-             <Button variant="ghost" className="w-full h-14 rounded-2xl border border-white/5 bg-white/5 text-on-surface hover:text-primary hover:bg-white/10 gap-3 font-heading font-bold italic transition-all group">
-               Full Tactical Logs <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-             </Button>
-          </div>
-        </div>
+        <Card className="border-white/5 overflow-hidden">
+          <CardContent className="p-0">
+             <div className="divide-y divide-white/5">
+                {applications.slice(0, 3).map((app, i) => (
+                   <div key={app.id} className="p-6 flex items-center justify-between hover:bg-white/5 transition-colors group">
+                      <div className="flex items-center gap-4">
+                         <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold group-hover:scale-110 transition-transform">
+                            {app.company.charAt(0)}
+                         </div>
+                         <div>
+                            <p className="font-bold text-text-main group-hover:text-primary transition-colors">{app.jobTitle}</p>
+                            <p className="text-xs text-text-muted">{app.company} • {app.location || 'Remote'}</p>
+                         </div>
+                      </div>
+                      <div className="flex items-center gap-6">
+                         <div className="hidden sm:block text-right">
+                            <p className="text-xs text-text-sub font-jetbrains">{new Date(app.dateApplied).toLocaleDateString()}</p>
+                            <p className="text-[10px] text-text-muted uppercase tracking-tighter">Applied Date</p>
+                         </div>
+                         <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                            app.status === 'OFFER' ? 'bg-success/20 text-success' :
+                            app.status === 'REJECTED' ? 'bg-error/20 text-error' :
+                            'bg-primary/20 text-primary'
+                         }`}>
+                            {app.status}
+                         </div>
+                      </div>
+                   </div>
+                ))}
+             </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
-};
-
-export default DashboardOverview;
+}

@@ -1,137 +1,116 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+@theme {
+  --color-primary: #6366F1;
+  --color-primary-hover: #4F46E5;
+  --color-secondary: #0EA5E9;
+  --color-accent: #8B5CF6;
+  
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui;
-  --font-heading: var(--font-hanken), ui-sans-serif, system-ui;
-  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular;
-  
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--on-primary);
-  --color-primary-container: var(--primary-container);
-  
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--on-secondary);
-  --color-secondary-container: var(--secondary-container);
-  
-  --color-tertiary: var(--tertiary);
-  --color-tertiary-foreground: var(--on-tertiary);
-  --color-tertiary-container: var(--tertiary-container);
+  --color-status-saved: #64748B;
+  --color-status-applied: #3B82F6;
+  --color-status-screening: #F59E0B;
+  --color-status-interview: #8B5CF6;
+  --color-status-offer: #10B981;
+  --color-status-rejected: #EF4444;
+  --color-status-withdrawn: #94A3B8;
 
-  --color-surface: var(--surface);
-  --color-on-surface: var(--on-surface);
-  --color-on-surface-variant: var(--on-surface-variant);
-  
-  --color-surface-container-lowest: var(--surface-container-lowest);
-  --color-surface-container-low: var(--surface-container-low);
-  --color-surface-container: var(--surface-container);
-  --color-surface-container-high: var(--surface-container-high);
-  --color-surface-container-highest: var(--surface-container-highest);
+  --color-background: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-surface-2: var(--bg-surface-2);
+  --color-text-main: var(--text-primary);
+  --color-text-sub: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border-subtle: var(--border-color);
 
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
-  
-  --color-outline: var(--outline);
-  --color-border: var(--outline);
-  --color-outline-variant: var(--outline-variant);
-
-  --radius-xs: 0.25rem;
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
-  
-  --spacing-margin-mobile: 16px;
-  --spacing-margin-desktop: 40px;
-  --spacing-container-max: 1440px;
-  --spacing-gutter: 24px;
+  --font-hanken: var(--font-hanken);
+  --font-inter: var(--font-inter);
+  --font-jetbrains: var(--font-mono);
 }
 
-:root {
-  /* Drouvana Digital Core - Dark Mode First */
-  --background: #051424;
-  --foreground: #d4e4fa;
-  
-  --surface: #051424;
-  --on-surface: #d4e4fa;
-  --on-surface-variant: #c7c4d7;
-  
-  --surface-container-lowest: #010f1f;
-  --surface-container-low: #0d1c2d;
-  --surface-container: #122131;
-  --surface-container-high: #1c2b3c;
-  --surface-container-highest: #273647;
-
-  --primary: #c0c1ff;
-  --on-primary: #1000a9;
-  --primary-container: #8083ff;
-  
-  --secondary: #89ceff;
-  --on-secondary: #00344d;
-  --secondary-container: #00a2e6;
-  
-  --tertiary: #d0bcff;
-  --on-tertiary: #3c0091;
-  --tertiary-container: #a078ff;
-
-  --error: #ffb4ab;
-  --success: #10B981;
-  --warning: #F59E0B;
-  
-  --outline: #908fa0;
-  --outline-variant: #464554;
-  
-  --radius: 0.5rem;
-}
-
-/* Base resets & global styles */
 @layer base {
+  :root {
+    --bg-base: #0F172A;
+    --bg-surface: #1E293B;
+    --bg-surface-2: #334155;
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --border-color: #334155;
+  }
+
   * {
-    @apply border-border/20;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    border-color: var(--border-color);
   }
+
   body {
-    @apply bg-background text-foreground min-h-screen antialiased font-sans;
-    background-image: radial-gradient(at 0% 0%, rgba(192, 193, 255, 0.05) 0px, transparent 50%),
-                      radial-gradient(at 100% 100%, rgba(137, 206, 255, 0.05) 0px, transparent 50%);
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-inter);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading tracking-tight italic;
+    font-family: var(--font-hanken);
   }
 }
 
-/* Glassmorphism & Custom Utilities */
 @layer utilities {
-  .glass {
-    @apply bg-surface-container/70 backdrop-blur-md border border-white/10 shadow-2xl;
+  .mesh-gradient {
+    background: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%), 
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
   }
-  
   .glass-card {
-    @apply bg-surface-container/50 backdrop-blur-lg border border-white/5 shadow-lg hover:shadow-primary/5 hover:border-white/10 transition-all duration-300;
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
   }
-
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-linear-to-r from-primary to-secondary;
+  .status-interview {
+    background: rgba(139, 92, 246, 0.2);
+    color: #8B5CF6;
   }
-  
-  .bg-gradient-primary {
-    @apply bg-linear-to-r from-primary-container to-tertiary-container;
+  .status-offer {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10B981;
   }
-
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
+  .status-applied {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3B82F6;
   }
-}
-
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  .status-screening {
+    background: rgba(245, 158, 11, 0.2);
+    color: #F59E0B;
+  }
+  .status-saved {
+    background: rgba(100, 116, 139, 0.2);
+    color: #94A3B8;
+  }
+  .status-rejected {
+    background: rgba(239, 68, 68, 0.2);
+    color: #EF4444;
+  }
+  .status-withdrawn {
+    background: rgba(148, 163, 184, 0.2);
+    color: #94A3B8;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--color-border-subtle);
+    border-radius: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+  }
 }
