@@ -1,28 +1,33 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Plus, Trash2, GripVertical, ChevronRight, Download } from 'lucide-react';
+import { Sparkles, Plus, Trash2, GripVertical, ChevronRight, Download, Save, CheckCircle2, Loader2 } from 'lucide-react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 
 export default function MasterResumePage() {
+  const { data: session } = useSession();
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
   const { register, control, handleSubmit } = useForm({
     defaultValues: {
       personalInfo: {
-        name: 'Alex Rivera',
-        email: 'alex.rivera@protocol.io',
-        phone: '+1 (555) 123-4567',
-        linkedin: 'linkedin.com/in/alexrivera',
+        name: session?.user?.name || '',
+        email: session?.user?.email || '',
+        phone: '',
+        linkedin: '',
       },
-      summary: 'Experienced Senior Product Designer with a passion for building intuitive, user-centric SaaS platforms. Proficient in React, Design Systems, and product strategy.',
+      summary: 'Experienced professional with a passion for building impactful products.',
       experience: [
-        { id: '1', company: 'TechFlow Inc.', role: 'Lead UI/UX Designer', dates: '2020 - Present', description: 'Spearheaded the redesign of the core dashboard, improving task completion rates by 25%.' }
+        { id: '1', company: '', role: '', dates: '', description: '' }
       ],
-      skills: 'Figma, User Research, Prototyping, Next.js, Tailwind CSS, Product Strategy',
+      skills: '',
     }
   });
 
@@ -31,9 +36,12 @@ export default function MasterResumePage() {
     name: "experience"
   });
 
-  const onSubmit = (data: any) => {
-    console.log(data);
-    // Auto-save logic
+  const onSubmit = async (data: any) => {
+    setSaving(true);
+    await new Promise(r => setTimeout(r, 800)); // Simulated save
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
   };
 
   return (
@@ -45,16 +53,17 @@ export default function MasterResumePage() {
             <ChevronRight className="w-3 h-3" />
             <span className="text-primary font-bold">Master Profile</span>
           </div>
-          <h1 className="text-3xl font-bold font-hanken">Master Architecture</h1>
-          <p className="text-text-sub text-sm">Maintain your foundational professional data for multi-vector optimization.</p>
+          <h1 className="text-3xl font-bold font-hanken">Master Profile</h1>
+          <p className="text-text-sub text-sm">Your professional information used across all AI features.</p>
         </div>
         
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <Button variant="outline" className="flex-1 sm:flex-none rounded-xl gap-2">
             <Download className="h-4 w-4" /> Download PDF
           </Button>
-          <Button className="flex-1 sm:flex-none rounded-xl gap-2 shadow-lg shadow-primary/20 border-none">
-            <Sparkles className="h-4 w-4" /> Analyze Strength
+          <Button onClick={handleSubmit(onSubmit)} className="flex-1 sm:flex-none rounded-xl gap-2 shadow-lg shadow-primary/20 border-none" disabled={saving}>
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <CheckCircle2 className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+            {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Profile'}
           </Button>
         </div>
       </div>

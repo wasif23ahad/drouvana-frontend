@@ -123,7 +123,7 @@ export default function AdminDashboard() {
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {metrics.map((m, i) => (
-          <div key={i} className="bg-surface-2/40 backdrop-blur-xl border border-border-color rounded-3xl p-8 relative overflow-hidden group hover:border-primary/30 transition-all shadow-lg">
+          <div key={i} className="bg-surface-2/40 backdrop-blur-xl border border-border-color rounded-(--radius-premium) p-8 relative overflow-hidden group hover:border-primary/30 transition-all shadow-lg">
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors" />
             <div className="flex items-center justify-between mb-6">
               <div className={`p-3 rounded-2xl bg-surface-2 border border-white/10 ${m.color}`}>
@@ -142,7 +142,7 @@ export default function AdminDashboard() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 bg-surface-2/40 border border-border-color rounded-[2.5rem] p-8 shadow-xl">
+        <div className="lg:col-span-8 bg-surface-2/40 border border-border-color rounded-(--radius-premium) p-8 shadow-xl">
           <h4 className="text-xl font-hanken font-bold text-text-main italic mb-8">Interaction Velocity</h4>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Events Table */}
-      <div className="bg-surface-2/40 border border-border-color rounded-[2.5rem] overflow-hidden shadow-xl">
+      <div className="bg-surface-2/40 border border-border-color rounded-(--radius-premium) overflow-hidden shadow-xl">
         <div className="p-8 border-b border-border-color flex flex-col sm:flex-row justify-between items-center gap-6">
           <h4 className="text-xl font-hanken font-bold text-text-main italic">System Activity Log</h4>
           <div className="flex gap-3 w-full sm:w-auto">

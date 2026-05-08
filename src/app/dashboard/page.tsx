@@ -3,20 +3,21 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Briefcase, FileText, Target, Plus, ChevronRight, Activity } from 'lucide-react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { Suspense } from 'react';
+
+// Recharts — loaded normally; Next.js code-splits per route automatically
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell,
+} from 'recharts';
+
+const ChartSkeleton = () => (
+  <div className="h-80 w-full bg-surface-2 rounded-xl animate-pulse flex items-center justify-center text-text-muted text-xs">
+    Loading chart...
+  </div>
+);
 
 export default function DashboardOverview() {
   const { applications } = useAppStore();

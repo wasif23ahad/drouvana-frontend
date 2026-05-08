@@ -56,6 +56,7 @@
     --text-muted: #64748B;
     --border-color: rgba(99, 102, 241, 0.12);
     --mesh-opacity: 0.08;
+    --radius-premium: 2.5rem;
   }
 
   * {
@@ -76,6 +77,16 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-hanken);
+  }
+
+  @keyframes gradient-x {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 5s ease infinite;
   }
 }
 

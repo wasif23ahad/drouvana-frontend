@@ -1,15 +1,35 @@
 "use client";
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
-import Step1JobDetails from '@/components/dashboard/workspace/Step1JobDetails';
-import Step2JDAnalysis from '@/components/dashboard/workspace/Step2JDAnalysis';
-import Step3ResumeGen from '@/components/dashboard/workspace/Step3ResumeGen';
-import Step4HealthScore from '@/components/dashboard/workspace/Step4HealthScore';
+import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronRight, Zap } from 'lucide-react';
+import { Check, ChevronRight, Zap, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+
+// Lazy-loaded AI step components — heavy AI logic deferred until needed
+const StepSkeleton = () => (
+  <div className="glass-card rounded-3xl p-8 animate-pulse space-y-4">
+    <div className="h-6 bg-surface-2 rounded-xl w-1/3" />
+    <div className="h-4 bg-surface-2 rounded-xl w-2/3" />
+    <div className="h-32 bg-surface-2 rounded-xl" />
+    <div className="h-11 bg-primary/20 rounded-xl" />
+  </div>
+);
+
+const Step1JobDetails = dynamic(() => import('@/components/dashboard/workspace/Step1JobDetails'), {
+  loading: () => <StepSkeleton />, ssr: false,
+});
+const Step2JDAnalysis = dynamic(() => import('@/components/dashboard/workspace/Step2JDAnalysis'), {
+  loading: () => <StepSkeleton />, ssr: false,
+});
+const Step3ResumeGen = dynamic(() => import('@/components/dashboard/workspace/Step3ResumeGen'), {
+  loading: () => <StepSkeleton />, ssr: false,
+});
+const Step4HealthScore = dynamic(() => import('@/components/dashboard/workspace/Step4HealthScore'), {
+  loading: () => <StepSkeleton />, ssr: false,
+});
 
 const STEPS = [
   { id: 1, title: 'Job Target', description: 'JD Acquisition' },

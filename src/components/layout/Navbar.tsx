@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -44,9 +45,11 @@ const Navbar = () => {
 
   const privateLinks = [
     { name: 'Dashboard', href: '/dashboard' },
+    { name: 'Applications', href: '/dashboard/tracker' },
     { name: 'Templates', href: '/templates' },
-    { name: 'Tracker', href: '/dashboard/tracker' },
     { name: 'Assistant', href: '/dashboard/assistant' },
+    { name: 'Settings', href: '/dashboard/settings' },
+    { name: 'Resources', href: '/templates' },
   ];
 
   const currentLinks = session ? privateLinks : publicLinks;
@@ -59,7 +62,7 @@ const Navbar = () => {
         <div className="flex items-center gap-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <Briefcase className="h-6 w-6 text-primary group-hover:scale-110 transition-transform" />
+            <Image src="/Drouvana_logo.png" alt="Drouvana" width={30} height={30} className="rounded-lg" />
             <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-linear-to-r from-text-primary to-text-secondary font-hanken">Drouvana</span>
           </Link>
 

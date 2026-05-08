@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, 
@@ -29,12 +30,13 @@ const Sidebar = () => {
     { name: 'Job Tracker', href: '/dashboard/tracker', icon: ListTodo },
     { name: 'Master Profile', href: '/dashboard/resume', icon: FileText },
     { name: 'AI Coach', href: '/dashboard/assistant', icon: MessageSquare },
+    { name: 'Workspace', href: '/dashboard/workspace', icon: Zap },
+    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
 
   const adminNavLinks = [
     ...userNavLinks,
     { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
 
   const isAdmin = session?.user?.role === 'ADMIN';
@@ -44,7 +46,7 @@ const Sidebar = () => {
     <aside className="bg-[var(--color-surface)] border-r border-[#334155] w-72 flex flex-col h-screen fixed left-0 top-0 z-50 overflow-y-auto hidden lg:flex shrink-0">
       <div className="p-6 border-b border-[#334155]">
         <Link href="/dashboard" className="flex items-center gap-2 group">
-          <Briefcase className="h-6 w-6 text-primary group-hover:scale-110 transition-transform" />
+          <Image src="/Drouvana_logo.png" alt="Drouvana" width={28} height={28} className="rounded-lg" />
           <span className="text-xl font-bold font-hanken tracking-tight text-text-main">Drouvana</span>
         </Link>
       </div>
