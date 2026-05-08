@@ -9,6 +9,7 @@ import {
   FileCode, 
   BarChart3, 
   Settings,
+  Zap,
   ArrowLeft,
   ChevronRight,
   Bell
@@ -20,6 +21,7 @@ const adminLinks = [
   { name: 'Dashboard', href: '/admin', icon: BarChart3 },
   { name: 'User Management', href: '/admin/users', icon: Users },
   { name: 'Resume Templates', href: '/admin/templates', icon: FileCode },
+  { name: 'AI Interaction Logs', href: '/admin/ai-logs', icon: Zap },
   { name: 'System Settings', href: '/admin/settings', icon: Settings },
 ];
 
@@ -34,10 +36,10 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen bg-background text-on-background font-sans">
       {/* Admin Sidebar */}
-      <aside className="w-64 bg-surface-container backdrop-blur-xl border-r border-white/10 flex flex-col h-screen fixed left-0 top-0 z-50 overflow-y-auto hidden md:flex shrink-0">
+      <aside className="w-64 bg-surface-container backdrop-blur-xl border-r border-white/10 h-screen fixed left-0 top-0 z-50 overflow-y-auto hidden md:flex flex-col shrink-0">
         <div className="p-6 border-b border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-tertiary flex items-center justify-center text-on-primary font-bold text-lg">D</div>
+            <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary to-tertiary flex items-center justify-center text-on-primary font-bold text-lg">D</div>
             <div>
               <h1 className="text-sm font-heading font-bold text-primary italic leading-none">Drouvana</h1>
               <p className="font-mono text-[8px] uppercase tracking-widest text-on-surface-variant">Admin Dashboard</p>

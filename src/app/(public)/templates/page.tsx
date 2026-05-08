@@ -24,6 +24,7 @@ export default function TemplatesExplorePage() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [category, setCategory] = useState('ALL');
+  const [minScore, setMinScore] = useState('0');
   const [sortBy, setSortBy] = useState('newest');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -43,6 +44,7 @@ export default function TemplatesExplorePage() {
       };
       
       if (category !== 'ALL') params.category = category;
+      if (minScore !== '0') params.minScore = parseInt(minScore);
       if (debouncedSearch) params.search = debouncedSearch;
 
       const response = await api.get('/api/templates', { params });
@@ -57,7 +59,7 @@ export default function TemplatesExplorePage() {
 
   useEffect(() => {
     fetchTemplates();
-  }, [debouncedSearch, category, sortBy, page]);
+  }, [debouncedSearch, category, minScore, sortBy, page]);
 
   return (
     <div className="max-w-spacing-container-max mx-auto py-12 px-spacing-margin-desktop space-y-10 min-h-screen">
@@ -86,8 +88,8 @@ export default function TemplatesExplorePage() {
         
         <div className="flex flex-col sm:flex-row gap-4 items-center">
           <Select value={category} onValueChange={(val) => { setCategory(val); setPage(1); }}>
-            <SelectTrigger className="w-full sm:w-48 h-11 rounded-lg bg-surface-container border-outline-variant/30 text-on-surface font-sans text-sm">
-              <SelectValue placeholder="All Categories" />
+            <SelectTrigger className="w-full sm:w-40 h-11 rounded-lg bg-surface-container border-outline-variant/30 text-on-surface font-sans text-sm">
+              <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent className="glass border-white/10">
               <SelectItem value="ALL">All Categories</SelectItem>
@@ -98,8 +100,20 @@ export default function TemplatesExplorePage() {
             </SelectContent>
           </Select>
 
+          <Select value={minScore} onValueChange={(val) => { setMinScore(val); setPage(1); }}>
+            <SelectTrigger className="w-full sm:w-40 h-11 rounded-lg bg-surface-container border-outline-variant/30 text-on-surface font-sans text-sm">
+              <SelectValue placeholder="ATS Score" />
+            </SelectTrigger>
+            <SelectContent className="glass border-white/10">
+              <SelectItem value="0">Any Score</SelectItem>
+              <SelectItem value="70">70%+ Match</SelectItem>
+              <SelectItem value="80">80%+ Match</SelectItem>
+              <SelectItem value="90">90%+ Match</SelectItem>
+            </SelectContent>
+          </Select>
+
           <Select value={sortBy} onValueChange={(val) => { setSortBy(val); setPage(1); }}>
-            <SelectTrigger className="w-full sm:w-48 h-11 rounded-lg bg-surface-container border-outline-variant/30 text-on-surface font-sans text-sm">
+            <SelectTrigger className="w-full sm:w-40 h-11 rounded-lg bg-surface-container border-outline-variant/30 text-on-surface font-sans text-sm">
               <SelectValue placeholder="Sort By" />
             </SelectTrigger>
             <SelectContent className="glass border-white/10">
@@ -138,7 +152,7 @@ export default function TemplatesExplorePage() {
                     alt={t.title} 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                   />
-                  <div className="absolute top-4 right-4 bg-gradient-to-r from-secondary-fixed-dim to-secondary text-on-secondary px-3 py-1 rounded-full font-mono text-[9px] font-bold uppercase tracking-widest">
+                  <div className="absolute top-4 right-4 bg-linear-to-r from-secondary-fixed-dim to-secondary text-on-secondary px-3 py-1 rounded-full font-mono text-[9px] font-bold uppercase tracking-widest">
                     {t.atsScore}% Match
                   </div>
                 </div>

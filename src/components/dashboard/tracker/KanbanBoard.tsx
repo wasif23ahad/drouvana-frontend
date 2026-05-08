@@ -189,7 +189,7 @@ export function KanbanBoard({ searchQuery }: { searchQuery: string }) {
         
         <DragOverlay>
           {activeApp ? (
-             <Card className="bg-surface border-primary outline outline-2 outline-primary shadow-2xl opacity-80 cursor-grabbing w-72">
+             <Card className="bg-surface border-primary outline-2 outline-primary shadow-2xl opacity-80 cursor-grabbing w-72">
                <CardContent className="p-4 flex flex-col gap-3">
                  <div>
                    <h4 className="font-semibold text-sm leading-tight mb-1">{activeApp.jobTitle}</h4>

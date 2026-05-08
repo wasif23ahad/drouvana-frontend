@@ -67,7 +67,7 @@ export default function TemplateDetailsPage() {
               alt={template.title} 
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-t from-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
           </div>
           <div className="grid grid-cols-4 gap-4">
             {template.images?.length > 0 ? template.images.map((img: string, i: number) => (
@@ -142,6 +142,27 @@ export default function TemplateDetailsPage() {
         </div>
       </div>
 
+      {/* Related Templates */}
+      <div className="pt-24 space-y-16">
+        <div className="text-center space-y-2">
+           <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-primary font-bold">Strategic Ecosystem</p>
+           <h2 className="text-4xl font-heading font-bold text-on-surface italic">Related Architectures</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="bg-surface-container-low rounded-2xl border border-white/5 overflow-hidden group hover:border-primary/30 transition-all">
+              <div className="aspect-video bg-surface-container overflow-hidden">
+                <div className="w-full h-full bg-primary/5 animate-pulse" />
+              </div>
+              <div className="p-6">
+                <div className="h-4 w-3/4 bg-surface-container rounded mb-3" />
+                <div className="h-3 w-1/2 bg-surface-container rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Social Proof */}
       <div className="pt-24 space-y-16">
         <div className="text-center space-y-2">
@@ -152,7 +173,7 @@ export default function TemplateDetailsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {template.reviews?.length > 0 ? template.reviews.slice(0, 3).map((r: any, i: number) => (
             <div key={i} className="bg-surface-container-low p-8 rounded-[32px] border border-white/5 space-y-6 relative group overflow-hidden">
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
+              <div className="absolute -top-4 -right-4 w-24 h-24 bg-linear-to-br from-primary/20 to-transparent rounded-full blur-2xl group-hover:from-primary/30 transition-colors" />
               <div className="flex gap-1">
                 {Array.from({ length: 5 }).map((_, s) => (
                   <Star key={s} className={cn("w-3 h-3", s < r.rating ? "text-secondary fill-secondary" : "text-white/10 fill-white/10")} />
@@ -160,7 +181,7 @@ export default function TemplateDetailsPage() {
               </div>
               <p className="text-on-surface-variant italic leading-relaxed font-sans text-sm">"{r.comment}"</p>
               <div className="flex items-center gap-4 pt-4 border-t border-white/5">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-tertiary flex items-center justify-center font-bold text-xs text-white">
+                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-tertiary flex items-center justify-center font-bold text-xs text-white">
                   {r.user?.name?.charAt(0) || 'U'}
                 </div>
                 <div>
