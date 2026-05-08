@@ -111,6 +111,33 @@ const AuthForm = ({ mode }: AuthFormProps) => {
           </p>
         </div>
 
+        {mode === 'login' && (
+          <div className="flex gap-2 mb-8">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1 rounded-xl text-[10px] uppercase tracking-widest font-bold"
+              onClick={() => {
+                form.setValue('email', 'user@example.com');
+                form.setValue('password', 'password123');
+              }}
+            >
+              Demo User
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1 rounded-xl text-[10px] uppercase tracking-widest font-bold"
+              onClick={() => {
+                form.setValue('email', 'admin@example.com');
+                form.setValue('password', 'admin123');
+              }}
+            >
+              Demo Admin
+            </Button>
+          </div>
+        )}
+
         {error && (
           <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-xl flex items-center gap-3 text-destructive text-sm animate-in fade-in slide-in-from-top-1">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />

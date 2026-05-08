@@ -4,7 +4,11 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Rocket, User, LogOut, LayoutDashboard, Briefcase, FileText } from 'lucide-react';
+import { 
+  Menu, X, Rocket, User, LogOut, LayoutDashboard, 
+  Briefcase, Sparkles, BookOpen, Mail, HelpCircle, 
+  Info, Settings, Bell 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSession, signOut } from 'next-auth/react';
 import { 
@@ -25,18 +29,26 @@ const Navbar = () => {
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Templates', href: '/templates', icon: FileText },
-    { name: 'Tracker', href: '/tracker', icon: Briefcase },
+  const publicLinks = [
+    { name: 'About', href: '/about', icon: Info },
+    { name: 'Blog', href: '/blog', icon: BookOpen },
+    { name: 'Contact', href: '/contact', icon: Mail },
+    { name: 'Help', href: '/help', icon: HelpCircle },
   ];
+
+  const privateLinks = [
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Workspace', href: '/dashboard/workspace', icon: Sparkles },
+    { name: 'Assistant', href: '/dashboard/assistant', icon: User },
+    { name: 'Tracker', href: '/dashboard/tracker', icon: Briefcase },
+  ];
+
+  const currentLinks = session ? privateLinks : publicLinks;
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -51,28 +63,25 @@ const Navbar = () => {
             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
               <Rocket className="text-white w-6 h-6" />
             </div>
-            <span className="text-2xl font-bold tracking-tight hidden sm:block">
-              Drouvana<span className="text-primary text-4xl">.</span>
+            <span className="text-2xl font-bold tracking-tight hidden sm:block italic">
+              Drouvana<span className="text-primary text-4xl leading-none">.</span>
             </span>
           </Link>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
+            {currentLinks.map((link) => (
               <Link 
                 key={link.name} 
                 href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-primary relative ${
-                  pathname === link.href ? 'text-primary' : 'text-foreground/70'
+                className={`text-sm font-bold uppercase tracking-widest transition-all hover:text-primary relative group/link ${
+                  pathname === link.href ? 'text-primary' : 'text-foreground/60'
                 }`}
               >
                 {link.name}
-                {pathname === link.href && (
-                  <motion.div 
-                    layoutId="nav-underline"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full"
-                  />
-                )}
+                <div className={`absolute -bottom-1 left-0 h-0.5 bg-primary rounded-full transition-all duration-300 ${
+                  pathname === link.href ? 'w-full' : 'w-0 group-hover/link:w-full'
+                }`} />
               </Link>
             ))}
           </div>
@@ -82,58 +91,58 @@ const Navbar = () => {
             {status === 'loading' ? (
               <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
             ) : session ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="relative h-10 w-10 rounded-full hover:bg-primary/10 transition-colors flex items-center justify-center">
-                    <Avatar className="h-10 w-10 border border-primary/20">
+              <div className="flex items-center gap-4">
+                <button className="p-2 hover:bg-primary/10 rounded-xl transition-colors relative hidden sm:block">
+                  <Bell className="w-5 h-5 text-foreground/60" />
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full" />
+                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="outline-none">
+                    <Avatar className="h-10 w-10 border-2 border-primary/20 hover:border-primary transition-colors">
                       <AvatarImage src={session.user?.image || ''} alt={session.user?.name || ''} />
-                      <AvatarFallback className="bg-primary/10 text-primary">
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold">
                         {session.user?.name?.charAt(0) || 'U'}
                       </AvatarFallback>
                     </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 glass" align="end">
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{session.user?.name}</p>
-                      <p className="text-xs leading-none text-muted-foreground">{session.user?.email}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push('/profile')}>
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/dashboard')}>
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      <span>Dashboard</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => signOut()} className="text-destructive focus:text-destructive">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-64 glass p-2 rounded-2xl mt-2" align="end">
+                    <DropdownMenuLabel className="p-3">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-bold leading-none">{session.user?.name}</p>
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{session.user?.email}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-white/5" />
+                    <DropdownMenuItem onClick={() => router.push('/profile')} className="rounded-xl p-3 focus:bg-primary/10 group cursor-pointer">
+                      <User className="mr-3 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      <span className="font-bold text-xs uppercase tracking-widest">Profile Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push('/dashboard/settings')} className="rounded-xl p-3 focus:bg-primary/10 group cursor-pointer">
+                      <Settings className="mr-3 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      <span className="font-bold text-xs uppercase tracking-widest">System Preferences</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-white/5" />
+                    <DropdownMenuItem onClick={() => signOut()} className="rounded-xl p-3 text-destructive focus:bg-destructive/10 group cursor-pointer">
+                      <LogOut className="mr-3 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      <span className="font-bold text-xs uppercase tracking-widest">Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
-              <div className="hidden sm:flex items-center gap-2">
-                <Link 
-                  href="/login"
-                  className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg transition-colors"
-                >
-                  Login
+              <div className="hidden sm:flex items-center gap-3">
+                <Link href="/login">
+                  <Button variant="ghost" className="rounded-xl font-bold uppercase tracking-widest text-xs">Login</Button>
                 </Link>
-                <Link 
-                  href="/register"
-                  className="px-4 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-white rounded-lg shadow-lg shadow-primary/20 transition-all"
-                >
-                  Get Started
+                <Link href="/register">
+                  <Button className="rounded-xl bg-primary hover:bg-primary/90 text-white font-bold uppercase tracking-widest text-xs shadow-lg shadow-primary/20">Sign Up</Button>
                 </Link>
               </div>
             )}
 
             {/* Mobile Menu Toggle */}
             <button 
-              className="md:hidden p-2 hover:bg-primary/10 rounded-lg transition-colors"
+              className="md:hidden p-2 hover:bg-primary/10 rounded-xl transition-colors"
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -146,44 +155,34 @@ const Navbar = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="md:hidden absolute top-20 left-4 right-4 z-40"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="md:hidden fixed inset-0 top-[72px] bg-background/95 backdrop-blur-xl z-40 p-6 flex flex-col gap-4"
           >
-            <div className="glass rounded-2xl p-6 flex flex-col gap-4 shadow-2xl">
-              {navLinks.map((link) => (
-                <Link 
-                  key={link.name} 
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${
-                    pathname === link.href ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                  }`}
-                >
-                  <link.icon className="w-5 h-5" />
-                  <span className="font-medium">{link.name}</span>
+            {currentLinks.map((link) => (
+              <Link 
+                key={link.name} 
+                href={link.href}
+                onClick={() => setIsOpen(false)}
+                className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${
+                  pathname === link.href ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'hover:bg-primary/10'
+                }`}
+              >
+                <link.icon className="w-5 h-5" />
+                <span className="font-bold uppercase tracking-widest">{link.name}</span>
+              </Link>
+            ))}
+            {!session && (
+              <div className="flex flex-col gap-3 mt-auto mb-10">
+                <Link href="/login" onClick={() => setIsOpen(false)}>
+                  <Button variant="outline" className="w-full h-14 rounded-2xl font-bold uppercase tracking-widest">Login</Button>
                 </Link>
-              ))}
-              {!session && (
-                <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border/50">
-                  <Link 
-                    href="/login"
-                    onClick={() => setIsOpen(false)}
-                    className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium border border-border/50 hover:bg-muted rounded-lg transition-colors"
-                  >
-                    Login
-                  </Link>
-                  <Link 
-                    href="/register"
-                    onClick={() => setIsOpen(false)}
-                    className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-white rounded-lg transition-all"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
-            </div>
+                <Link href="/register" onClick={() => setIsOpen(false)}>
+                  <Button className="w-full h-14 rounded-2xl bg-primary text-white font-bold uppercase tracking-widest">Get Started</Button>
+                </Link>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

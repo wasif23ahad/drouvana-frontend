@@ -14,23 +14,45 @@ import {
   Rocket,
   ChevronRight,
   LogOut,
-  PlusCircle
+  PlusCircle,
+  Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 
-const sidebarLinks = [
+interface SidebarLink {
+  name: string;
+  href: string;
+  icon: any;
+  highlight?: boolean;
+}
+
+const userLinks: SidebarLink[] = [
   { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Job Tracker', href: '/dashboard/tracker', icon: Briefcase },
-  { name: 'My Resumes', href: '/dashboard/resumes', icon: FileText },
   { name: 'AI Workspace', href: '/dashboard/workspace', icon: Rocket, highlight: true },
-  { name: 'Profile', href: '/dashboard/profile', icon: User },
+  { name: 'Career Coach', href: '/dashboard/assistant', icon: User },
+  { name: 'Job Tracker', href: '/dashboard/tracker', icon: Briefcase },
+  { name: 'Templates', href: '/templates', icon: FileText },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+];
+
+const adminLinks: SidebarLink[] = [
+  { name: 'Admin Overview', href: '/admin', icon: LayoutDashboard },
+  { name: 'User Management', href: '/admin/users', icon: User },
+  { name: 'AI Performance', href: '/admin/performance', icon: Activity },
+  { name: 'Content Manager', href: '/admin/content', icon: FileText },
+  { name: 'System Logs', href: '/admin/logs', icon: Bell },
+  { name: 'Global Settings', href: '/admin/settings', icon: Settings },
 ];
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  
+  // Rule 100: Check role
+  const isAdmin = (session?.user as any)?.role === 'ADMIN' || pathname.startsWith('/admin');
+  const links = isAdmin ? adminLinks : userLinks;
 
   return (
     <aside className="w-72 border-r border-border/50 bg-background/50 backdrop-blur-xl flex flex-col h-screen fixed left-0 top-0 z-40">
@@ -39,11 +61,11 @@ const Sidebar = () => {
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg shadow-primary/20">
             <Rocket className="text-white w-5 h-5" />
           </div>
-          <span className="text-xl font-bold tracking-tight">Drouvana</span>
+          <span className="text-xl font-bold tracking-tight italic">Drouvana</span>
         </Link>
 
         <div className="space-y-1">
-          {sidebarLinks.map((link) => (
+          {links.map((link) => (
             <Link
               key={link.name}
               href={link.href}
