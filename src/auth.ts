@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
-import axios from "axios";
+import api from "@/lib/api";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -17,7 +17,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         try {
-          const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+          const response = await api.post("/api/auth/login", {
             email: credentials?.email,
             password: credentials?.password,
           });
