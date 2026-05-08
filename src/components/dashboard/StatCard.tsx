@@ -15,33 +15,44 @@ interface StatCardProps {
 }
 
 const StatCard = ({ title, value, icon: Icon, trend, description, color = 'primary' }: StatCardProps) => {
-  const colorMap = {
-    primary: 'text-primary bg-primary/10',
-    success: 'text-success bg-success/10',
-    warning: 'text-warning bg-warning/10',
-    destructive: 'text-error bg-error/10',
-  };
-
   return (
-    <div className="bg-surface-container-low backdrop-blur-md border border-white/10 rounded-xl p-6 relative overflow-hidden group hover:border-primary/30 transition-all">
-      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-        <Icon className={cn("w-16 h-16", color === 'primary' ? 'text-primary' : color === 'success' ? 'text-success' : color === 'warning' ? 'text-warning' : 'text-error')} />
+    <div className="bg-surface-container-low/50 backdrop-blur-xl border border-white/5 rounded-[2rem] p-8 relative overflow-hidden group hover:border-primary/40 transition-all duration-500 shadow-2xl">
+      <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
+        <Icon className={cn("w-24 h-24", 
+          color === 'primary' ? 'text-primary' : 
+          color === 'success' ? 'text-secondary' : 
+          color === 'warning' ? 'text-tertiary' : 'text-error'
+        )} />
       </div>
-      <p className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">{title}</p>
-      <h3 className="text-3xl font-heading font-bold text-on-surface mb-4 italic">{value}</h3>
-      <div className="flex items-center gap-2">
-        {trend && (
-          <span className={cn(
-            "px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1",
-            trend.isUp ? "text-success bg-success/10" : "text-error bg-error/10"
-          )}>
-            {trend.isUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-            {trend.value}%
+      
+      <div className="space-y-6 relative z-10">
+        <div className="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center border border-white/5 shadow-lg group-hover:border-primary/50 transition-colors">
+          <Icon className={cn("w-6 h-6", 
+            color === 'primary' ? 'text-primary' : 
+            color === 'success' ? 'text-secondary' : 
+            color === 'warning' ? 'text-tertiary' : 'text-error'
+          )} />
+        </div>
+
+        <div className="space-y-1">
+          <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-on-surface-variant font-black opacity-60">{title}</p>
+          <h3 className="text-4xl font-heading font-bold text-on-surface italic tracking-tighter">{value}</h3>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {trend && (
+            <span className={cn(
+              "px-3 py-1 rounded-xl text-[10px] font-mono font-black uppercase tracking-widest flex items-center gap-1.5 shadow-md",
+              trend.isUp ? "text-secondary bg-secondary/10 border border-secondary/20" : "text-error bg-error/10 border border-error/20"
+            )}>
+              {trend.isUp ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+              {trend.value}%
+            </span>
+          )}
+          <span className="font-mono text-[9px] text-on-surface-variant uppercase tracking-[0.2em] font-bold opacity-40">
+            {description || "vs last month"}
           </span>
-        )}
-        <span className="font-mono text-[10px] text-on-surface-variant uppercase tracking-tighter">
-          {description || "vs last month"}
-        </span>
+        </div>
       </div>
     </div>
   );

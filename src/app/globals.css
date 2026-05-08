@@ -38,6 +38,7 @@
   --color-warning: var(--warning);
   --color-error: var(--error);
   
+  --color-outline: var(--outline);
   --color-border: var(--outline);
   --color-outline-variant: var(--outline-variant);
 
@@ -93,7 +94,7 @@
 /* Base resets & global styles */
 @layer base {
   * {
-    @apply border-outline/20;
+    @apply border-border/20;
     transition: background-color 0.3s ease, border-color 0.3s ease;
   }
   body {
@@ -109,19 +110,19 @@
 /* Glassmorphism & Custom Utilities */
 @layer utilities {
   .glass {
-    @apply bg-surface-container/70 backdrop-blur-[12px] border border-white/10 shadow-2xl;
+    @apply bg-surface-container/70 backdrop-blur-md border border-white/10 shadow-2xl;
   }
   
   .glass-card {
-    @apply bg-surface-container/50 backdrop-blur-[16px] border border-white/5 shadow-lg hover:shadow-primary/5 hover:border-white/10 transition-all duration-300;
+    @apply bg-surface-container/50 backdrop-blur-lg border border-white/5 shadow-lg hover:shadow-primary/5 hover:border-white/10 transition-all duration-300;
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+    @apply bg-clip-text text-transparent bg-linear-to-r from-primary to-secondary;
   }
   
   .bg-gradient-primary {
-    @apply bg-gradient-to-r from-primary-container to-tertiary-container;
+    @apply bg-linear-to-r from-primary-container to-tertiary-container;
   }
 
   .animate-float {
