@@ -106,18 +106,18 @@ export default function DashboardOverview() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className="col-span-1 border-white/5 shadow-2xl">
+        <Card className="col-span-1 border-border-color shadow-2xl">
           <CardHeader>
             <CardTitle className="text-lg font-hanken">Application Funnel</CardTitle>
           </CardHeader>
           <CardContent className="pl-2 h-80">
              <ResponsiveContainer width="100%" height="100%">
                <BarChart data={statusData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="rgba(255,255,255,0.05)" />
+                 <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--border-color)" />
                  <XAxis type="number" stroke="var(--color-text-muted)" fontSize={12} tickLine={false} axisLine={false} />
                  <YAxis dataKey="name" type="category" stroke="var(--color-text-sub)" fontSize={12} tickLine={false} axisLine={false} width={80} />
                  <Tooltip 
-                   cursor={{fill: 'rgba(255,255,255,0.02)'}} 
+                   cursor={{fill: 'var(--bg-surface-2)', opacity: 0.1}} 
                    contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '12px' }}
                  />
                  <Bar dataKey="value" fill="var(--color-primary)" radius={[0, 4, 4, 0]} />
@@ -126,7 +126,7 @@ export default function DashboardOverview() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-1 border-white/5 shadow-2xl overflow-hidden relative">
+        <Card className="col-span-1 border-border-color shadow-2xl overflow-hidden relative">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl pointer-events-none" />
           <CardHeader>
             <CardTitle className="text-lg font-hanken">Status Distribution</CardTitle>
@@ -164,11 +164,11 @@ export default function DashboardOverview() {
             View All <ChevronRight className="h-3 w-3" />
           </Link>
         </div>
-        <Card className="border-white/5 overflow-hidden">
+        <Card className="border-border-color overflow-hidden">
           <CardContent className="p-0">
-             <div className="divide-y divide-white/5">
+             <div className="divide-y divide-border-color">
                 {applications.slice(0, 3).map((app, i) => (
-                   <div key={app.id} className="p-6 flex items-center justify-between hover:bg-white/5 transition-colors group">
+                   <div key={app.id} className="p-6 flex items-center justify-between hover:bg-surface-2/20 transition-colors group">
                       <div className="flex items-center gap-4">
                          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold group-hover:scale-110 transition-transform">
                             {app.company.charAt(0)}

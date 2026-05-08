@@ -110,7 +110,7 @@ export default function LandingPage() {
         </section>
 
         {/* 4. Statistics Section */}
-        <section className="w-full py-20 glass-card mx-auto max-w-7xl rounded-3xl my-12 border-white/5 shadow-2xl">
+        <section className="w-full py-20 glass-card mx-auto max-w-7xl rounded-3xl my-12 border-border-color shadow-2xl">
           <div className="container mx-auto px-4 md:px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
@@ -145,13 +145,18 @@ export default function LandingPage() {
                 { step: '01', title: 'Save a Job', desc: 'Drop a URL from LinkedIn or Indeed. AI extracts all the details instantly.' },
                 { step: '02', title: 'Tailor & Apply', desc: 'Get an AI-tailored resume and cover letter matching the job requirements.' },
                 { step: '03', title: 'Track Progress', desc: 'Move cards on your Kanban board and automate follow-up emails.' }
-               ].map((item, i) => (
-                 <div key={i} className="relative p-8 rounded-2xl glass-card group hover:border-primary/30 transition-all">
-                   <div className="text-6xl font-hanken font-black text-white/5 absolute top-4 right-4 group-hover:text-primary/10 transition-colors">{item.step}</div>
-                   <h3 className="text-xl font-bold mb-3 mt-8 relative z-10">{item.title}</h3>
-                   <p className="text-text-sub relative z-10 leading-relaxed">{item.desc}</p>
-                 </div>
-               ))}
+                ].map((item, i) => (
+                  <div key={i} className="relative p-10 rounded-[2.5rem] glass-card group hover:border-primary/40 transition-all overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-transparent via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative z-10">
+                      <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 border border-primary/20">
+                        <span className="text-primary font-bold font-mono text-sm">{item.step}</span>
+                      </div>
+                      <h3 className="text-2xl font-bold mb-4 font-hanken text-text-main">{item.title}</h3>
+                      <p className="text-text-sub leading-relaxed font-sans text-base">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
         </section>
@@ -166,7 +171,7 @@ export default function LandingPage() {
                 { quote: "The Kanban board is a lifesaver. I finally know exactly where I stand with my 40+ applications.", author: "Michael T.", role: "Product Manager" },
                 { quote: "The AI coach helped me prep for my interview at Google and I got the offer!", author: "Elena R.", role: "UX Designer" }
               ].map((test, i) => (
-                <Card key={i} className="glass-card hover:bg-white/5 transition-colors">
+                <Card key={i} className="glass-card hover:bg-surface-2/30 transition-colors">
                   <CardHeader>
                     <div className="flex gap-1 mb-2">
                        {[...Array(5)].map((_, j) => <Star key={j} className="h-4 w-4 fill-amber-500 text-amber-500" />)}
@@ -186,7 +191,7 @@ export default function LandingPage() {
         </section>
 
         {/* 7. Security / Privacy */}
-        <section className="w-full py-24 bg-transparent border-t border-white/5">
+        <section className="w-full py-24 bg-transparent border-t border-border-color">
           <div className="container mx-auto px-4 md:px-6 text-center">
              <div className="h-16 w-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-8">
                <ShieldCheck className="h-8 w-8 text-primary" />

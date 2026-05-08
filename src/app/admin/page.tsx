@@ -110,7 +110,7 @@ export default function AdminDashboard() {
           <h2 className="text-4xl font-hanken font-bold text-text-main italic tracking-tight">Intelligence Oversight</h2>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
-          <Button variant="outline" className="bg-surface-2/50 border-white/5 text-text-main gap-2 rounded-xl h-12 flex-1 md:flex-none">
+          <Button variant="outline" className="bg-surface-2/50 border-border-color text-text-main gap-2 rounded-xl h-12 flex-1 md:flex-none">
             <Download className="w-4 h-4" />
             Export Audit
           </Button>
@@ -123,7 +123,7 @@ export default function AdminDashboard() {
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {metrics.map((m, i) => (
-          <div key={i} className="bg-surface-2/40 backdrop-blur-xl border border-white/5 rounded-3xl p-8 relative overflow-hidden group hover:border-primary/30 transition-all shadow-lg">
+          <div key={i} className="bg-surface-2/40 backdrop-blur-xl border border-border-color rounded-3xl p-8 relative overflow-hidden group hover:border-primary/30 transition-all shadow-lg">
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors" />
             <div className="flex items-center justify-between mb-6">
               <div className={`p-3 rounded-2xl bg-surface-2 border border-white/10 ${m.color}`}>
@@ -142,7 +142,7 @@ export default function AdminDashboard() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 bg-surface-2/40 border border-white/5 rounded-[2.5rem] p-8 shadow-xl">
+        <div className="lg:col-span-8 bg-surface-2/40 border border-border-color rounded-[2.5rem] p-8 shadow-xl">
           <h4 className="text-xl font-hanken font-bold text-text-main italic mb-8">Interaction Velocity</h4>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
                     <stop offset="95%" stopColor="#6366F1" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
                 <XAxis 
                   dataKey="name" 
                   stroke="#64748B" 
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
                   fontFamily="JetBrains Mono"
                 />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#1E293B', border: '1px solid #334155', borderRadius: '12px' }}
+                  contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: '12px' }}
                   itemStyle={{ fontSize: '12px', fontFamily: 'Hanken Grotesk' }}
                 />
                 <Area type="monotone" dataKey="users" stroke="#6366F1" fillOpacity={1} fill="url(#colorUsers)" strokeWidth={3} />
@@ -179,7 +179,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="lg:col-span-4 bg-surface-2/40 border border-white/5 rounded-[2.5rem] p-8 shadow-xl flex flex-col">
+        <div className="lg:col-span-4 bg-surface-2/40 border border-border-color rounded-[2.5rem] p-8 shadow-xl flex flex-col">
           <h4 className="text-xl font-hanken font-bold text-text-main italic mb-8">AI Distribution</h4>
           <div className="flex-1 flex flex-col justify-center space-y-8">
             {[
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
                   <span className="text-text-sub">{f.label}</span>
                   <span className="text-text-main font-bold">{f.val}%</span>
                 </div>
-                <div className="h-2 bg-surface-2 rounded-full overflow-hidden border border-white/5">
+                <div className="h-2 bg-surface-2 rounded-full overflow-hidden border border-border-color">
                   <div 
                     className={`${f.color} h-full rounded-full transition-all duration-1000`}
                     style={{ width: `${f.val}%` }}
@@ -205,14 +205,14 @@ export default function AdminDashboard() {
       </div>
 
       {/* Events Table */}
-      <div className="bg-surface-2/40 border border-white/5 rounded-[2.5rem] overflow-hidden shadow-xl">
-        <div className="p-8 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-6">
+      <div className="bg-surface-2/40 border border-border-color rounded-[2.5rem] overflow-hidden shadow-xl">
+        <div className="p-8 border-b border-border-color flex flex-col sm:flex-row justify-between items-center gap-6">
           <h4 className="text-xl font-hanken font-bold text-text-main italic">System Activity Log</h4>
           <div className="flex gap-3 w-full sm:w-auto">
             <div className="relative flex-1 sm:w-80">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
               <input 
-                className="w-full bg-surface-2 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-xs font-sans focus:border-primary focus:outline-none transition-all text-text-main" 
+                className="w-full bg-surface-2 border border-border-color rounded-xl pl-12 pr-4 py-3 text-xs font-sans focus:border-primary focus:outline-none transition-all text-text-main" 
                 placeholder="Filter events or components..." 
                 value={searchQuery}
                 onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
@@ -226,7 +226,7 @@ export default function AdminDashboard() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-white/5 bg-surface-2/20 text-text-muted font-mono text-[10px] uppercase tracking-[0.2em]">
+              <tr className="border-b border-border-color bg-surface-2/20 text-text-muted font-mono text-[10px] uppercase tracking-[0.2em]">
                 <th className="px-8 py-5 font-bold">Event Type</th>
                 <th className="px-8 py-5 font-bold">Vector Component</th>
                 <th className="px-8 py-5 font-bold">Status</th>
@@ -234,7 +234,7 @@ export default function AdminDashboard() {
                 <th className="px-8 py-5 font-bold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 text-sm">
+            <tbody className="divide-y divide-border-color text-sm">
               {paginatedEvents.map((ev) => (
                 <tr key={ev.id} className="hover:bg-white/5 transition-colors group">
                   <td className="px-8 py-5 font-hanken font-bold italic text-text-main text-base">{ev.type}</td>
@@ -257,7 +257,7 @@ export default function AdminDashboard() {
         </div>
         
         {/* Table Pagination */}
-        <div className="p-6 border-t border-white/5 flex items-center justify-between">
+        <div className="p-6 border-t border-border-color flex items-center justify-between">
            <p className="text-xs text-text-muted font-mono">
              Showing <span className="text-text-main font-bold">{Math.min(filteredEvents.length, itemsPerPage * page)}</span> of <span className="text-text-main font-bold">{filteredEvents.length}</span> nodes
            </p>

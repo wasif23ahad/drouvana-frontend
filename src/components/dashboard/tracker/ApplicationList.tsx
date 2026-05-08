@@ -44,7 +44,7 @@ export function ApplicationList({ searchQuery }: { searchQuery: string }) {
             </tr>
           ) : (
             filteredApps.map((app) => (
-              <tr key={app.id} className="hover:bg-surface-2/50 transition-colors group">
+              <tr key={app.id} className="hover:bg-surface-2/30 transition-colors group">
                 <td className="px-6 py-4">
                   <div className="font-semibold text-text-main">{app.jobTitle}</div>
                   <div className="text-text-sub mt-0.5">{app.company}</div>

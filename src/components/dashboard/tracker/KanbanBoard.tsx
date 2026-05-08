@@ -102,7 +102,7 @@ function Column({ col, applications }: { col: typeof COLUMNS[0], applications: a
   });
 
   return (
-    <div className="shrink-0 w-72 flex flex-col bg-surface-2/30 rounded-2xl h-full border border-border-subtle overflow-hidden">
+    <div className="shrink-0 w-72 flex flex-col bg-surface-2/40 rounded-2xl h-full border border-border-subtle overflow-hidden">
       <div className={`p-4 border-b border-border-subtle bg-surface-2 flex items-center justify-between border-l-4 ${col.colorClass}`}>
         <h3 className="font-semibold text-sm">{col.title}</h3>
         <Badge variant="outline" className="bg-surface bg-opacity-50 text-[10px] py-0">{applications.length}</Badge>
