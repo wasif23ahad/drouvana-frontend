@@ -35,6 +35,10 @@ export default function ResumeBuilderPage() {
   const [headerAlign, setHeaderAlign] = useState<'left' | 'center' | 'right'>('left');
   const [atsScore, setAtsScore] = useState(96);
 
+  // Open-Resume core features state
+  const [accentColor, setAccentColor] = useState<string>('#2563eb');
+  const [previewZoom, setPreviewZoom] = useState<number>(1);
+
   // FlowCV style custom section layout ordering controller
   const [sectionsOrder, setSectionsOrder] = useState<SectionItem[]>([
     { id: 'summary', title: 'Professional Summary', enabled: true },
@@ -202,6 +206,76 @@ export default function ResumeBuilderPage() {
     setSectionsOrder(sectionsOrder.map(s => s.id === id ? { ...s, enabled: !s.enabled } : s));
   };
 
+  const handleSectionTitleChange = (id: string, newTitle: string) => {
+    setSectionsOrder(sectionsOrder.map(s => s.id === id ? { ...s, title: newTitle } : s));
+  };
+
+  const loadOpenResumePreset = (preset: 'fs' | 'cloud') => {
+    if (preset === 'fs') {
+      setProfile({
+        personalInfo: {
+          name: 'Alex Rivera',
+          email: 'alex.rivera@example.com',
+          phone: '+1 (555) 382-9102',
+          linkedin: 'linkedin.com/in/alexrivera-dev',
+          address: 'Austin, TX'
+        },
+        summary: 'Passionate Full Stack Software Engineer with 6+ years building scalable React/Next.js client applications and highly responsive Node.js web APIs. Dedicated to reducing load vectors and optimizing core user layout stability.',
+        experience: [
+          {
+            company: 'TechCraft Interactive',
+            role: 'Senior Frontend Engineer',
+            dates: '2021 - Present',
+            description: '• Spearheaded implementation of robust state machine workflows using Zustand and Next.js App Router architectures.\n• Optimized dynamic bundling strategies to cut Initial Server Response metrics by 35%.\n• Mentored 4 junior developers and established single-source-of-truth component tokens systems.'
+          },
+          {
+            company: 'Apex Web Studio',
+            role: 'Full Stack Engineer',
+            dates: '2018 - 2021',
+            description: '• Developed customized client intake forms scaling across 45,000 active dashboard sessions.\n• Integrated continuous authentication validation via secure serverless callback interceptors.\n• Designed distributed caching patterns over persistent Redis key structures.'
+          }
+        ],
+        skills: 'React, Next.js, TypeScript, TailwindCSS, Node.js, Express, Zustand, Prisma DB, REST APIs, Git Integration',
+        education: [
+          {
+            institution: 'University of Texas at Austin',
+            degree: 'B.S. Computer Science',
+            dates: '2014 - 2018'
+          }
+        ]
+      });
+      toast.success('Loaded Open-Resume preset: Full Stack Engineer');
+    } else {
+      setProfile({
+        personalInfo: {
+          name: 'Marcus Vance',
+          email: 'marcus.vance@example.com',
+          phone: '+1 (555) 849-2019',
+          linkedin: 'linkedin.com/in/marcus-v-cloud',
+          address: 'Seattle, WA'
+        },
+        summary: 'Cloud Infrastructure Developer & DevOps Architect focused on high-concurrency microservice meshing, Kubernetes state deployment synchronization, and optimized network barrier design.',
+        experience: [
+          {
+            company: 'HyperScale Networks',
+            role: 'Principal Systems Architect',
+            dates: '2020 - Present',
+            description: '• Designed multi-region failover automation across AWS CloudFront and global Edge clusters.\n• Automated continuous database snapshot pipelines using server-sent event trigger verification loops.\n• Reduced quarterly enterprise compute budget by $140,000 via systematic idle resource pruning.'
+          }
+        ],
+        skills: 'Kubernetes, AWS Infrastructure, Docker Containerization, CI/CD Actions, Terraform, Golang Systems, Redis Interception',
+        education: [
+          {
+            institution: 'University of Washington',
+            degree: 'B.S. Network Engineering',
+            dates: '2015 - 2019'
+          }
+        ]
+      });
+      toast.success('Loaded Open-Resume preset: Cloud Infrastructure');
+    }
+  };
+
   // Experience updates
   const handleExpChange = (index: number, field: string, value: string) => {
     const updated = [...profile.experience];
@@ -326,6 +400,26 @@ export default function ResumeBuilderPage() {
           {activeTab === 'content' && (
             <div className="flex flex-col gap-6">
               
+              {/* Open-Resume Feature: Interactive Preset Sample Loading */}
+              <Card className="bg-linear-to-r from-primary/10 to-violet-500/10 border-primary/20 backdrop-blur-md rounded-2xl p-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                  <div>
+                    <span className="text-xs font-bold text-primary font-jetbrains uppercase flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5" /> Open-Resume Intake Presets
+                    </span>
+                    <p className="text-xs text-text-sub mt-0.5">Instantly autofill structured data optimized for ATS analysis algorithms.</p>
+                  </div>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <Button onClick={() => loadOpenResumePreset('fs')} size="sm" variant="secondary" className="flex-1 sm:flex-none text-[11px] h-8 rounded-lg">
+                      Full Stack Eng
+                    </Button>
+                    <Button onClick={() => loadOpenResumePreset('cloud')} size="sm" variant="secondary" className="flex-1 sm:flex-none text-[11px] h-8 rounded-lg">
+                      Cloud Architect
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+
               {/* Dynamic Section Position Ordering */}
               <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
                 <CardHeader className="pb-3">
@@ -342,11 +436,14 @@ export default function ResumeBuilderPage() {
                           type="checkbox" 
                           checked={sec.enabled} 
                           onChange={() => toggleSectionEnabled(sec.id)}
-                          className="rounded border-white/10 accent-primary"
+                          className="rounded border-white/10 accent-primary shrink-0"
                         />
-                        <span className={`text-xs font-bold ${sec.enabled ? 'text-text-main' : 'text-text-muted line-through opacity-50'}`}>
-                          {sec.title}
-                        </span>
+                        <input 
+                          type="text"
+                          value={sec.title}
+                          onChange={(e) => handleSectionTitleChange(sec.id, e.target.value)}
+                          className={`text-xs font-bold bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-primary/50 rounded px-1 w-full ${sec.enabled ? 'text-text-main' : 'text-text-muted line-through opacity-50'}`}
+                        />
                       </div>
                       <div className="flex items-center gap-1">
                         <Button 
@@ -596,6 +693,45 @@ export default function ResumeBuilderPage() {
                 </div>
               </Card>
 
+              {/* Open-Resume Feature: Accent Theme Color Picker */}
+              <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl p-5">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-xs font-jetbrains uppercase text-primary tracking-wider font-bold">Accent Color Theme</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-text-muted font-mono">{accentColor}</span>
+                    <input 
+                      type="color" 
+                      value={accentColor}
+                      onChange={e => setAccentColor(e.target.value)}
+                      className="w-5 h-5 rounded border-none cursor-pointer p-0 bg-transparent"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { hex: '#2563eb', label: 'Tech Blue' },
+                    { hex: '#059669', label: 'Emerald' },
+                    { hex: '#7c3aed', label: 'Royal Violet' },
+                    { hex: '#dc2626', label: 'Crimson' },
+                    { hex: '#ea580c', label: 'Amber' },
+                    { hex: '#0ea5e9', label: 'Sky' },
+                    { hex: '#475569', label: 'Slate' }
+                  ].map(c => (
+                    <button
+                      key={c.hex}
+                      onClick={() => setAccentColor(c.hex)}
+                      className={`h-7 px-2.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 border ${
+                        accentColor === c.hex ? 'border-white text-white font-bold scale-105' : 'border-white/5 text-text-muted hover:text-text-sub'
+                      }`}
+                      style={{ backgroundColor: `${c.hex}20` }}
+                    >
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: c.hex }} />
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+              </Card>
+
               {/* Layout Alignment sliders */}
               <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl p-5 space-y-5">
                 
@@ -743,12 +879,48 @@ export default function ResumeBuilderPage() {
         </div>
 
         {/* Right Layout Canvas (Strict A4 Page Dimensions ratio mapping) */}
-        <div className="lg:col-span-7">
+        <div className="lg:col-span-7 flex flex-col gap-4">
+          {/* Open-Resume Feature: Live Preview Zoom Scale Controller */}
+          <div className="flex justify-between items-center bg-surface-2 px-4 py-2 rounded-xl border border-white/5">
+            <span className="text-xs text-text-sub flex items-center gap-1.5 font-medium">
+              <Sliders className="w-3.5 h-3.5 text-primary" /> Live Canvas Magnification
+            </span>
+            <div className="flex items-center gap-1.5">
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={() => setPreviewZoom(Math.max(0.5, previewZoom - 0.1))} 
+                className="h-6 w-6 p-0 text-xs text-text-muted hover:bg-surface"
+              >
+                -
+              </Button>
+              <span className="text-xs font-mono font-bold text-primary w-12 text-center">
+                {Math.round(previewZoom * 100)}%
+              </span>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={() => setPreviewZoom(Math.min(1.5, previewZoom + 0.1))} 
+                className="h-6 w-6 p-0 text-xs text-text-muted hover:bg-surface"
+              >
+                +
+              </Button>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={() => setPreviewZoom(1)} 
+                className="h-6 px-2 text-[10px] text-text-muted hover:bg-surface ml-1"
+              >
+                Reset
+              </Button>
+            </div>
+          </div>
+
           <div className="sticky top-6 flex justify-center overflow-x-auto pb-6">
             
             {/* Inner A4 Printable Paper Boundary Container */}
             <div 
-              className="bg-white text-black p-10 rounded-xl shadow-2xl transition-all select-text shrink-0 printable-resume flowcv-a4-canvas border border-neutral-300"
+              className="bg-white text-black p-10 rounded-xl shadow-2xl transition-all select-text shrink-0 printable-resume flowcv-a4-canvas border border-neutral-300 origin-top"
               style={{
                 width: '210mm',
                 minHeight: '297mm', // absolute A4 metrics standard
@@ -756,19 +928,22 @@ export default function ResumeBuilderPage() {
                 fontSize: `${fontSize}px`,
                 lineHeight: lineSpacing,
                 color: '#1a1a1a', // true deep contrast printable black
+                transform: `scale(${previewZoom})`,
+                marginBottom: previewZoom > 1 ? `${(previewZoom - 1) * 300}px` : '0px'
               }}
             >
               
               {/* Header block with selected alignment layout */}
               <div 
                 className={`border-b-2 pb-5 mb-5 ${
-                  template === 'executive' ? 'border-neutral-400' : template === 'modern' ? 'border-blue-700' : 'border-neutral-200'
+                  template === 'executive' ? 'border-neutral-400' : template === 'modern' ? '' : 'border-neutral-200'
                 }`}
                 style={{
                   textAlign: headerAlign,
+                  borderColor: template === 'modern' ? accentColor : undefined
                 }}
               >
-                <h1 className="font-bold tracking-tight m-0 leading-tight" style={{ fontSize: `${fontSize * 2.2}px`, color: template === 'modern' ? '#1e3a8a' : '#000' }}>
+                <h1 className="font-bold tracking-tight m-0 leading-tight" style={{ fontSize: `${fontSize * 2.2}px`, color: template === 'modern' ? accentColor : '#000' }}>
                   {profile.personalInfo.name || 'Full Name'}
                 </h1>
                 
@@ -799,11 +974,11 @@ export default function ResumeBuilderPage() {
                           className="font-bold uppercase tracking-widest m-0 pb-1.5 mb-2 border-b border-neutral-200" 
                           style={{ 
                             fontSize: `${fontSize * 0.95}px`, 
-                            color: template === 'modern' ? '#1e3a8a' : '#111',
-                            borderBottom: template === 'modern' ? '1px solid #bfdbfe' : '1px solid #e5e5e5'
+                            color: template === 'modern' ? accentColor : '#111',
+                            borderBottom: template === 'modern' ? `1px solid ${accentColor}40` : '1px solid #e5e5e5'
                           }}
                         >
-                          Professional Summary
+                          {sectionMeta.title}
                         </h2>
                         <p className="m-0 leading-relaxed text-justify text-neutral-800" style={{ fontSize: `${fontSize}px` }}>
                           {profile.summary}
@@ -820,11 +995,11 @@ export default function ResumeBuilderPage() {
                           className="font-bold uppercase tracking-widest m-0 pb-1.5 mb-3 border-b border-neutral-200" 
                           style={{ 
                             fontSize: `${fontSize * 0.95}px`, 
-                            color: template === 'modern' ? '#1e3a8a' : '#111',
-                            borderBottom: template === 'modern' ? '1px solid #bfdbfe' : '1px solid #e5e5e5'
+                            color: template === 'modern' ? accentColor : '#111',
+                            borderBottom: template === 'modern' ? `1px solid ${accentColor}40` : '1px solid #e5e5e5'
                           }}
                         >
-                          Work Experience
+                          {sectionMeta.title}
                         </h2>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: `${sectionGap * 0.7}px` }}>
                           {profile.experience.map((exp, eIdx) => (
@@ -835,9 +1010,22 @@ export default function ResumeBuilderPage() {
                               </div>
                               <div className="font-medium text-neutral-700" style={{ fontSize: `${fontSize * 0.92}px` }}>{exp.company || 'Company'}</div>
                               {exp.description && (
-                                <p className="m-0 text-neutral-700 pl-3 border-l-2 border-neutral-200 mt-1 text-justify" style={{ fontSize: `${fontSize * 0.95}px` }}>
-                                  {exp.description}
-                                </p>
+                                <div className="mt-1">
+                                  {exp.description.split('\n').map((line, lIdx) => {
+                                    const tLine = line.trim();
+                                    if (!tLine) return null;
+                                    const isBullet = tLine.startsWith('•') || tLine.startsWith('-') || tLine.startsWith('*');
+                                    const cleanText = tLine.replace(/^[•\-*]\s*/, '');
+                                    return (
+                                      <div key={lIdx} className="flex items-start gap-2 text-neutral-700 text-justify leading-normal mt-0.5" style={{ fontSize: `${fontSize * 0.95}px` }}>
+                                        <span className="text-neutral-400 select-none shrink-0" style={{ fontSize: `${fontSize * 0.8}px`, marginTop: '2px' }}>
+                                          {isBullet ? '•' : '•'}
+                                        </span>
+                                        <span className="flex-1">{cleanText}</span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
                               )}
                             </div>
                           ))}
@@ -854,11 +1042,11 @@ export default function ResumeBuilderPage() {
                           className="font-bold uppercase tracking-widest m-0 pb-1.5 mb-2.5 border-b border-neutral-200" 
                           style={{ 
                             fontSize: `${fontSize * 0.95}px`, 
-                            color: template === 'modern' ? '#1e3a8a' : '#111',
-                            borderBottom: template === 'modern' ? '1px solid #bfdbfe' : '1px solid #e5e5e5'
+                            color: template === 'modern' ? accentColor : '#111',
+                            borderBottom: template === 'modern' ? `1px solid ${accentColor}40` : '1px solid #e5e5e5'
                           }}
                         >
-                          Core Competencies
+                          {sectionMeta.title}
                         </h2>
                         <div className="flex flex-wrap gap-1.5">
                           {profile.skills.split(',').map((sk, skIdx) => {
@@ -867,12 +1055,13 @@ export default function ResumeBuilderPage() {
                             return (
                               <span 
                                 key={skIdx} 
-                                className="bg-neutral-100 text-neutral-800 rounded font-medium border border-neutral-200"
+                                className="rounded font-medium border border-neutral-200"
                                 style={{ 
                                   padding: '2px 8px', 
                                   fontSize: `${fontSize * 0.85}px`,
-                                  backgroundColor: template === 'modern' ? '#eff6ff' : '#f5f5f5',
-                                  borderColor: template === 'modern' ? '#dbeafe' : '#e5e5e5'
+                                  backgroundColor: template === 'modern' ? `${accentColor}10` : '#f5f5f5',
+                                  borderColor: template === 'modern' ? `${accentColor}30` : '#e5e5e5',
+                                  color: template === 'modern' ? accentColor : '#262626'
                                 }}
                               >
                                 {trimmed}
@@ -892,11 +1081,11 @@ export default function ResumeBuilderPage() {
                           className="font-bold uppercase tracking-widest m-0 pb-1.5 mb-3 border-b border-neutral-200" 
                           style={{ 
                             fontSize: `${fontSize * 0.95}px`, 
-                            color: template === 'modern' ? '#1e3a8a' : '#111',
-                            borderBottom: template === 'modern' ? '1px solid #bfdbfe' : '1px solid #e5e5e5'
+                            color: template === 'modern' ? accentColor : '#111',
+                            borderBottom: template === 'modern' ? `1px solid ${accentColor}40` : '1px solid #e5e5e5'
                           }}
                         >
-                          Education
+                          {sectionMeta.title}
                         </h2>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: `${sectionGap * 0.5}px` }}>
                           {profile.education.map((edu, edIdx) => (
