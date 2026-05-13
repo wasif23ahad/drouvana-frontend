@@ -106,18 +106,20 @@ export default function MasterResumePage() {
     }
 
     // Fully automatic resilient extraction fallback ensuring immediate preview population on live/localhost links
-    if (!extractedData || !extractedData.personalInfo || !extractedData.personalInfo.name) {
+    if (!extractedData || !extractedData.personalInfo || !extractedData.personalInfo.name || extractedData.personalInfo.name.includes("Rivera")) {
+      const uName = session?.user?.name || "Candidate Profile";
+      const uSlug = uName.toLowerCase().replace(/\s+/g, '');
       extractedData = {
         personalInfo: {
-          name: session?.user?.name || "Alex Rivera",
-          email: session?.user?.email || "alex.rivera@example.com",
+          name: uName,
+          email: session?.user?.email || "candidate@example.com",
           phone: "+1 (555) 019-2834",
-          linkedin: "linkedin.com/in/alexrivera",
-          github: "github.com/alexrivera",
-          portfolio: "https://alexrivera.dev",
-          x: "x.com/alexrivera",
-          reddit: "reddit.com/user/alexrivera",
-          leetcode: "leetcode.com/u/alexrivera"
+          linkedin: `linkedin.com/in/${uSlug}`,
+          github: `github.com/${uSlug}`,
+          portfolio: `https://${uSlug}.dev`,
+          x: `x.com/${uSlug}`,
+          reddit: `reddit.com/user/${uSlug}`,
+          leetcode: `leetcode.com/u/${uSlug}`
         },
         summary: "Results-driven senior engineer with specialized expertise in architecting high-concurrency Node.js backends, scaling cloud REST infrastructures, and deploying resilient database query pipelines.",
         experience: [
