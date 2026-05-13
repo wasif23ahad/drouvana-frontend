@@ -16,7 +16,10 @@ import {
   LogOut,
   Zap,
   MessageSquare,
-  ListTodo
+  ListTodo,
+  Activity,
+  Send,
+  Layers
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { signOut, useSession } from 'next-auth/react';
@@ -28,9 +31,13 @@ const Sidebar = () => {
   const userNavLinks = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Job Tracker', href: '/dashboard/tracker', icon: ListTodo },
-    { name: 'Profile', href: '/dashboard/resume', icon: FileText },
+    { name: 'Profile Data', href: '/dashboard/resume', icon: FileText },
+    { name: 'Resume Builder', href: '/dashboard/builder', icon: Sparkles },
+    { name: 'ATS Analyzer', href: '/dashboard/analyzer', icon: BarChart3 },
+    { name: 'Cover Letters', href: '/dashboard/cover-letter', icon: Layers },
+    { name: 'Cold Outreach', href: '/dashboard/outreach', icon: Send },
     { name: 'AI Coach', href: '/dashboard/assistant', icon: MessageSquare },
-    { name: 'Workspace', href: '/dashboard/workspace', icon: Zap },
+    { name: 'Pipeline Health', href: '/dashboard/health', icon: Activity },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
 
