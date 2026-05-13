@@ -304,53 +304,56 @@ export default function ChatInterface() {
   );
 }
 
-// Helper for inline bolding formatting
+// Helper for inline bolding formatting — eye-soothing crisp white text
 const formatInline = (line: string): React.ReactNode[] => {
   if (!line) return [];
   const parts = line.split(/(\*\*.*?\*\*)/g);
   return parts.map((part, idx) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={idx} className="font-semibold text-primary">{part.slice(2, -2)}</strong>;
+      return <strong key={idx} className="font-semibold text-white">{part.slice(2, -2)}</strong>;
     }
     return part;
   });
 };
 
-// State-of-the-art native React Markdown Block parser
+// State-of-the-art line-by-line native React Markdown parser
 const renderMarkdown = (text: string) => {
   if (!text) return null;
-  const blocks = text.split(/\n\n+/);
+  const lines = text.split('\n');
   return (
-    <div className="space-y-3 w-full">
-      {blocks.map((block, blockIdx) => {
-        const trimmed = block.trim();
-        if (!trimmed) return null;
+    <div className="space-y-1.5 w-full text-text-main">
+      {lines.map((line, lineIdx) => {
+        const trimmed = line.trim();
+        if (!trimmed) return <div key={lineIdx} className="h-1.5" />;
 
         if (trimmed.startsWith('### ')) {
-          return <h4 key={blockIdx} className="font-bold text-primary text-base mt-2 border-b border-primary/10 pb-1">{formatInline(trimmed.replace(/^###\s+/, ''))}</h4>;
+          return (
+            <h4 key={lineIdx} className="font-bold text-white text-base mt-3 mb-1">
+              {formatInline(trimmed.replace(/^###\s+/, ''))}
+            </h4>
+          );
         }
         if (trimmed.startsWith('## ')) {
-          return <h3 key={blockIdx} className="font-bold text-primary text-lg mt-3 border-b border-primary/10 pb-1">{formatInline(trimmed.replace(/^##\s+/, ''))}</h3>;
+          return (
+            <h3 key={lineIdx} className="font-bold text-white text-lg mt-3 mb-1 border-b border-white/10 pb-1">
+              {formatInline(trimmed.replace(/^##\s+/, ''))}
+            </h3>
+          );
         }
         if (trimmed.startsWith('# ')) {
-          return <h2 key={blockIdx} className="font-bold text-primary text-xl mt-3 border-b border-primary/10 pb-1">{formatInline(trimmed.replace(/^#\s+/, ''))}</h2>;
+          return (
+            <h2 key={lineIdx} className="font-bold text-white text-xl mt-4 mb-1 border-b border-white/10 pb-1">
+              {formatInline(trimmed.replace(/^#\s+/, ''))}
+            </h2>
+          );
         }
 
-        const lines = trimmed.split('\n');
+        const isListItem = trimmed.startsWith('-') || trimmed.startsWith('•') || trimmed.startsWith('*');
+        const textContent = trimmed.replace(/^[-•*]\s*/, '');
         return (
-          <div key={blockIdx} className="space-y-1.5">
-            {lines.map((line, lineIdx) => {
-              const cleanLine = line.trim();
-              if (!cleanLine) return null;
-              const isListItem = cleanLine.startsWith('-') || cleanLine.startsWith('•') || cleanLine.startsWith('*');
-              const textContent = cleanLine.replace(/^[-•*]\s*/, '');
-              return (
-                <div key={lineIdx} className={cn(isListItem ? "flex gap-2 pl-1" : "", "text-sm leading-relaxed text-text-main")}>
-                  {isListItem && <span className="text-primary select-none mt-0.5">•</span>}
-                  <span className="flex-1">{formatInline(textContent)}</span>
-                </div>
-              );
-            })}
+          <div key={lineIdx} className={cn(isListItem ? "flex gap-2 pl-2.5" : "", "text-sm leading-relaxed text-text-main")}>
+            {isListItem && <span className="text-white/60 select-none mt-0.5">•</span>}
+            <span className="flex-1">{formatInline(textContent)}</span>
           </div>
         );
       })}
