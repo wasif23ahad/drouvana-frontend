@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Plus, Trash2, GripVertical, ChevronRight, Download, Save, CheckCircle2, Loader2, UploadCloud } from 'lucide-react';
+import { Sparkles, Plus, Trash2, GripVertical, ChevronRight, Download, Save, CheckCircle2, Loader2, UploadCloud, FileText, Eye, X } from 'lucide-react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
@@ -21,7 +21,9 @@ export default function MasterResumePage() {
   const [parseSuccessMsg, setParseSuccessMsg] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const { register, control, handleSubmit, reset } = useForm({
+  const [pdfModalOpen, setPdfModalOpen] = useState(false);
+
+  const { register, control, handleSubmit, reset, watch } = useForm({
     defaultValues: {
       personalInfo: {
         name: session?.user?.name || '',
@@ -34,13 +36,18 @@ export default function MasterResumePage() {
         leetcode: '',
         portfolio: '',
       },
-      summary: 'Experienced professional with a passion for building impactful products.',
+      summary: '',
       experience: [
         { id: '1', company: '', role: '', dates: '', description: '' }
       ],
       skills: '',
+      uploadedFileName: '',
+      uploadedPdfBase64: ''
     }
   });
+
+  const uploadedFileName = watch('uploadedFileName');
+  const uploadedPdfBase64 = watch('uploadedPdfBase64');
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -90,6 +97,13 @@ export default function MasterResumePage() {
 
     setParsing(true);
     setParseSuccessMsg(false);
+
+    const fileBase64 = await new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(file);
+    });
+
     const formData = new FormData();
     formData.append('file', file);
 
@@ -102,38 +116,41 @@ export default function MasterResumePage() {
         extractedData = res.data.data;
       }
     } catch (error) {
-      console.error('API parsing boundary hit, serving local intelligent parsing extraction simulation metrics', error);
+      console.error('API parsing boundary hit', error);
     }
 
-    // Fully automatic resilient extraction fallback ensuring immediate preview population on live/localhost links
+    // Fully automatic resilient extraction fallback adhering strictly to Rule: unparsed fields must remain empty strings
     if (!extractedData || !extractedData.personalInfo || !extractedData.personalInfo.name || extractedData.personalInfo.name.includes("Rivera")) {
-      const uName = session?.user?.name || "Candidate Profile";
-      const uSlug = uName.toLowerCase().replace(/\s+/g, '');
+      const uName = session?.user?.name || "";
       extractedData = {
         personalInfo: {
           name: uName,
-          email: session?.user?.email || "candidate@example.com",
-          phone: "+1 (555) 019-2834",
-          linkedin: `linkedin.com/in/${uSlug}`,
-          github: `github.com/${uSlug}`,
-          portfolio: `https://${uSlug}.dev`,
-          x: `x.com/${uSlug}`,
-          reddit: `reddit.com/user/${uSlug}`,
-          leetcode: `leetcode.com/u/${uSlug}`
+          email: session?.user?.email || "",
+          phone: "",
+          linkedin: "",
+          github: "",
+          portfolio: "",
+          x: "",
+          reddit: "",
+          leetcode: ""
         },
-        summary: "Results-driven senior engineer with specialized expertise in architecting high-concurrency Node.js backends, scaling cloud REST infrastructures, and deploying resilient database query pipelines.",
+        summary: "",
         experience: [
           {
             id: "exp_auto_1",
-            company: "Enterprise Cloud Platforms",
-            role: "Senior Backend Systems Engineer",
-            dates: "2021 - Present",
-            description: "• Architected robust database connection pools handling 15,000+ simultaneous read/write queries with zero dropped frames.\n• Implemented optimized token verification and JWT middleware barriers securing primary client state.\n• Streamlined continuous integration build sequences via automated broadcast channels."
+            company: "",
+            role: "",
+            dates: "",
+            description: ""
           }
         ],
-        skills: "React, Node.js, TypeScript, Next.js, Express, PostgreSQL, Redis, Docker Containerization"
+        skills: ""
       };
     }
+
+    // Preserve uploaded file reference and embedded preview string
+    extractedData.uploadedFileName = file.name;
+    extractedData.uploadedPdfBase64 = fileBase64;
 
     // Simulate subtle parsing wait animation completion timing to create a high WOW aesthetic feel
     setTimeout(async () => {
@@ -210,6 +227,28 @@ export default function MasterResumePage() {
               </div>
               <div className="w-48 h-1.5 bg-surface-2 rounded-full overflow-hidden mt-1">
                 <div className="h-full bg-gradient-to-r from-primary via-secondary to-primary animate-pulse w-full rounded-full" />
+              </div>
+            </div>
+          ) : uploadedFileName ? (
+            <div 
+              className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 bg-surface-2 rounded-2xl border border-white/10 hover:border-primary/40 transition-all text-left w-full max-w-2xl mx-auto" 
+              onClick={(e) => { e.stopPropagation(); setPdfModalOpen(true); }}
+            >
+              <div className="flex items-center gap-3 overflow-hidden">
+                <div className="w-10 h-10 rounded-xl bg-error/10 flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5 text-error" />
+                </div>
+                <div className="truncate">
+                  <p className="text-sm font-bold text-text-main truncate">{uploadedFileName}</p>
+                  <p className="text-xs text-primary flex items-center gap-1 font-jetbrains mt-0.5">
+                    <Eye className="w-3 h-3" /> Click to view uploaded resume
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button size="sm" variant="ghost" className="h-8 px-2.5 text-xs hover:text-error font-jetbrains uppercase tracking-wider" onClick={(e) => { e.stopPropagation(); /* lets root input trigger */ }}>
+                  <UploadCloud className="w-3.5 h-3.5 mr-1.5" /> Replace
+                </Button>
               </div>
             </div>
           ) : (
@@ -384,6 +423,29 @@ export default function MasterResumePage() {
           </CardContent>
         </Card>
       </form>
+
+      {pdfModalOpen && uploadedPdfBase64 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPdfModalOpen(false)}>
+          <div className="relative w-full max-w-4xl h-[85vh] bg-surface rounded-3xl border border-white/10 overflow-hidden flex flex-col shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 bg-surface-2 border-b border-white/10">
+              <div className="flex items-center gap-2 truncate">
+                <FileText className="w-4 h-4 text-error shrink-0" />
+                <span className="text-sm font-bold text-text-main truncate">{uploadedFileName}</span>
+              </div>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-white/10" onClick={() => setPdfModalOpen(false)}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex-1 w-full h-full bg-white">
+              <iframe 
+                src={uploadedPdfBase64.startsWith('data:') ? uploadedPdfBase64 : `data:application/pdf;base64,${uploadedPdfBase64}`} 
+                className="w-full h-full border-none"
+                title="Uploaded Resume PDF Preview"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
