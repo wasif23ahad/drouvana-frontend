@@ -43,8 +43,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
+    async jwt({ token, user, account, profile }) {
+      if (account?.provider === "google" && profile) {
+        try {
+          const response = await api.post("/api/auth/google", {
+            email: profile.email,
+            name: profile.name,
+            googleId: profile.sub || profile.id || account.providerAccountId,
+            avatar: profile.picture || profile.image || user?.image,
+          });
+          
+          const backendUser = response.data;
+          if (backendUser) {
+            token.id = backendUser.id;
+            token.role = backendUser.role;
+            token.accessToken = backendUser.token;
+          }
+        } catch (error) {
+          console.error("Backend Google Auth Error:", error);
+        }
+      } else if (user) {
         token.id = user.id;
         token.role = (user as any).role;
         token.accessToken = (user as any).accessToken;
