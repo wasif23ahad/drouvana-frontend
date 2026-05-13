@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Briefcase, FileText, Target, Plus, ChevronRight, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import api from '@/lib/api';
 
 // Recharts — loaded normally; Next.js code-splits per route automatically
 import {
@@ -20,7 +22,33 @@ const ChartSkeleton = () => (
 );
 
 export default function DashboardOverview() {
-  const { applications } = useAppStore();
+  const { applications, setApplications } = useAppStore();
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (session?.user) {
+      api.get('/api/applications', { params: { limit: 100 } })
+        .then(res => {
+          if (res.data?.applications) {
+            // Map backend structure to frontend Zustand structure
+            const mappedApps = res.data.applications.map((a: any) => ({
+              id: a.id,
+              jobTitle: a.jobTitle,
+              company: a.company,
+              platform: a.platform || 'Direct',
+              status: a.status,
+              location: a.location || 'Remote',
+              salaryRange: a.salaryRange,
+              dateApplied: a.createdAt || new Date().toISOString(),
+              lastUpdated: a.updatedAt || new Date().toISOString(),
+              notes: a.notes,
+            }));
+            setApplications(mappedApps);
+          }
+        })
+        .catch(err => console.error('Failed to sync applications:', err));
+    }
+  }, [session?.user, setApplications]);
 
   const totalApps = applications.length;
   const interviews = applications.filter(a => a.status === 'INTERVIEW').length;

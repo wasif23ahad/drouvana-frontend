@@ -132,7 +132,7 @@ const Navbar = () => {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <Link href="/login">
+              <Link href="/login?switch=true">
                 <Button variant="ghost" className="hidden sm:inline-flex text-sm font-medium hover:text-primary transition-colors h-9">
                   Sign In
                 </Button>
@@ -178,7 +178,7 @@ const Navbar = () => {
             ))}
             {!session && (
               <div className="flex flex-col gap-3 pt-4 border-t border-white/5">
-                <Link href="/login" onClick={() => setIsOpen(false)}>
+                <Link href="/login?switch=true" onClick={() => setIsOpen(false)}>
                   <Button variant="outline" className="w-full h-12 rounded-full font-bold uppercase tracking-widest text-xs border-primary text-primary">Login</Button>
                 </Link>
                 <Link href="/register" onClick={() => setIsOpen(false)}>

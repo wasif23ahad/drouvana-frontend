@@ -35,6 +35,7 @@ interface AppState {
   updateApplicationStatus: (id: string, status: JobStatus) => void;
   updateApplication: (id: string, data: Partial<Application>) => void;
   deleteApplication: (id: string) => void;
+  setApplications: (applications: Application[]) => void;
 }
 
 const SEEDED_APPLICATIONS: Application[] = [
@@ -130,6 +131,7 @@ export const useAppStore = create<AppState>()(
         set((state) => ({
           applications: state.applications.filter((app) => app.id !== id),
         })),
+      setApplications: (applications) => set({ applications }),
     }),
     {
       name: 'drouvana-storage',
