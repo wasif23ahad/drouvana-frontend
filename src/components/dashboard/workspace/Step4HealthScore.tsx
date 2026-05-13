@@ -19,6 +19,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
 
+const getBaseURL = () => {
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    const configured = process.env.NEXT_PUBLIC_API_URL || '';
+    if (!configured || configured.includes('localhost')) {
+      return 'https://douvana-backend.vercel.app';
+    }
+  }
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+};
+
 export default function Step4HealthScore() {
   const { data: session } = useSession();
   const { applicationId, healthScore, setHealthScore, reset, setStep } = useWorkspaceStore();
@@ -38,7 +48,7 @@ export default function Step4HealthScore() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ai/analyze-resume/sse/${applicationId}`, {
+      const response = await fetch(`${getBaseURL()}/api/ai/analyze-resume/sse/${applicationId}`, {
         headers
       });
 
