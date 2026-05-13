@@ -219,12 +219,12 @@ export default function ChatInterface() {
                 {m.role === 'assistant' ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
               </div>
               <div className={cn(
-                "p-4 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap",
+                "p-4 rounded-2xl text-sm leading-relaxed",
                 m.role === 'user'
-                  ? "bg-primary text-white rounded-tr-none"
-                  : "bg-surface border border-[var(--color-border-subtle)] text-text-main rounded-tl-none"
+                  ? "bg-primary text-white rounded-tr-none whitespace-pre-wrap"
+                  : "bg-surface border border-[var(--color-border-subtle)] text-text-main rounded-tl-none w-full overflow-x-auto"
               )}>
-                {m.content}
+                {m.role === 'user' ? m.content : renderMarkdown(m.content)}
               </div>
             </motion.div>
           ))}
@@ -235,14 +235,14 @@ export default function ChatInterface() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex gap-4 max-w-[85%]"
+            className="flex gap-4 max-w-[85%] w-full"
           >
             <div className="h-9 w-9 rounded-full flex-shrink-0 flex items-center justify-center bg-primary/10 text-primary border border-primary/10">
               <Bot className="h-4 w-4" />
             </div>
-            <div className="p-4 rounded-2xl bg-surface border border-[var(--color-border-subtle)] text-text-main rounded-tl-none text-sm leading-relaxed whitespace-pre-wrap">
-              {streamingContent}
-              <span className="inline-block w-1.5 h-4 bg-primary animate-pulse ml-0.5 rounded-sm" />
+            <div className="p-4 rounded-2xl bg-surface border border-[var(--color-border-subtle)] text-text-main rounded-tl-none text-sm leading-relaxed flex-1 overflow-x-auto">
+              {renderMarkdown(streamingContent)}
+              <span className="inline-block w-1.5 h-4 bg-primary animate-pulse mt-2 rounded-sm" />
             </div>
           </motion.div>
         )}
@@ -303,3 +303,57 @@ export default function ChatInterface() {
     </div>
   );
 }
+
+// Helper for inline bolding formatting
+const formatInline = (line: string): React.ReactNode[] => {
+  if (!line) return [];
+  const parts = line.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, idx) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={idx} className="font-semibold text-primary">{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+};
+
+// State-of-the-art native React Markdown Block parser
+const renderMarkdown = (text: string) => {
+  if (!text) return null;
+  const blocks = text.split(/\n\n+/);
+  return (
+    <div className="space-y-3 w-full">
+      {blocks.map((block, blockIdx) => {
+        const trimmed = block.trim();
+        if (!trimmed) return null;
+
+        if (trimmed.startsWith('### ')) {
+          return <h4 key={blockIdx} className="font-bold text-primary text-base mt-2 border-b border-primary/10 pb-1">{formatInline(trimmed.replace(/^###\s+/, ''))}</h4>;
+        }
+        if (trimmed.startsWith('## ')) {
+          return <h3 key={blockIdx} className="font-bold text-primary text-lg mt-3 border-b border-primary/10 pb-1">{formatInline(trimmed.replace(/^##\s+/, ''))}</h3>;
+        }
+        if (trimmed.startsWith('# ')) {
+          return <h2 key={blockIdx} className="font-bold text-primary text-xl mt-3 border-b border-primary/10 pb-1">{formatInline(trimmed.replace(/^#\s+/, ''))}</h2>;
+        }
+
+        const lines = trimmed.split('\n');
+        return (
+          <div key={blockIdx} className="space-y-1.5">
+            {lines.map((line, lineIdx) => {
+              const cleanLine = line.trim();
+              if (!cleanLine) return null;
+              const isListItem = cleanLine.startsWith('-') || cleanLine.startsWith('•') || cleanLine.startsWith('*');
+              const textContent = cleanLine.replace(/^[-•*]\s*/, '');
+              return (
+                <div key={lineIdx} className={cn(isListItem ? "flex gap-2 pl-1" : "", "text-sm leading-relaxed text-text-main")}>
+                  {isListItem && <span className="text-primary select-none mt-0.5">•</span>}
+                  <span className="flex-1">{formatInline(textContent)}</span>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
