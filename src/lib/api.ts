@@ -26,6 +26,13 @@ const api = axios.create({
 
 // Request interceptor to dynamically inject backend JWT Bearer tokens
 api.interceptors.request.use(async (config) => {
+  // Allow browser to automatically calculate multipart/form-data boundaries for file uploads
+  if (config.data instanceof FormData) {
+    if (config.headers) {
+      delete config.headers['Content-Type'];
+    }
+  }
+
   if (typeof window !== 'undefined') {
     try {
       const session = await getSession();
