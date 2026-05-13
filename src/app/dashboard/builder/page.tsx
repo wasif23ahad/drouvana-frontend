@@ -114,6 +114,11 @@ export default function ResumeBuilderPage() {
               email: p.personalInfo?.email || prev.personalInfo.email,
               phone: p.personalInfo?.phone || prev.personalInfo.phone,
               linkedin: p.personalInfo?.linkedin || prev.personalInfo.linkedin,
+              github: p.personalInfo?.github || (prev.personalInfo as any).github,
+              x: p.personalInfo?.x || (prev.personalInfo as any).x,
+              reddit: p.personalInfo?.reddit || (prev.personalInfo as any).reddit,
+              leetcode: p.personalInfo?.leetcode || (prev.personalInfo as any).leetcode,
+              portfolio: p.personalInfo?.portfolio || (prev.personalInfo as any).portfolio,
             },
             summary: p.summary || prev.summary,
             experience: p.experience?.length ? p.experience : prev.experience,
@@ -956,8 +961,13 @@ export default function ResumeBuilderPage() {
                 >
                   {profile.personalInfo.email && <span>{profile.personalInfo.email}</span>}
                   {profile.personalInfo.phone && <span>• {profile.personalInfo.phone}</span>}
-                  {profile.personalInfo.linkedin && <span className="text-blue-800">• {profile.personalInfo.linkedin}</span>}
                   {profile.personalInfo.address && <span>• {profile.personalInfo.address}</span>}
+                  {profile.personalInfo.linkedin && <span className="text-blue-800">• {profile.personalInfo.linkedin}</span>}
+                  {(profile.personalInfo as any).github && <span className="text-neutral-700">• {(profile.personalInfo as any).github}</span>}
+                  {(profile.personalInfo as any).portfolio && <span className="text-emerald-800">• {(profile.personalInfo as any).portfolio}</span>}
+                  {(profile.personalInfo as any).leetcode && <span className="text-amber-700">• {(profile.personalInfo as any).leetcode}</span>}
+                  {(profile.personalInfo as any).x && <span className="text-neutral-900">• {(profile.personalInfo as any).x}</span>}
+                  {(profile.personalInfo as any).reddit && <span className="text-orange-700">• {(profile.personalInfo as any).reddit}</span>}
                 </div>
               </div>
 

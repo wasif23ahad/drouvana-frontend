@@ -27,6 +27,11 @@ export default function MasterResumePage() {
         email: session?.user?.email || '',
         phone: '',
         linkedin: '',
+        github: '',
+        x: '',
+        reddit: '',
+        leetcode: '',
+        portfolio: '',
       },
       summary: 'Experienced professional with a passion for building impactful products.',
       experience: [
@@ -175,20 +180,40 @@ export default function MasterResumePage() {
           </CardHeader>
           <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Full Identity</Label>
-              <Input {...register('personalInfo.name')} className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
+              <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Full Name</Label>
+              <Input {...register('personalInfo.name')} placeholder="e.g. Alex Rivera" className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Communication Node</Label>
-              <Input {...register('personalInfo.email')} className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
+              <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Email</Label>
+              <Input {...register('personalInfo.email')} placeholder="e.g. alex@example.com" className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Tactical Phone</Label>
-              <Input {...register('personalInfo.phone')} className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
+              <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Phone</Label>
+              <Input {...register('personalInfo.phone')} placeholder="e.g. +1 (555) 019-2834" className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
             </div>
             <div className="space-y-2">
               <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">LinkedIn URL</Label>
-              <Input {...register('personalInfo.linkedin')} className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
+              <Input {...register('personalInfo.linkedin')} placeholder="e.g. linkedin.com/in/username" className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">GitHub URL</Label>
+              <Input {...register('personalInfo.github')} placeholder="e.g. github.com/username" className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">X (Twitter) URL</Label>
+              <Input {...register('personalInfo.x')} placeholder="e.g. x.com/username" className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Reddit Profile</Label>
+              <Input {...register('personalInfo.reddit')} placeholder="e.g. reddit.com/user/username" className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">LeetCode Profile</Label>
+              <Input {...register('personalInfo.leetcode')} placeholder="e.g. leetcode.com/u/username" className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Portfolio Website</Label>
+              <Input {...register('personalInfo.portfolio')} placeholder="e.g. https://myportfolio.dev" className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
             </div>
           </CardContent>
         </Card>
