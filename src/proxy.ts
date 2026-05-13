@@ -11,10 +11,6 @@ export default auth((req) => {
   if (isApiAuthRoute) return undefined;
 
   if (isAuthRoute) {
-    const isSwitching = nextUrl.searchParams.get("switch") === "true";
-    if (isLoggedIn && !isSwitching) {
-      return Response.redirect(new URL("/dashboard", nextUrl));
-    }
     return undefined;
   }
 
