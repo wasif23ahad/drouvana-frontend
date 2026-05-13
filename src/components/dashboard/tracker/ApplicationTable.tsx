@@ -70,9 +70,10 @@ export default function ApplicationTracker() {
       if (debouncedSearch) params.search = debouncedSearch;
 
       const response = await api.get('/api/applications', { params });
-      setApplications(response.data.applications);
-      setTotalCount(response.data.pagination.total);
-      setTotalPages(response.data.pagination.pages);
+      const source = response.data?.data || response.data?.applications || [];
+      setApplications(source);
+      setTotalCount(response.data?.pagination?.total || source.length);
+      setTotalPages(response.data?.pagination?.pages || 1);
     } catch (error) {
       console.error('Failed to fetch applications:', error);
     } finally {

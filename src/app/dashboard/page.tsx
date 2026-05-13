@@ -29,9 +29,10 @@ export default function DashboardOverview() {
     if (session?.user) {
       api.get('/api/applications', { params: { limit: 100 } })
         .then(res => {
-          if (res.data?.applications) {
+          const sourceApps = res.data?.data || res.data?.applications;
+          if (Array.isArray(sourceApps)) {
             // Map backend structure to frontend Zustand structure
-            const mappedApps = res.data.applications.map((a: any) => ({
+            const mappedApps = sourceApps.map((a: any) => ({
               id: a.id,
               jobTitle: a.jobTitle,
               company: a.company,
