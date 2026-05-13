@@ -35,8 +35,17 @@ api.interceptors.request.use(async (config) => {
 
   if (typeof window !== 'undefined') {
     try {
+      // First check if we have a locally cached token to prevent async context initialization race conditions
+      let token = localStorage.getItem('drouvana_cached_token');
+      
       const session = await getSession();
-      const token = (session?.user as any)?.accessToken;
+      const sessionToken = (session?.user as any)?.accessToken || (session as any)?.accessToken;
+      
+      if (sessionToken) {
+        token = sessionToken;
+        localStorage.setItem('drouvana_cached_token', sessionToken);
+      }
+
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -51,6 +60,11 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Flush potentially stale/expired local token caching if unauthorized
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      localStorage.removeItem('drouvana_cached_token');
+    }
+
     // Standardize error reporting
     const message = error.response?.data?.message || error.message || 'An unexpected error occurred';
     console.error(`[API Error] ${message}`, error);

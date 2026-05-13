@@ -15,7 +15,6 @@ import {
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuLabel, 
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
@@ -103,12 +102,12 @@ const Navbar = () => {
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-64 glass-card p-2 rounded-xl mt-2 border-[var(--color-border-subtle)]" align="end">
-                  <DropdownMenuLabel className="p-3">
+                  <div className="p-3 select-none">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-bold text-text-main">{session.user?.name}</p>
                       <p className="text-[10px] font-jetbrains uppercase tracking-widest text-text-muted">{session.user?.email}</p>
                     </div>
-                  </DropdownMenuLabel>
+                  </div>
                   <DropdownMenuSeparator className="bg-white/5" />
                   <DropdownMenuItem onClick={() => router.push('/dashboard')} className="rounded-lg p-3 focus:bg-primary/10 cursor-pointer">
                     <LayoutDashboard className="mr-3 h-4 w-4 text-primary" />
