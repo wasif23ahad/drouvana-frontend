@@ -62,10 +62,10 @@ export default function MasterResumePage() {
     try {
       await api.put('/api/resume/master', { data });
       setSaved(true);
-      toast.success('Master Profile Saved Successfully');
+      toast.success('Profile Saved Successfully');
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      toast.error('Failed to save master profile');
+      toast.error('Failed to save profile');
       console.error(error);
     } finally {
       setSaving(false);
@@ -85,7 +85,8 @@ export default function MasterResumePage() {
       const res = await api.post('/api/ai/parse-resume', formData);
       if (res.data.data) {
         reset(res.data.data);
-        toast.success('Data Extracted and Populated');
+        await api.put('/api/resume/master', { data: res.data.data });
+        toast.success('Resume Extracted & Profile Synchronized');
       }
     } catch (error) {
       console.error(error);
@@ -116,9 +117,9 @@ export default function MasterResumePage() {
           <div className="flex items-center text-xs text-text-muted gap-2 font-jetbrains uppercase tracking-widest mb-2">
             <Link href="/dashboard" className="hover:text-primary transition-colors">Workspace</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-primary font-bold">Master Profile</span>
+            <span className="text-primary font-bold">Profile</span>
           </div>
-          <h1 className="text-3xl font-bold font-hanken">Master Profile</h1>
+          <h1 className="text-3xl font-bold font-hanken">Profile</h1>
           <p className="text-text-sub text-sm">Your professional information used across all AI features.</p>
         </div>
         

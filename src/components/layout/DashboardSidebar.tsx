@@ -28,7 +28,7 @@ const Sidebar = () => {
   const userNavLinks = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Job Tracker', href: '/dashboard/tracker', icon: ListTodo },
-    { name: 'Master Profile', href: '/dashboard/resume', icon: FileText },
+    { name: 'Profile', href: '/dashboard/resume', icon: FileText },
     { name: 'AI Coach', href: '/dashboard/assistant', icon: MessageSquare },
     { name: 'Workspace', href: '/dashboard/workspace', icon: Zap },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
