@@ -122,7 +122,7 @@ export default function ApplicationTracker() {
                     <div className="flex items-center justify-between mt-4 text-[10px] font-mono text-on-surface-variant uppercase tracking-widest border-t border-white/5 pt-3">
                       <div className="flex items-center gap-1.5 opacity-70">
                         <Calendar className="w-3 h-3" />
-                        {new Date(app.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        {app.createdAt ? new Date(app.createdAt).toISOString().split('T')[0] : ''}
                       </div>
                       <div className="flex items-center gap-1 bg-surface-variant/50 px-2 py-0.5 rounded text-[9px]">
                         {app.platform || 'Direct'}
@@ -173,7 +173,7 @@ export default function ApplicationTracker() {
                 </TableCell>
                 <TableCell>
                   <div className="text-xs font-mono text-on-surface-variant uppercase">
-                    {new Date(app.createdAt).toLocaleDateString()}
+                    {app.createdAt ? new Date(app.createdAt).toISOString().split('T')[0] : ''}
                   </div>
                 </TableCell>
                 <TableCell className="text-right p-6">

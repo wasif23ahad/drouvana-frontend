@@ -209,7 +209,9 @@ export default function DashboardOverview() {
                       </div>
                       <div className="flex items-center gap-6">
                          <div className="hidden sm:block text-right">
-                            <p className="text-xs text-text-sub font-jetbrains">{new Date(app.dateApplied).toLocaleDateString()}</p>
+                            <p className="text-xs text-text-sub font-jetbrains">
+                               {app.dateApplied ? new Date(app.dateApplied).toISOString().split('T')[0] : ''}
+                            </p>
                             <p className="text-[10px] text-text-muted uppercase tracking-tighter">Applied Date</p>
                          </div>
                          <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
