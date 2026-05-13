@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAppStore } from '@/lib/store';
+import { useSession } from 'next-auth/react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -23,6 +24,7 @@ const SUGGESTIONS = [
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function ChatInterface() {
+  const { data: session } = useSession();
   const { applications } = useAppStore();
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: 'Hi there! I\'m your Drouvana AI Career Coach. I can help with interview prep, resume advice, email drafts, and job search strategy. What can I help you with today?' }
@@ -78,9 +80,15 @@ export default function ChatInterface() {
     try {
       abortRef.current = new AbortController();
 
+      const token = (session?.user as any)?.accessToken;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${API_URL}/api/ai/chat/sse`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         credentials: 'include',
         body: JSON.stringify({ history, context }),
         signal: abortRef.current.signal,

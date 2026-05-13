@@ -17,8 +17,10 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useSession } from 'next-auth/react';
 
 export default function Step4HealthScore() {
+  const { data: session } = useSession();
   const { applicationId, healthScore, setHealthScore, reset, setStep } = useWorkspaceStore();
   const [loading, setLoading] = useState(!healthScore);
   const [streamingText, setStreamingText] = useState('');
@@ -30,10 +32,14 @@ export default function Step4HealthScore() {
     setProgress(0);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/analyze-resume/sse/${applicationId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+      const token = (session?.user as any)?.accessToken;
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ai/analyze-resume/sse/${applicationId}`, {
+        headers
       });
 
       if (!response.ok) throw new Error('Failed to connect to AI');
@@ -75,10 +81,10 @@ export default function Step4HealthScore() {
   };
 
   useEffect(() => {
-    if (!healthScore) {
+    if (!healthScore && session?.user) {
       startStreaming();
     }
-  }, []);
+  }, [session]);
 
   if (loading) {
     return (
