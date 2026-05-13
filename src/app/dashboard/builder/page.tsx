@@ -9,6 +9,7 @@ import { Sparkles, Download, Save, CheckCircle2, Loader2, LayoutTemplate, FileTe
 import Link from 'next/link';
 import api from '@/lib/api';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 interface SectionItem {
   id: string;
@@ -17,6 +18,7 @@ interface SectionItem {
 }
 
 export default function ResumeBuilderPage() {
+  const { status } = useSession();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -87,6 +89,13 @@ export default function ResumeBuilderPage() {
       } catch (err) {}
     }
 
+    if (status === 'unauthenticated') {
+      setLoading(false);
+      return;
+    }
+
+    if (status !== 'authenticated') return;
+
     // Fetch primary profile data from backend
     const fetchMasterProfile = async () => {
       try {
@@ -114,7 +123,7 @@ export default function ResumeBuilderPage() {
       }
     };
     fetchMasterProfile();
-  }, []);
+  }, [status]);
 
   // Save current flow custom build state to persistent memory
   const handleSaveVersion = (customVersionName?: string) => {

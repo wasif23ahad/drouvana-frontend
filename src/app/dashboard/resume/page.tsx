@@ -14,7 +14,7 @@ import api from '@/lib/api';
 import { toast } from 'sonner';
 
 export default function MasterResumePage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [parsing, setParsing] = useState(false);
@@ -42,6 +42,12 @@ export default function MasterResumePage() {
   });
 
   React.useEffect(() => {
+    if (status === 'unauthenticated') {
+      setLoading(false);
+      return;
+    }
+    if (status !== 'authenticated') return;
+
     const fetchResume = async () => {
       try {
         const res = await api.get('/api/resume/master');
@@ -55,7 +61,7 @@ export default function MasterResumePage() {
       }
     };
     fetchResume();
-  }, [reset]);
+  }, [reset, status]);
 
   const onSubmit = async (data: any) => {
     setSaving(true);

@@ -7,14 +7,19 @@ import { BarChart3, Sparkles, CheckCircle2, Loader2, ArrowRight, FileText, Chevr
 import Link from 'next/link';
 import api from '@/lib/api';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 export default function AtsAnalyzerPage() {
+  const { status } = useSession();
   const [loading, setLoading] = useState(false);
   const [resumeText, setResumeText] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [result, setResult] = useState<any>(null);
 
   useEffect(() => {
+    if (status === 'unauthenticated') return;
+    if (status !== 'authenticated') return;
+
     // Optionally load master summary as default fallback
     const fetchMaster = async () => {
       try {
@@ -27,7 +32,7 @@ export default function AtsAnalyzerPage() {
       }
     };
     fetchMaster();
-  }, []);
+  }, [status]);
 
   const handleAnalyze = async () => {
     if (!resumeText.trim() || !jobDescription.trim()) {

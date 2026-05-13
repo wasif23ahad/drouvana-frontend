@@ -7,8 +7,10 @@ import { Activity, RefreshCw, CheckCircle2, AlertTriangle, ArrowUpRight, Trendin
 import Link from 'next/link';
 import api from '@/lib/api';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 export default function PipelineHealthPage() {
+  const { status } = useSession();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState<any>(null);
@@ -75,8 +77,14 @@ export default function PipelineHealthPage() {
   };
 
   useEffect(() => {
-    fetchHealthMetrics();
-  }, []);
+    if (status === 'unauthenticated') {
+      setLoading(false);
+      return;
+    }
+    if (status === 'authenticated') {
+      fetchHealthMetrics();
+    }
+  }, [status]);
 
   if (loading) {
     return (
