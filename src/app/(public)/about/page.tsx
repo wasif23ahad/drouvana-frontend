@@ -25,10 +25,10 @@ export default function AboutPage() {
           <ChevronRight className="w-3 h-3" />
           <span className="text-primary font-bold">About</span>
         </div>
-        <h1 className="text-5xl md:text-7xl font-hanken font-bold text-text-main italic leading-tight tracking-tight">
+        <h1 className="text-5xl md:text-7xl font-hanken font-bold text-text-main leading-tight tracking-tight">
           Our Mission to <span className="bg-primary bg-clip-text text-transparent">Humanize</span> Job Hunting
         </h1>
-        <p className="text-xl text-text-sub leading-relaxed font-sans italic max-w-3xl mx-auto">
+        <p className="text-xl text-text-sub leading-relaxed font-sans max-w-3xl mx-auto">
           We believe finding your next career move shouldn't feel like speaking to a void. Drouvana leverages advanced AI to understand your unique value, connecting you with opportunities where you'll thrive.
         </p>
       </section>
@@ -37,8 +37,8 @@ export default function AboutPage() {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div className="bg-surface-2/50 backdrop-blur-xl rounded-[2.5rem] p-10 md:p-14 border border-white/10 relative overflow-hidden shadow-2xl">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[50px] rounded-full"></div>
-          <h2 className="text-4xl font-hanken font-bold text-text-main italic mb-8 relative z-10 tracking-tight">The Drouvana Story</h2>
-          <div className="space-y-6 font-sans text-text-sub leading-relaxed italic relative z-10 text-lg">
+          <h2 className="text-4xl font-hanken font-bold text-text-main mb-8 relative z-10 tracking-tight">The Drouvana Story</h2>
+          <div className="space-y-6 font-sans text-text-sub leading-relaxed relative z-10 text-lg">
             <p>
               Founded in 2023 by a team of frustrated tech professionals and AI researchers, Drouvana was born from a simple realization: the modern job search is fundamentally broken. It's a high-friction, low-transparency process that treats human potential as mere data points.
             </p>
@@ -61,7 +61,7 @@ export default function AboutPage() {
       <section className="space-y-16 py-12">
         <div className="text-center space-y-4">
           <p className="font-jetbrains text-[10px] uppercase tracking-[0.4em] text-secondary font-black">Strategic Core</p>
-          <h2 className="text-4xl font-hanken font-bold text-text-main italic tracking-tight">Core Principles</h2>
+          <h2 className="text-4xl font-hanken font-bold text-text-main tracking-tight">Core Principles</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {PRINCIPLES.map((p, i) => (
@@ -69,8 +69,8 @@ export default function AboutPage() {
               <div className="w-16 h-16 rounded-2xl bg-surface-2 flex items-center justify-center mb-8 border border-white/10 group-hover:border-primary/50 transition-colors">
                 <p.icon className={cn("w-7 h-7", p.color === 'primary' ? 'text-primary' : p.color === 'secondary' ? 'text-secondary' : 'text-tertiary')} />
               </div>
-              <h3 className="text-2xl font-hanken font-bold text-text-main italic mb-4">{p.title}</h3>
-              <p className="font-sans text-text-sub leading-relaxed text-sm italic">{p.desc}</p>
+              <h3 className="text-2xl font-hanken font-bold text-text-main mb-4">{p.title}</h3>
+              <p className="font-sans text-text-sub leading-relaxed text-sm ">{p.desc}</p>
             </div>
           ))}
         </div>
@@ -79,15 +79,15 @@ export default function AboutPage() {
       {/* CTA Section */}
       <section className="bg-surface-2 border border-white/10 rounded-[3rem] p-12 md:p-20 text-center space-y-8 relative overflow-hidden shadow-2xl">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-        <h2 className="text-4xl md:text-5xl font-hanken font-bold text-text-main italic tracking-tight leading-tight">Ready to evolve your career strategy?</h2>
+        <h2 className="text-4xl md:text-5xl font-hanken font-bold text-text-main tracking-tight leading-tight">Ready to evolve your career strategy?</h2>
         <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
           <Link href="/register">
-            <button className="h-14 px-10 rounded-2xl bg-primary text-white font-hanken font-bold italic text-lg shadow-xl shadow-primary/20 hover:scale-105 transition-all">
+            <button className="h-14 px-10 rounded-2xl bg-primary text-white font-hanken font-bold text-lg shadow-xl shadow-primary/20 hover:scale-105 transition-all">
               Initialize Account
             </button>
           </Link>
           <Link href="/templates">
-            <button className="h-14 px-10 rounded-2xl bg-surface-2 text-text-main font-hanken font-bold italic text-lg border border-white/10 hover:bg-white/5 transition-all">
+            <button className="h-14 px-10 rounded-2xl bg-surface-2 text-text-main font-hanken font-bold text-lg border border-white/10 hover:bg-white/5 transition-all">
               Explore Blueprints
             </button>
           </Link>

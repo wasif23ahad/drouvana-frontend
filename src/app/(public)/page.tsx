@@ -125,7 +125,9 @@ export default function LandingPage() {
                       <span className="font-medium">{feature.price}</span>
                       <span className="flex items-center text-amber-500 font-medium"><Star className="h-3 w-3 mr-1 fill-current" />{feature.rating}</span>
                     </div>
-                    <Button variant="outline" className="w-full rounded-xl">View Details</Button>
+                    <Link href="/register" className="w-full">
+                      <Button variant="outline" className="w-full rounded-xl">View Details</Button>
+                    </Link>
                   </CardFooter>
                 </Card>
               ))}
@@ -233,7 +235,7 @@ export default function LandingPage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-text-main italic mb-6 leading-relaxed">&quot;{test.quote}&quot;</p>
+                    <p className="text-text-main mb-6 leading-relaxed">&quot;{test.quote}&quot;</p>
                     <div>
                       <p className="font-semibold font-hanken text-primary">{test.author}</p>
                       <p className="text-sm text-text-muted font-jetbrains uppercase tracking-widest">{test.role}</p>

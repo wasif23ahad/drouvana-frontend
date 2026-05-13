@@ -35,8 +35,8 @@ const Step2JDAnalysis = () => {
           <ShieldCheck className="text-primary w-10 h-10" />
         </div>
         <div className="space-y-2">
-          <h3 className="font-hanken font-bold text-2xl text-text-main italic tracking-tight">Semantic Extraction Result</h3>
-          <p className="text-text-sub leading-relaxed italic">{analysis.roleInsights}</p>
+          <h3 className="font-hanken font-bold text-2xl text-text-main tracking-tight">Semantic Extraction Result</h3>
+          <p className="text-text-sub leading-relaxed ">{analysis.roleInsights}</p>
         </div>
       </div>
 
@@ -72,9 +72,9 @@ const Step2JDAnalysis = () => {
       <div className="p-10 bg-surface-2/50 rounded-4xl border border-white/5 space-y-4 relative overflow-hidden shadow-xl">
         <div className="flex items-center gap-3">
           <Info className="w-5 h-5 text-primary" />
-          <h4 className="font-hanken font-bold text-lg text-text-main italic tracking-tight">Organization Profile Summary</h4>
+          <h4 className="font-hanken font-bold text-lg text-text-main tracking-tight">Organization Profile Summary</h4>
         </div>
-        <p className="text-text-sub leading-relaxed italic text-lg">
+        <p className="text-text-sub leading-relaxed text-lg">
           {analysis.companySummary}
         </p>
       </div>
@@ -84,13 +84,13 @@ const Step2JDAnalysis = () => {
         <Button 
           variant="outline" 
           onClick={() => setStep(1)} 
-          className="rounded-2xl h-14 px-8 border-white/10 bg-surface-2 hover:bg-white/5 text-text-main font-hanken font-bold italic shadow-lg gap-2"
+          className="rounded-2xl h-14 px-8 border-white/10 bg-surface-2 hover:bg-white/5 text-text-main font-hanken font-bold shadow-lg gap-2"
         >
           <ChevronLeft className="w-4 h-4" /> Back to Parameters
         </Button>
         <Button 
           onClick={() => setStep(3)} 
-          className="rounded-2xl bg-primary text-white gap-3 h-16 px-10 font-hanken font-bold italic text-lg shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group"
+          className="rounded-2xl bg-primary text-white gap-3 h-16 px-10 font-hanken font-bold text-lg shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group"
         >
           Next: Optimization Protocol <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </Button>

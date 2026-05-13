@@ -69,8 +69,8 @@ const Step3ResumeGen = () => {
   return (
     <div className="space-y-16 max-w-5xl mx-auto">
       <div className="text-center space-y-4">
-        <h3 className="text-4xl font-hanken font-bold text-text-main italic tracking-tight">Design Architecture</h3>
-        <p className="text-text-sub italic text-lg max-w-xl mx-auto">Choose the structural blueprint for your tailored strategic profile.</p>
+        <h3 className="text-4xl font-hanken font-bold text-text-main tracking-tight">Design Architecture</h3>
+        <p className="text-text-sub text-lg max-w-xl mx-auto">Choose the structural blueprint for your tailored strategic profile.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -91,7 +91,7 @@ const Step3ResumeGen = () => {
               />
               <div className="absolute inset-0 bg-linear-to-t from-bg-base/90 via-bg-base/20 to-transparent" />
               <div className="absolute bottom-8 left-8 right-8 space-y-2">
-                <h4 className="font-hanken font-bold text-2xl text-text-main italic tracking-tight">{tpl.name}</h4>
+                <h4 className="font-hanken font-bold text-2xl text-text-main tracking-tight">{tpl.name}</h4>
                 <p className="font-jetbrains text-[9px] uppercase tracking-[0.2em] text-primary font-black">{tpl.desc}</p>
               </div>
             </div>
@@ -108,7 +108,7 @@ const Step3ResumeGen = () => {
         <Button 
           onClick={startGeneration}
           disabled={loading || !templateId}
-          className="w-full max-w-lg h-16 rounded-4xl bg-primary text-white text-lg font-hanken font-bold italic gap-4 shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group"
+          className="w-full max-w-lg h-16 rounded-4xl bg-primary text-white text-lg font-hanken font-bold gap-4 shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group"
         >
           {loading ? (
             <div className="flex items-center gap-3">

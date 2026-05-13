@@ -98,7 +98,7 @@ export default function ApplicationTracker() {
               <div className="p-4 flex items-center justify-between border-b border-white/5 shrink-0">
                 <div className="flex items-center gap-2">
                   <div className={cn("w-2 h-2 rounded-full", col.color)} />
-                  <h3 className="font-heading font-bold text-sm text-on-surface italic">{col.title}</h3>
+                  <h3 className="font-heading font-bold text-sm text-on-surface ">{col.title}</h3>
                   <span className="bg-surface-container text-on-surface-variant text-[10px] font-mono px-2 py-0.5 rounded-full">{colApps.length}</span>
                 </div>
                 <button className="text-on-surface-variant hover:text-on-surface"><MoreHorizontal className="w-4 h-4" /></button>
@@ -115,7 +115,7 @@ export default function ApplicationTracker() {
                         <span className="text-primary font-bold text-lg">{app.company.charAt(0)}</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-heading font-bold text-sm text-on-surface group-hover:text-primary transition-colors truncate italic pr-12">{app.jobTitle}</h4>
+                        <h4 className="font-heading font-bold text-sm text-on-surface group-hover:text-primary transition-colors truncate pr-12">{app.jobTitle}</h4>
                         <p className="text-xs text-on-surface-variant mt-0.5 font-sans">{app.company} • {app.location || 'Remote'}</p>
                       </div>
                     </div>
@@ -161,7 +161,7 @@ export default function ApplicationTracker() {
             {applications.map((app) => (
               <TableRow key={app.id} className="border-white/5 hover:bg-white/5 transition-colors group">
                 <TableCell className="p-6">
-                  <div className="font-heading font-bold text-on-surface italic">{app.company}</div>
+                  <div className="font-heading font-bold text-on-surface ">{app.company}</div>
                 </TableCell>
                 <TableCell>
                   <div className="text-sm font-medium text-on-surface-variant">{app.jobTitle}</div>
@@ -275,7 +275,7 @@ export default function ApplicationTracker() {
              <Target className="w-8 h-8 text-on-surface-variant" />
            </div>
            <div className="space-y-1">
-             <h3 className="text-xl font-heading font-bold text-on-surface italic">No results found</h3>
+             <h3 className="text-xl font-heading font-bold text-on-surface ">No results found</h3>
              <p className="text-on-surface-variant text-sm font-sans">Try adjusting your search or filters.</p>
            </div>
         </div>

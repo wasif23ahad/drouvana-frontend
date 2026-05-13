@@ -14,7 +14,7 @@ export default function HelpPage() {
     <div className="max-w-4xl mx-auto py-20 px-4 space-y-16">
       {/* Search Header */}
       <div className="text-center space-y-8">
-        <h1 className="text-5xl font-black tracking-tight italic">How can we <span className="text-primary">Help</span>?</h1>
+        <h1 className="text-5xl font-black tracking-tight ">How can we <span className="text-primary">Help</span>?</h1>
         <div className="relative max-w-xl mx-auto">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
           <Input 

@@ -41,7 +41,7 @@ export default function AdminLayout({
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary to-tertiary flex items-center justify-center text-on-primary font-bold text-lg">D</div>
             <div>
-              <h1 className="text-sm font-heading font-bold text-primary italic leading-none">Drouvana</h1>
+              <h1 className="text-sm font-heading font-bold text-primary leading-none">Drouvana</h1>
               <p className="font-mono text-[8px] uppercase tracking-widest text-on-surface-variant">Admin Dashboard</p>
             </div>
           </div>

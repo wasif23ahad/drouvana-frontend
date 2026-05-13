@@ -52,11 +52,11 @@ const WorkspacePage = () => {
         </div>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-4xl font-bold font-hanken text-text-main italic tracking-tight flex items-center gap-4">
+            <h1 className="text-4xl font-bold font-hanken text-text-main tracking-tight flex items-center gap-4">
               Intelligence Workspace
               <span className="bg-primary/10 text-primary text-[9px] uppercase tracking-[0.2em] font-black px-3 py-1 rounded-full border border-primary/20">v4.2 Tactical</span>
             </h1>
-            <p className="text-text-sub italic">Augmenting resume architecture through high-fidelity AI alignment.</p>
+            <p className="text-text-sub ">Augmenting resume architecture through high-fidelity AI alignment.</p>
           </div>
         </div>
       </div>
@@ -74,13 +74,13 @@ const WorkspacePage = () => {
                 step === s.id ? "bg-primary border-primary text-white shadow-xl shadow-primary/30 scale-110" :
                 "bg-surface-2 border-white/5 text-text-muted/40"
               )}>
-                {step > s.id ? <Check className="w-6 h-6 stroke-3" /> : <span className="font-hanken font-bold italic text-lg">{s.id}</span>}
+                {step > s.id ? <Check className="w-6 h-6 stroke-3" /> : <span className="font-hanken font-bold text-lg">{s.id}</span>}
                 {step === s.id && (
                    <div className="absolute -inset-2 bg-primary/20 rounded-2xl blur-lg animate-pulse -z-10" />
                 )}
               </div>
               <div className="text-center space-y-1">
-                <p className={cn("text-sm font-hanken font-bold italic tracking-tight", step === s.id ? "text-text-main" : "text-text-muted/60")}>{s.title}</p>
+                <p className={cn("text-sm font-hanken font-bold tracking-tight", step === s.id ? "text-text-main" : "text-text-muted/60")}>{s.title}</p>
                 <p className="font-jetbrains text-[8px] uppercase tracking-[0.2em] text-text-muted/40 font-black">{s.description}</p>
               </div>
             </div>

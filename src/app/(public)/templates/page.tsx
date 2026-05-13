@@ -70,7 +70,7 @@ export default function TemplatesExplorePage() {
           <ChevronRight className="w-3 h-3" />
           <span className="text-primary font-bold">Templates</span>
         </div>
-        <h1 className="text-5xl font-heading font-bold text-on-surface italic leading-tight">Explore Templates</h1>
+        <h1 className="text-5xl font-heading font-bold text-on-surface leading-tight">Explore Templates</h1>
         <p className="font-sans text-on-surface-variant max-w-2xl">Discover battle-tested resume designs augmented by AI matching intelligence.</p>
       </div>
 
@@ -160,10 +160,10 @@ export default function TemplatesExplorePage() {
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-primary mb-1">{t.category}</p>
-                      <h4 className="text-lg font-heading font-bold text-on-surface italic group-hover:text-primary transition-colors">{t.title}</h4>
+                      <h4 className="text-lg font-heading font-bold text-on-surface group-hover:text-primary transition-colors">{t.title}</h4>
                     </div>
                   </div>
-                  <p className="text-xs text-on-surface-variant flex-1 italic line-clamp-2 leading-relaxed">{t.description}</p>
+                  <p className="text-xs text-on-surface-variant flex-1 line-clamp-2 leading-relaxed">{t.description}</p>
                   <Button className="w-full rounded-lg bg-surface-container-highest group-hover:bg-gradient-primary transition-all font-mono text-[10px] uppercase tracking-widest h-10 border-none">
                     Analyze Design
                   </Button>
@@ -177,7 +177,7 @@ export default function TemplatesExplorePage() {
               <Search className="w-8 h-8 text-on-surface-variant" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-2xl font-heading font-bold text-on-surface italic">No results found</h3>
+              <h3 className="text-2xl font-heading font-bold text-on-surface ">No results found</h3>
               <p className="text-on-surface-variant">Try adjusting your filters or search query.</p>
             </div>
           </div>

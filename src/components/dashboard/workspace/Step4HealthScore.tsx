@@ -93,7 +93,7 @@ export default function Step4HealthScore() {
         
         <div className="text-center space-y-6 max-w-lg">
           <div className="space-y-2">
-            <h3 className="text-3xl font-hanken font-bold text-text-main italic tracking-tight">Neural Verification...</h3>
+            <h3 className="text-3xl font-hanken font-bold text-text-main tracking-tight">Neural Verification...</h3>
             <p className="font-jetbrains text-[10px] uppercase tracking-[0.3em] text-primary font-black animate-pulse">
               PROTOCOL {progress < 30 ? '01: SEMANTIC_PARSING' : progress < 60 ? '02: VECTOR_ALIGNMENT' : '03: ATS_SIMULATION'}
             </p>
@@ -108,7 +108,7 @@ export default function Step4HealthScore() {
             />
           </div>
 
-          <div className="p-8 bg-surface-2 rounded-4xl border border-white/5 text-[11px] text-left font-jetbrains text-text-muted/40 line-clamp-3 h-24 overflow-hidden italic shadow-lg">
+          <div className="p-8 bg-surface-2 rounded-4xl border border-white/5 text-[11px] text-left font-jetbrains text-text-muted/40 line-clamp-3 h-24 overflow-hidden shadow-lg">
             {streamingText || "Initializing ATS simulation engine: loading vector space..."}
           </div>
         </div>
@@ -139,15 +139,15 @@ export default function Step4HealthScore() {
             />
           </svg>
           <div className="absolute flex flex-col items-center">
-            <span className="text-6xl font-hanken font-bold text-text-main italic tracking-tighter">{score}%</span>
+            <span className="text-6xl font-hanken font-bold text-text-main tracking-tighter">{score}%</span>
             <span className="font-jetbrains text-[9px] uppercase tracking-[0.2em] font-black text-text-muted">Strategic Match</span>
           </div>
         </div>
 
         <div className="flex-1 space-y-6 text-center md:text-left">
           <div className="space-y-2">
-            <h2 className="text-4xl font-hanken font-bold text-text-main italic tracking-tight leading-tight">Optimization Success 🚀</h2>
-            <p className="text-text-sub text-lg leading-relaxed italic">
+            <h2 className="text-4xl font-hanken font-bold text-text-main tracking-tight leading-tight">Optimization Success 🚀</h2>
+            <p className="text-text-sub text-lg leading-relaxed ">
               Your architectural profile demonstrates a <strong>{score}%</strong> probability of bypass-success through automated verification layers.
             </p>
           </div>
@@ -167,7 +167,7 @@ export default function Step4HealthScore() {
           </div>
           <div className="space-y-4">
             {(healthScore.strengths || []).map((s: string, i: number) => (
-              <div key={i} className="p-6 rounded-4xl bg-surface-2 border border-white/5 italic text-text-sub text-sm shadow-lg">
+              <div key={i} className="p-6 rounded-4xl bg-surface-2 border border-white/5 text-text-sub text-sm shadow-lg">
                 {s}
               </div>
             ))}
@@ -196,11 +196,11 @@ export default function Step4HealthScore() {
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
             <Trophy className="text-primary w-6 h-6" />
           </div>
-          <h4 className="text-2xl font-hanken font-bold text-text-main italic tracking-tight">Tactical Refinements</h4>
+          <h4 className="text-2xl font-hanken font-bold text-text-main tracking-tight">Tactical Refinements</h4>
         </div>
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
           {(healthScore.recommendations || healthScore.prioritized_improvement_suggestions || []).map((r: string | any, i: number) => (
-            <li key={i} className="flex gap-4 text-text-sub leading-relaxed italic text-sm">
+            <li key={i} className="flex gap-4 text-text-sub leading-relaxed text-sm">
               <span className="w-2 h-2 rounded-full bg-primary mt-2 shrink-0 shadow-[0_0_8px_rgba(192,193,255,0.5)]" />
               {typeof r === 'string' ? r : r.suggestion || r.improved}
             </li>
@@ -213,19 +213,19 @@ export default function Step4HealthScore() {
         <Button 
           variant="outline" 
           onClick={startStreaming} 
-          className="rounded-2xl h-14 px-8 border-white/10 bg-surface-2 hover:bg-white/5 text-text-main font-hanken font-bold italic shadow-lg gap-3"
+          className="rounded-2xl h-14 px-8 border-white/10 bg-surface-2 hover:bg-white/5 text-text-main font-hanken font-bold shadow-lg gap-3"
         >
           <RefreshCw className="w-4 h-4" /> Re-execute Verification
         </Button>
         <div className="flex gap-4 w-full sm:w-auto">
           <Button 
             variant="outline" 
-            className="flex-1 sm:flex-none rounded-2xl h-14 px-8 border-white/10 bg-surface-2 text-text-main font-hanken font-bold italic" 
+            className="flex-1 sm:flex-none rounded-2xl h-14 px-8 border-white/10 bg-surface-2 text-text-main font-hanken font-bold " 
             onClick={() => setStep(1)}
           >
             Adjust Target
           </Button>
-          <Button className="flex-1 sm:flex-none rounded-3xl bg-primary text-white gap-3 h-16 px-10 font-hanken font-bold italic text-lg shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group">
+          <Button className="flex-1 sm:flex-none rounded-3xl bg-primary text-white gap-3 h-16 px-10 font-hanken font-bold text-lg shadow-2xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95 group">
             Final Preview Protocol <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>

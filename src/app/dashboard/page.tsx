@@ -71,7 +71,7 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold font-hanken mb-1">{totalApps}</div>
-            <p className="text-xs text-text-muted italic">+2 from last week</p>
+            <p className="text-xs text-text-muted ">+2 from last week</p>
           </CardContent>
         </Card>
         <Card className="hover:border-secondary/30 transition-colors group">
@@ -81,7 +81,7 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold font-hanken mb-1">{activeApps}</div>
-            <p className="text-xs text-text-muted italic">Awaiting responses</p>
+            <p className="text-xs text-text-muted ">Awaiting responses</p>
           </CardContent>
         </Card>
         <Card className="hover:border-accent/30 transition-colors group">
@@ -91,7 +91,7 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold font-hanken mb-1">{interviews}</div>
-            <p className="text-xs text-text-muted italic">2 coming up this week</p>
+            <p className="text-xs text-text-muted ">2 coming up this week</p>
           </CardContent>
         </Card>
         <Card className="hover:border-success/30 transition-colors group border-success/10 bg-success/5">
@@ -101,7 +101,7 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold font-hanken mb-1 text-success">{offers}</div>
-            <p className="text-xs text-success/70 italic font-medium">Congratulations!</p>
+            <p className="text-xs text-success/70 font-medium">Congratulations!</p>
           </CardContent>
         </Card>
       </div>

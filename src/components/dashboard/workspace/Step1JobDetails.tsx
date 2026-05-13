@@ -51,8 +51,8 @@ const Step1JobDetails = () => {
   return (
     <div className="max-w-3xl mx-auto space-y-12">
       <div className="space-y-2 text-center">
-        <h2 className="text-3xl font-hanken font-bold text-text-main italic tracking-tight">Mission Parameters</h2>
-        <p className="text-text-sub italic">Define the target organization and role specifications.</p>
+        <h2 className="text-3xl font-hanken font-bold text-text-main tracking-tight">Mission Parameters</h2>
+        <p className="text-text-sub ">Define the target organization and role specifications.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -89,7 +89,7 @@ const Step1JobDetails = () => {
         <div className="relative group">
           <div className="absolute inset-0 bg-primary/5 rounded-4xl blur-2xl group-focus-within:bg-primary/10 transition-colors pointer-events-none" />
           <textarea
-            className="w-full h-80 p-8 rounded-4xl bg-surface-2 border border-white/5 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all resize-none text-text-sub leading-relaxed relative z-10 italic"
+            className="w-full h-80 p-8 rounded-4xl bg-surface-2 border border-white/5 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all resize-none text-text-sub leading-relaxed relative z-10 "
             placeholder="Initialize semantic intake: paste the job description protocol here..."
             value={jdText}
             onChange={(e) => setJdText(e.target.value)}
@@ -101,7 +101,7 @@ const Step1JobDetails = () => {
         <Button 
           onClick={handleAnalyze} 
           disabled={loading}
-          className="w-full h-16 rounded-4xl text-white shadow-2xl shadow-primary/20 text-lg font-hanken font-bold italic gap-4 border-none transition-all hover:scale-[1.02] active:scale-95 group"
+          className="w-full h-16 rounded-4xl text-white shadow-2xl shadow-primary/20 text-lg font-hanken font-bold gap-4 border-none transition-all hover:scale-[1.02] active:scale-95 group"
         >
           {loading ? (
             <div className="flex items-center gap-3">

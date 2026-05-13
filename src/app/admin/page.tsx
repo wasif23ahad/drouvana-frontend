@@ -107,7 +107,7 @@ export default function AdminDashboard() {
             <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
             <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-success font-black">System Operational</p>
           </div>
-          <h2 className="text-4xl font-hanken font-bold text-text-main italic tracking-tight">Intelligence Oversight</h2>
+          <h2 className="text-4xl font-hanken font-bold text-text-main tracking-tight">Intelligence Oversight</h2>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <Button variant="outline" className="bg-surface-2/50 border-border-color text-text-main gap-2 rounded-xl h-12 flex-1 md:flex-none">
@@ -135,7 +135,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-text-muted mb-1">{m.label}</p>
-            <h3 className="text-4xl font-hanken font-bold text-text-main italic">{m.value}</h3>
+            <h3 className="text-4xl font-hanken font-bold text-text-main ">{m.value}</h3>
           </div>
         ))}
       </div>
@@ -143,7 +143,7 @@ export default function AdminDashboard() {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 bg-surface-2/40 border border-border-color rounded-(--radius-premium) p-8 shadow-xl">
-          <h4 className="text-xl font-hanken font-bold text-text-main italic mb-8">Interaction Velocity</h4>
+          <h4 className="text-xl font-hanken font-bold text-text-main mb-8">Interaction Velocity</h4>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
@@ -180,7 +180,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="lg:col-span-4 bg-surface-2/40 border border-border-color rounded-[2.5rem] p-8 shadow-xl flex flex-col">
-          <h4 className="text-xl font-hanken font-bold text-text-main italic mb-8">AI Distribution</h4>
+          <h4 className="text-xl font-hanken font-bold text-text-main mb-8">AI Distribution</h4>
           <div className="flex-1 flex flex-col justify-center space-y-8">
             {[
               { label: 'Neural Parsing', val: 74, color: 'bg-primary' },
@@ -207,7 +207,7 @@ export default function AdminDashboard() {
       {/* Events Table */}
       <div className="bg-surface-2/40 border border-border-color rounded-(--radius-premium) overflow-hidden shadow-xl">
         <div className="p-8 border-b border-border-color flex flex-col sm:flex-row justify-between items-center gap-6">
-          <h4 className="text-xl font-hanken font-bold text-text-main italic">System Activity Log</h4>
+          <h4 className="text-xl font-hanken font-bold text-text-main ">System Activity Log</h4>
           <div className="flex gap-3 w-full sm:w-auto">
             <div className="relative flex-1 sm:w-80">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
@@ -237,7 +237,7 @@ export default function AdminDashboard() {
             <tbody className="divide-y divide-border-color text-sm">
               {paginatedEvents.map((ev) => (
                 <tr key={ev.id} className="hover:bg-white/5 transition-colors group">
-                  <td className="px-8 py-5 font-hanken font-bold italic text-text-main text-base">{ev.type}</td>
+                  <td className="px-8 py-5 font-hanken font-bold text-text-main text-base">{ev.type}</td>
                   <td className="px-8 py-5 text-text-sub font-mono text-xs">{ev.component}</td>
                   <td className="px-8 py-5">
                     <span className="px-3 py-1 rounded-lg bg-surface-2 text-primary text-[10px] font-bold font-mono border border-primary/20">

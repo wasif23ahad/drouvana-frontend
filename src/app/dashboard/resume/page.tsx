@@ -5,17 +5,22 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Plus, Trash2, GripVertical, ChevronRight, Download, Save, CheckCircle2, Loader2 } from 'lucide-react';
+import { Sparkles, Plus, Trash2, GripVertical, ChevronRight, Download, Save, CheckCircle2, Loader2, UploadCloud } from 'lucide-react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { useDropzone } from 'react-dropzone';
+import axios from 'axios';
+import { toast } from 'sonner';
 
 export default function MasterResumePage() {
   const { data: session } = useSession();
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [parsing, setParsing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const { register, control, handleSubmit } = useForm({
+  const { register, control, handleSubmit, reset } = useForm({
     defaultValues: {
       personalInfo: {
         name: session?.user?.name || '',
@@ -36,13 +41,73 @@ export default function MasterResumePage() {
     name: "experience"
   });
 
+  React.useEffect(() => {
+    const fetchResume = async () => {
+      try {
+        const res = await axios.get('/api/resume/master');
+        if (res.data.data) {
+          reset(res.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to load master resume', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchResume();
+  }, [reset]);
+
   const onSubmit = async (data: any) => {
     setSaving(true);
-    await new Promise(r => setTimeout(r, 800)); // Simulated save
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    try {
+      await axios.put('/api/resume/master', { data });
+      setSaved(true);
+      toast.success('Master Profile Saved Successfully');
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error) {
+      toast.error('Failed to save master profile');
+      console.error(error);
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const onDrop = async (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (!file) return;
+
+    setParsing(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      toast.info('Analyzing PDF Architecture...');
+      const res = await axios.post('/api/ai/parse-resume', formData);
+      if (res.data.data) {
+        reset(res.data.data);
+        toast.success('Data Extracted and Populated');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to parse PDF document');
+    } finally {
+      setParsing(false);
+    }
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { 'application/pdf': ['.pdf'] },
+    multiple: false
+  });
+
+  if (loading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full gap-8 pb-20">
@@ -68,7 +133,32 @@ export default function MasterResumePage() {
         </div>
       </div>
 
-      <form onChange={handleSubmit(onSubmit)} className="max-w-4xl space-y-8">
+      <div 
+        {...getRootProps()} 
+        className={`border-2 border-dashed rounded-3xl p-8 text-center cursor-pointer transition-colors ${
+          isDragActive ? 'border-primary bg-primary/5' : 'border-white/10 hover:border-primary/50 bg-surface/30'
+        }`}
+      >
+        <input {...getInputProps()} />
+        {parsing ? (
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-sm font-jetbrains text-text-sub uppercase tracking-widest">Parsing document...</p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-surface-2 flex items-center justify-center">
+              <UploadCloud className="w-6 h-6 text-text-sub" />
+            </div>
+            <p className="text-sm font-bold text-text-main">
+              {isDragActive ? "Drop PDF here" : "Import existing Resume (PDF)"}
+            </p>
+            <p className="text-xs text-text-muted">Our AI will extract and structure your intelligence logs automatically.</p>
+          </div>
+        )}
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl space-y-8">
         <Card className="border-white/5 shadow-2xl">
           <CardHeader>
             <CardTitle className="font-hanken text-xl flex items-center gap-2">
@@ -109,7 +199,7 @@ export default function MasterResumePage() {
           <CardContent>
             <textarea
               {...register('summary')}
-              className="w-full min-h-[120px] p-4 rounded-xl border-none bg-surface-2 text-text-main focus:ring-2 focus:ring-primary custom-scrollbar resize-y text-sm italic leading-relaxed"
+              className="w-full min-h-[120px] p-4 rounded-xl border-none bg-surface-2 text-text-main focus:ring-2 focus:ring-primary custom-scrollbar resize-y text-sm leading-relaxed"
             ></textarea>
           </CardContent>
         </Card>
@@ -162,7 +252,7 @@ export default function MasterResumePage() {
                    </div>
                    <textarea
                      {...register(`experience.${index}.description` as const)}
-                     className="w-full min-h-[100px] p-4 rounded-xl border-none bg-surface-2 text-text-main focus:ring-2 focus:ring-primary text-sm italic leading-relaxed custom-scrollbar"
+                     className="w-full min-h-[100px] p-4 rounded-xl border-none bg-surface-2 text-text-main focus:ring-2 focus:ring-primary text-sm leading-relaxed custom-scrollbar"
                    ></textarea>
                 </div>
               </div>
@@ -179,7 +269,7 @@ export default function MasterResumePage() {
             <CardDescription className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Comma-separated skills protocol</CardDescription>
           </CardHeader>
           <CardContent>
-             <Input {...register('skills')} placeholder="e.g. React, Node.js, Python" className="bg-surface-2 border-none h-14 rounded-xl focus-visible:ring-primary italic" />
+             <Input {...register('skills')} placeholder="e.g. React, Node.js, Python" className="bg-surface-2 border-none h-14 rounded-xl focus-visible:ring-primary " />
           </CardContent>
         </Card>
       </form>

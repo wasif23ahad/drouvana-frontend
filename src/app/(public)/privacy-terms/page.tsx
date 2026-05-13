@@ -41,8 +41,8 @@ export default function PrivacyTermsPage() {
           <ChevronRight className="w-3 h-3" />
           <span className="text-primary font-bold">Privacy & Terms</span>
         </div>
-        <h1 className="text-5xl md:text-6xl font-hanken font-bold text-text-main italic tracking-tight">Legal & <span className="text-primary">Data Ethics</span></h1>
-        <p className="text-lg text-text-sub leading-relaxed font-sans italic">
+        <h1 className="text-5xl md:text-6xl font-hanken font-bold text-text-main tracking-tight">Legal & <span className="text-primary">Data Ethics</span></h1>
+        <p className="text-lg text-text-sub leading-relaxed font-sans ">
           Transparent governance of the Drouvana Digital Core and user professional narratives.
         </p>
       </section>
@@ -54,8 +54,8 @@ export default function PrivacyTermsPage() {
             <div className="w-14 h-14 rounded-2xl bg-surface-2 flex items-center justify-center mb-6 border border-white/10 group-hover:border-primary/50 transition-colors">
               <section.icon className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="text-2xl font-hanken font-bold text-text-main italic mb-4">{section.title}</h3>
-            <p className="font-sans text-text-sub leading-relaxed text-base italic">{section.content}</p>
+            <h3 className="text-2xl font-hanken font-bold text-text-main mb-4">{section.title}</h3>
+            <p className="font-sans text-text-sub leading-relaxed text-base ">{section.content}</p>
           </div>
         ))}
       </div>
@@ -68,8 +68,8 @@ export default function PrivacyTermsPage() {
             Security Architecture
           </div>
           <div className="bg-surface-2 border border-white/10 rounded-[2.5rem] p-10 md:p-14 space-y-8 shadow-2xl">
-            <h4 className="text-3xl font-hanken font-bold text-text-main italic tracking-tight">Technical Safeguards</h4>
-            <div className="space-y-6 text-text-sub font-sans italic leading-relaxed text-lg">
+            <h4 className="text-3xl font-hanken font-bold text-text-main tracking-tight">Technical Safeguards</h4>
+            <div className="space-y-6 text-text-sub font-sans leading-relaxed text-lg">
               <p>
                 Drouvana implements industry-standard encryption for data at rest and in transit. Our database architecture utilizes multi-tenant isolation, ensuring that your professional documents are never accessible to other platform users.
               </p>
@@ -93,7 +93,7 @@ export default function PrivacyTermsPage() {
             ].map((stat, i) => (
               <div key={i} className="bg-surface-2/30 border border-white/5 rounded-2xl p-6 text-center">
                 <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-text-muted mb-2">{stat.label}</p>
-                <p className="text-xl font-hanken font-bold text-text-main italic">{stat.val}</p>
+                <p className="text-xl font-hanken font-bold text-text-main ">{stat.val}</p>
               </div>
             ))}
           </div>

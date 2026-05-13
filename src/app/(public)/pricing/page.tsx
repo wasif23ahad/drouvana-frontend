@@ -54,8 +54,8 @@ export default function PricingPage() {
           <ChevronRight className="w-3 h-3" />
           <span className="text-primary font-bold">Pricing</span>
         </div>
-        <h1 className="text-5xl md:text-6xl font-hanken font-bold text-text-main italic leading-tight tracking-tight">Flexible Plans for Every Career Stage</h1>
-        <p className="text-text-sub text-lg italic">Supercharge your job search with AI-driven insights, tailored resumes, and intelligent tracking. Choose the plan that fits your momentum.</p>
+        <h1 className="text-5xl md:text-6xl font-hanken font-bold text-text-main leading-tight tracking-tight">Flexible Plans for Every Career Stage</h1>
+        <p className="text-text-sub text-lg ">Supercharge your job search with AI-driven insights, tailored resumes, and intelligent tracking. Choose the plan that fits your momentum.</p>
       </header>
 
       {/* Pricing Cards */}
@@ -75,13 +75,13 @@ export default function PricingPage() {
             )}
             
             <div className="space-y-2 mb-8">
-              <h3 className={cn("text-3xl font-hanken font-bold italic", plan.highlight ? "text-primary" : "text-text-main")}>{plan.name}</h3>
+              <h3 className={cn("text-3xl font-hanken font-bold ", plan.highlight ? "text-primary" : "text-text-main")}>{plan.name}</h3>
               <p className="text-sm text-text-sub font-sans h-10">{plan.desc}</p>
             </div>
 
             <div className="mb-10">
               <div className="flex items-baseline gap-2">
-                <span className="text-6xl font-hanken font-bold text-text-main italic tracking-tighter">{plan.price}</span>
+                <span className="text-6xl font-hanken font-bold text-text-main tracking-tighter">{plan.price}</span>
                 <span className="text-text-sub font-jetbrains text-sm uppercase">/mo</span>
               </div>
             </div>
@@ -98,7 +98,7 @@ export default function PricingPage() {
             </ul>
 
             <Button className={cn(
-              "w-full h-14 rounded-2xl font-hanken font-bold italic text-lg shadow-lg border-none transition-all active:scale-95",
+              "w-full h-14 rounded-2xl font-hanken font-bold text-lg shadow-lg border-none transition-all active:scale-95",
               plan.highlight ? "bg-primary text-white shadow-primary/20" : "bg-surface-2 text-text-main hover:bg-white/5"
             )}>
               {plan.button}
@@ -111,7 +111,7 @@ export default function PricingPage() {
       <div className="space-y-12 py-12">
         <div className="text-center space-y-2">
            <p className="font-jetbrains text-[10px] uppercase tracking-[0.4em] text-secondary font-black">Strategic Breakdown</p>
-           <h2 className="text-4xl font-hanken font-bold text-text-main italic tracking-tight">Compare Plan Capabilities</h2>
+           <h2 className="text-4xl font-hanken font-bold text-text-main tracking-tight">Compare Plan Capabilities</h2>
         </div>
         <div className="bg-surface-2 rounded-4xl border border-white/5 overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
@@ -119,9 +119,9 @@ export default function PricingPage() {
               <thead>
                 <tr className="border-b border-white/10 bg-surface/50">
                   <th className="py-6 px-10 font-jetbrains text-[10px] uppercase tracking-[0.2em] text-text-muted">Capabilities</th>
-                  <th className="py-6 px-10 font-hanken font-bold text-lg text-text-main italic">Free</th>
-                  <th className="py-6 px-10 font-hanken font-bold text-lg text-primary italic bg-primary/5">Pro</th>
-                  <th className="py-6 px-10 font-hanken font-bold text-lg text-text-main italic">Executive</th>
+                  <th className="py-6 px-10 font-hanken font-bold text-lg text-text-main ">Free</th>
+                  <th className="py-6 px-10 font-hanken font-bold text-lg text-primary bg-primary/5">Pro</th>
+                  <th className="py-6 px-10 font-hanken font-bold text-lg text-text-main ">Executive</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -147,7 +147,7 @@ export default function PricingPage() {
 
       {/* FAQ */}
       <div className="max-w-4xl mx-auto space-y-12">
-        <h2 className="text-4xl font-hanken font-bold text-center text-text-main italic tracking-tight">Frequently Asked Questions</h2>
+        <h2 className="text-4xl font-hanken font-bold text-center text-text-main tracking-tight">Frequently Asked Questions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[
             { q: 'Can I switch plans later?', a: 'Yes, you can upgrade or downgrade at any time. Prorated charges will be applied to your account automatically.' },
@@ -156,8 +156,8 @@ export default function PricingPage() {
             { q: 'How do I cancel?', a: 'Cancel anytime from your account settings. You will maintain access until the end of your billing cycle.' }
           ].map((item) => (
             <div key={item.q} className="bg-surface-2/50 border border-white/5 rounded-2xl p-8 space-y-4 hover:border-primary/30 transition-all shadow-lg">
-              <h4 className="font-hanken font-bold text-text-main italic">{item.q}</h4>
-              <p className="text-sm text-text-sub leading-relaxed italic">{item.a}</p>
+              <h4 className="font-hanken font-bold text-text-main ">{item.q}</h4>
+              <p className="text-sm text-text-sub leading-relaxed ">{item.a}</p>
             </div>
           ))}
         </div>

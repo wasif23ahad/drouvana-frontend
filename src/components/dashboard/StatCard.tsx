@@ -36,7 +36,7 @@ const StatCard = ({ title, value, icon: Icon, trend, description, color = 'prima
 
         <div className="space-y-1">
           <p className="font-jetbrains text-[9px] uppercase tracking-[0.3em] text-text-muted font-black opacity-60">{title}</p>
-          <h3 className="text-4xl font-hanken font-bold text-text-main italic tracking-tighter">{value}</h3>
+          <h3 className="text-4xl font-hanken font-bold text-text-main tracking-tighter">{value}</h3>
         </div>
 
         <div className="flex items-center gap-3">

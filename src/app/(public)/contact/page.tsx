@@ -8,7 +8,7 @@ export default function ContactPage() {
   return (
     <div className="max-w-6xl mx-auto py-20 px-4 space-y-12">
       <div className="max-w-2xl">
-        <h1 className="text-5xl font-black tracking-tight mb-4 italic">Get in <span className="text-primary">Touch</span></h1>
+        <h1 className="text-5xl font-black tracking-tight mb-4 ">Get in <span className="text-primary">Touch</span></h1>
         <p className="text-xl text-muted-foreground">Have questions or feedback? Our team is here to help you accelerate your career.</p>
       </div>
 

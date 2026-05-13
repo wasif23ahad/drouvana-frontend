@@ -41,7 +41,7 @@ export default function TemplateDetailsPage() {
   if (!template) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-6">
-        <h1 className="text-3xl font-heading font-bold text-on-surface italic">Template Not Found</h1>
+        <h1 className="text-3xl font-heading font-bold text-on-surface ">Template Not Found</h1>
         <Link href="/templates">
           <Button variant="outline" className="border-primary/20 text-primary hover:bg-primary/5">Back to Explore</Button>
         </Link>
@@ -95,8 +95,8 @@ export default function TemplateDetailsPage() {
                 <span className="opacity-50">({template._count?.reviews || 0} reviews)</span>
               </div>
             </div>
-            <h1 className="text-5xl font-heading font-bold text-on-surface italic leading-tight tracking-tight">{template.title}</h1>
-            <p className="text-lg text-on-surface-variant leading-relaxed font-sans italic">{template.description}</p>
+            <h1 className="text-5xl font-heading font-bold text-on-surface leading-tight tracking-tight">{template.title}</h1>
+            <p className="text-lg text-on-surface-variant leading-relaxed font-sans ">{template.description}</p>
           </div>
 
           {/* Technical Specs */}
@@ -113,7 +113,7 @@ export default function TemplateDetailsPage() {
                 </div>
                 <div>
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-on-surface-variant mb-1">{s.label}</p>
-                  <p className="font-heading font-bold text-on-surface italic text-sm">{s.val}</p>
+                  <p className="font-heading font-bold text-on-surface text-sm">{s.val}</p>
                 </div>
               </div>
             ))}
@@ -123,7 +123,7 @@ export default function TemplateDetailsPage() {
             <h4 className="font-mono text-[10px] uppercase tracking-[0.3em] text-primary font-bold">Optimal For Roles</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {template.bestFor?.map((f: string) => (
-                <div key={f} className="flex items-center gap-3 font-heading font-bold text-sm text-on-surface-variant italic">
+                <div key={f} className="flex items-center gap-3 font-heading font-bold text-sm text-on-surface-variant ">
                   <CheckCircle className="w-4 h-4 text-secondary" />
                   {f}
                 </div>
@@ -132,7 +132,7 @@ export default function TemplateDetailsPage() {
           </div>
 
           <div className="flex gap-4 pt-6">
-            <Button className="h-16 px-10 rounded-2xl bg-gradient-primary text-white text-lg font-heading font-bold italic flex-1 gap-3 shadow-xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95">
+            <Button className="h-16 px-10 rounded-2xl bg-gradient-primary text-white text-lg font-heading font-bold flex-1 gap-3 shadow-xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95">
               Launch Builder <Rocket className="w-6 h-6" />
             </Button>
             <Button variant="outline" size="icon" className="h-16 w-16 rounded-2xl border-white/10 bg-surface-container hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all">
@@ -146,7 +146,7 @@ export default function TemplateDetailsPage() {
       <div className="pt-24 space-y-16">
         <div className="text-center space-y-2">
            <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-primary font-bold">Strategic Ecosystem</p>
-           <h2 className="text-4xl font-heading font-bold text-on-surface italic">Related Architectures</h2>
+           <h2 className="text-4xl font-heading font-bold text-on-surface ">Related Architectures</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -167,7 +167,7 @@ export default function TemplateDetailsPage() {
       <div className="pt-24 space-y-16">
         <div className="text-center space-y-2">
            <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-secondary font-black">Success Stories</p>
-           <h2 className="text-4xl font-heading font-bold text-on-surface italic">Verified Platform Impact</h2>
+           <h2 className="text-4xl font-heading font-bold text-on-surface ">Verified Platform Impact</h2>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -179,20 +179,20 @@ export default function TemplateDetailsPage() {
                   <Star key={s} className={cn("w-3 h-3", s < r.rating ? "text-secondary fill-secondary" : "text-white/10 fill-white/10")} />
                 ))}
               </div>
-              <p className="text-on-surface-variant italic leading-relaxed font-sans text-sm">"{r.comment}"</p>
+              <p className="text-on-surface-variant leading-relaxed font-sans text-sm">"{r.comment}"</p>
               <div className="flex items-center gap-4 pt-4 border-t border-white/5">
                 <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-tertiary flex items-center justify-center font-bold text-xs text-white">
                   {r.user?.name?.charAt(0) || 'U'}
                 </div>
                 <div>
-                  <h5 className="font-heading font-bold text-sm text-on-surface italic">{r.user?.name || 'Anonymous User'}</h5>
+                  <h5 className="font-heading font-bold text-sm text-on-surface ">{r.user?.name || 'Anonymous User'}</h5>
                   <p className="font-mono text-[8px] uppercase tracking-widest text-primary font-black">Verified Strategist</p>
                 </div>
               </div>
             </div>
           )) : (
             <div className="col-span-full py-12 text-center bg-surface-container-low rounded-3xl border border-dashed border-white/10">
-              <p className="text-on-surface-variant italic font-sans">Strategic assessments pending for this design architecture.</p>
+              <p className="text-on-surface-variant font-sans">Strategic assessments pending for this design architecture.</p>
             </div>
           )}
         </div>

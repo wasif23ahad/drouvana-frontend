@@ -67,11 +67,11 @@ export default function AnalyticsPage() {
         </div>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-4xl font-heading font-bold text-on-surface italic tracking-tight flex items-center gap-4">
+            <h1 className="text-4xl font-heading font-bold text-on-surface tracking-tight flex items-center gap-4">
               Tactical Analytics
               <span className="bg-primary/10 text-primary text-[9px] uppercase tracking-[0.2em] font-black px-3 py-1 rounded-full border border-primary/20">Alpha V.1</span>
             </h1>
-            <p className="font-sans text-on-surface-variant italic leading-relaxed text-lg">Visualizing multi-vector deployment performance and conversion metrics.</p>
+            <p className="font-sans text-on-surface-variant leading-relaxed text-lg">Visualizing multi-vector deployment performance and conversion metrics.</p>
           </div>
         </div>
       </div>
@@ -101,7 +101,7 @@ export default function AnalyticsPage() {
              </div>
              <div className="space-y-1">
                <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-on-surface-variant font-bold opacity-60">{m.title}</p>
-               <h3 className="text-3xl font-heading font-bold text-on-surface italic tracking-tighter">{m.value}</h3>
+               <h3 className="text-3xl font-heading font-bold text-on-surface tracking-tighter">{m.value}</h3>
              </div>
           </div>
         ))}
@@ -113,7 +113,7 @@ export default function AnalyticsPage() {
         <div className="lg:col-span-2 bg-surface-container-low/50 backdrop-blur-xl border border-white/5 rounded-[3rem] p-10 shadow-2xl space-y-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/5 blur-[100px] pointer-events-none -z-10" />
           <div className="flex justify-between items-center px-2">
-            <h3 className="text-2xl font-heading font-bold text-on-surface italic tracking-tight">Application Velocity</h3>
+            <h3 className="text-2xl font-heading font-bold text-on-surface tracking-tight">Application Velocity</h3>
             <div className="flex items-center gap-4 text-on-surface-variant font-mono text-[10px] uppercase tracking-widest font-black">
                <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-primary" /> Active Vectors</span>
                <span className="text-xs">7D History</span>
@@ -166,7 +166,7 @@ export default function AnalyticsPage() {
         {/* Status Distribution */}
         <div className="bg-surface-container-low/50 backdrop-blur-xl border border-white/5 rounded-[3rem] p-10 shadow-2xl space-y-10 flex flex-col relative overflow-hidden">
           <div className="absolute top-0 right-0 w-48 h-48 bg-tertiary/5 blur-[80px] pointer-events-none -z-10" />
-          <h3 className="text-2xl font-heading font-bold text-on-surface italic tracking-tight">Status Distribution</h3>
+          <h3 className="text-2xl font-heading font-bold text-on-surface tracking-tight">Status Distribution</h3>
           <div className="flex-1 flex flex-col items-center justify-center">
             <div className="w-full h-56">
               <ResponsiveContainer width="100%" height="100%">
@@ -195,7 +195,7 @@ export default function AnalyticsPage() {
                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
                      <span className="font-mono text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">{s.name}</span>
                    </div>
-                   <span className="text-xl font-heading font-bold text-on-surface italic">{s.value}%</span>
+                   <span className="text-xl font-heading font-bold text-on-surface ">{s.value}%</span>
                 </div>
               ))}
             </div>
@@ -209,7 +209,7 @@ export default function AnalyticsPage() {
             <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center border border-secondary/20">
               <TrendingUp className="text-secondary w-5 h-5" />
             </div>
-            <h3 className="text-2xl font-heading font-bold text-on-surface italic tracking-tight">Platform Performance</h3>
+            <h3 className="text-2xl font-heading font-bold text-on-surface tracking-tight">Platform Performance</h3>
          </div>
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
            {[
@@ -220,7 +220,7 @@ export default function AnalyticsPage() {
            ].map((p, i) => (
              <div key={i} className="space-y-4">
                <div className="flex justify-between items-end">
-                 <span className="font-heading font-bold text-on-surface italic">{p.name}</span>
+                 <span className="font-heading font-bold text-on-surface ">{p.name}</span>
                  <span className="font-mono text-[10px] text-on-surface-variant font-bold">{p.success} Efficiency</span>
                </div>
                <div className="h-2 w-full bg-surface-container rounded-full overflow-hidden border border-white/5 shadow-inner">

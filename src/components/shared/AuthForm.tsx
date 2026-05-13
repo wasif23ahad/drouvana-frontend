@@ -107,7 +107,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
             <span className="text-xl font-bold font-hanken text-text-main">Drouvana</span>
           </div>
           <h1 className="text-4xl font-bold font-hanken text-text-main mt-12 mb-6 tracking-tight">
-            Accelerate your career <span className="text-primary italic">trajectory.</span>
+            Accelerate your career <span className="text-primary ">trajectory.</span>
           </h1>
           <p className="text-text-sub text-sm max-w-md leading-relaxed">
             Harness the power of AI to navigate the modern job market, optimize your resume, and land your dream role faster.

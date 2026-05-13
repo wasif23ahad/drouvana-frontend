@@ -46,8 +46,8 @@ export default function BlogPage() {
         
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
           <div className="space-y-4 max-w-2xl">
-            <h1 className="text-5xl md:text-6xl font-heading font-bold text-on-surface italic leading-tight tracking-tight">Career Insights</h1>
-            <p className="text-xl text-on-surface-variant font-sans italic leading-relaxed">Deep dives into the intersection of artificial intelligence and professional evolution.</p>
+            <h1 className="text-5xl md:text-6xl font-heading font-bold text-on-surface leading-tight tracking-tight">Career Insights</h1>
+            <p className="text-xl text-on-surface-variant font-sans leading-relaxed">Deep dives into the intersection of artificial intelligence and professional evolution.</p>
           </div>
           
           <div className="flex flex-wrap gap-3">
@@ -96,8 +96,8 @@ export default function BlogPage() {
                 <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> {post.date}</span>
                 <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary" /> {post.readTime}</span>
               </div>
-              <h3 className="text-2xl font-heading font-bold text-on-surface group-hover:text-primary transition-colors leading-tight italic tracking-tight">{post.title}</h3>
-              <p className="text-sm text-on-surface-variant leading-relaxed flex-1 font-sans italic">{post.excerpt}</p>
+              <h3 className="text-2xl font-heading font-bold text-on-surface group-hover:text-primary transition-colors leading-tight tracking-tight">{post.title}</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed flex-1 font-sans ">{post.excerpt}</p>
               <button className="flex items-center gap-3 font-mono text-[10px] font-black uppercase tracking-[0.2em] text-primary group/btn transition-all hover:gap-5">
                 Full Protocol <ArrowRight className="w-4 h-4 transition-transform" />
               </button>
@@ -110,12 +110,12 @@ export default function BlogPage() {
       <section className="bg-surface-container-low border border-white/10 rounded-[3rem] p-12 md:p-20 text-center space-y-8 relative overflow-hidden shadow-2xl">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-primary/5 rounded-full blur-3xl pointer-events-none" />
         <div className="space-y-4 max-w-2xl mx-auto relative z-10">
-          <h2 className="text-4xl font-heading font-bold text-on-surface italic tracking-tight">Stay ahead of the curve</h2>
-          <p className="font-sans text-on-surface-variant italic">Join 10,000+ professionals receiving weekly AI-driven career strategies.</p>
+          <h2 className="text-4xl font-heading font-bold text-on-surface tracking-tight">Stay ahead of the curve</h2>
+          <p className="font-sans text-on-surface-variant ">Join 10,000+ professionals receiving weekly AI-driven career strategies.</p>
         </div>
         <form className="flex flex-col sm:flex-row justify-center gap-4 relative z-10 max-w-lg mx-auto">
           <Input placeholder="Enter your email" className="h-14 bg-surface-container rounded-2xl border-white/10 px-6 font-sans" />
-          <button className="h-14 px-10 rounded-2xl bg-gradient-primary text-white font-heading font-bold italic shadow-xl shadow-primary/20 whitespace-nowrap">
+          <button className="h-14 px-10 rounded-2xl bg-gradient-primary text-white font-heading font-bold shadow-xl shadow-primary/20 whitespace-nowrap">
             Join Protocol
           </button>
         </form>
