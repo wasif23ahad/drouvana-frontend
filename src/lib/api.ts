@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getSession } from 'next-auth/react';
+import { getSession, signOut } from 'next-auth/react';
 
 const getBaseURL = () => {
   if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
@@ -63,6 +63,8 @@ api.interceptors.response.use(
     // Flush potentially stale/expired local token caching if unauthorized
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       localStorage.removeItem('drouvana_cached_token');
+      // Trigger NextAuth signout to reset authentication state cleanly
+      signOut({ callbackUrl: '/login?switch=true', redirect: true }).catch(() => {});
     }
 
     // Standardize error reporting
