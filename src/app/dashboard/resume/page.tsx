@@ -10,7 +10,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useDropzone } from 'react-dropzone';
-import axios from 'axios';
+import api from '@/lib/api';
 import { toast } from 'sonner';
 
 export default function MasterResumePage() {
@@ -44,7 +44,7 @@ export default function MasterResumePage() {
   React.useEffect(() => {
     const fetchResume = async () => {
       try {
-        const res = await axios.get('/api/resume/master');
+        const res = await api.get('/api/resume/master');
         if (res.data.data) {
           reset(res.data.data);
         }
@@ -60,7 +60,7 @@ export default function MasterResumePage() {
   const onSubmit = async (data: any) => {
     setSaving(true);
     try {
-      await axios.put('/api/resume/master', { data });
+      await api.put('/api/resume/master', { data });
       setSaved(true);
       toast.success('Master Profile Saved Successfully');
       setTimeout(() => setSaved(false), 3000);
@@ -82,7 +82,7 @@ export default function MasterResumePage() {
 
     try {
       toast.info('Analyzing PDF Architecture...');
-      const res = await axios.post('/api/ai/parse-resume', formData);
+      const res = await api.post('/api/ai/parse-resume', formData);
       if (res.data.data) {
         reset(res.data.data);
         toast.success('Data Extracted and Populated');

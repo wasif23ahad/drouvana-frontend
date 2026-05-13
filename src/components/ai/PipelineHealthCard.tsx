@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Zap, AlertCircle, CheckCircle, ArrowRight, Activity, Sparkles, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import axios from 'axios';
+import api from '@/lib/api';
 
 interface HealthInsight {
   icon: string;
@@ -28,11 +28,7 @@ export default function PipelineHealthCard() {
   const fetchHealth = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/ai/pipeline-health`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const res = await api.get('/api/ai/pipeline-health');
       setData(res.data.data);
     } catch (error) {
       console.error('Pipeline Health Error:', error);

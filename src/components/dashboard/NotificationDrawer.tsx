@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import axios from 'axios';
+import api from '@/lib/api';
 
 interface Notification {
   id: string;
@@ -34,7 +34,7 @@ const NotificationDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get('/api/notifications');
+      const res = await api.get('/api/notifications');
       setNotifications(res.data.data);
     } catch (error) {
       console.error(error);
@@ -43,7 +43,7 @@ const NotificationDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
 
   const markAsRead = async (id: string) => {
     try {
-      await axios.patch(`/api/notifications/${id}/read`);
+      await api.patch(`/api/notifications/${id}/read`);
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
     } catch (error) {
       console.error(error);

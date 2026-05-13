@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { Button } from '@/components/ui/button';
 import { Rocket, Loader2, CheckCircle2, Layout, Sparkles } from 'lucide-react';
-import axios from 'axios';
+import api from '@/lib/api';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -27,7 +27,7 @@ const Step3ResumeGen = () => {
 
     setLoading(true);
     try {
-      const res = await axios.post('/api/ai/generate-resume', { 
+      const res = await api.post('/api/ai/generate-resume', { 
         applicationId,
         templateId 
       });
@@ -44,7 +44,7 @@ const Step3ResumeGen = () => {
 
     const interval = setInterval(async () => {
       try {
-        const res = await axios.get(`/api/ai/jobs/${jobId}`);
+        const res = await api.get(`/api/ai/jobs/${jobId}`);
         const { status, result } = res.data.data;
 
         if (status === 'completed') {

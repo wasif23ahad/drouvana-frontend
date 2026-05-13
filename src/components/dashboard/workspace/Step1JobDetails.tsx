@@ -5,7 +5,7 @@ import { useWorkspaceStore } from '@/store/useWorkspaceStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Rocket, Sparkles, Building2, Briefcase, FileText } from 'lucide-react';
-import axios from 'axios';
+import api from '@/lib/api';
 import { toast } from 'sonner';
 
 const Step1JobDetails = () => {
@@ -22,7 +22,7 @@ const Step1JobDetails = () => {
 
     setLoading(true);
     try {
-      const appRes = await axios.post('/api/applications', {
+      const appRes = await api.post('/api/applications', {
         company,
         jobTitle: title,
         jobDescription: jdText,
@@ -32,7 +32,7 @@ const Step1JobDetails = () => {
       const appId = appRes.data.data.id;
       setApplicationId(appId);
 
-      const res = await axios.post('/api/ai/parse-jd', { 
+      const res = await api.post('/api/ai/parse-jd', { 
         jd: jdText,
         applicationId: appId
       });
