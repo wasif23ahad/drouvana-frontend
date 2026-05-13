@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import api from '@/lib/api';
+import { useSession } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 
 const STATUS_COLORS: Record<string, string> = {
@@ -45,6 +46,7 @@ const KANBAN_COLUMNS = [
 ];
 
 export default function ApplicationTracker() {
+  const { status } = useSession();
   const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -82,8 +84,14 @@ export default function ApplicationTracker() {
   };
 
   useEffect(() => {
-    fetchApplications();
-  }, [debouncedSearch, page, viewMode]);
+    if (status === 'unauthenticated') {
+      setLoading(false);
+      return;
+    }
+    if (status === 'authenticated') {
+      fetchApplications();
+    }
+  }, [debouncedSearch, page, viewMode, status]);
 
   const renderKanban = () => {
     return (

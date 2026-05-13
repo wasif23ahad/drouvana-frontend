@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { TrendingUp, Zap, AlertCircle, CheckCircle, ArrowRight, Activity, Sparkles, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
+import { useSession } from 'next-auth/react';
 
 interface HealthInsight {
   icon: string;
@@ -22,6 +23,7 @@ interface PipelineHealth {
 }
 
 export default function PipelineHealthCard() {
+  const { status } = useSession();
   const [data, setData] = useState<PipelineHealth | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,8 +40,14 @@ export default function PipelineHealthCard() {
   };
 
   useEffect(() => {
-    fetchHealth();
-  }, []);
+    if (status === 'unauthenticated') {
+      setLoading(false);
+      return;
+    }
+    if (status === 'authenticated') {
+      fetchHealth();
+    }
+  }, [status]);
 
   if (loading) {
     return (
