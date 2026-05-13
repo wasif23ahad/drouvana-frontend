@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Briefcase, FileText, Target, Plus, ChevronRight, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import api from '@/lib/api';
 
@@ -24,9 +24,12 @@ const ChartSkeleton = () => (
 export default function DashboardOverview() {
   const { applications, setApplications } = useAppStore();
   const { data: session } = useSession();
+  const hasSynced = useRef(false);
 
   useEffect(() => {
-    if (session?.user) {
+    // Only synchronize once per mount lifetime to eliminate cyclic re-fetch cascading loops with interceptors
+    if (session?.user && !hasSynced.current) {
+      hasSynced.current = true;
       api.get('/api/applications', { params: { limit: 100 } })
         .then(res => {
           const sourceApps = res.data?.data || res.data?.applications;

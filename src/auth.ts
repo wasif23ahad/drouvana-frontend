@@ -17,7 +17,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         try {
-          const response = await api.post("/api/auth/login", {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+          const response = await api.post(`${apiUrl}/api/auth/login`, {
             email: credentials?.email,
             password: credentials?.password,
           });
@@ -46,7 +47,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user, account, profile }) {
       if (account?.provider === "google" && profile) {
         try {
-          const response = await api.post("/api/auth/google", {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+          const response = await api.post(`${apiUrl}/api/auth/google`, {
             email: profile.email,
             name: profile.name,
             googleId: profile.sub || profile.id || account.providerAccountId,
