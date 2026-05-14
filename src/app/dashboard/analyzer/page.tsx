@@ -37,14 +37,24 @@ interface ATSResult {
   };
   overall_suggestions: string[];
   strengths: string[];
+  breakdown?: {
+    keyword: number;
+    sections: number;
+    action_verbs: number;
+    quantification: number;
+    length: number;
+    formatting: number;
+    alignment: number;
+  };
 }
 
 type ResumeSource = 'upload' | 'builder' | 'paste';
 
 // ─── Score Gauge ─────────────────────────────────────────────────────────────
 function ScoreGauge({ score }: { score: number }) {
-  const color = score >= 80 ? '#10b981' : score >= 60 ? '#f59e0b' : '#ef4444';
-  const label = score >= 80 ? 'Excellent' : score >= 60 ? 'Good' : 'Needs Work';
+  const safeScore = Math.max(0, Math.min(100, Math.round(Number(score) || 0)));
+  const color = safeScore >= 85 ? '#10b981' : safeScore >= 70 ? '#22d3ee' : safeScore >= 55 ? '#f59e0b' : '#ef4444';
+  const label = safeScore >= 85 ? 'Excellent' : safeScore >= 70 ? 'Strong' : safeScore >= 55 ? 'Good' : safeScore >= 40 ? 'Needs Work' : 'Low Match';
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="relative w-36 h-36">
@@ -55,12 +65,12 @@ function ScoreGauge({ score }: { score: number }) {
             stroke={color} strokeWidth="12"
             strokeLinecap="round"
             strokeDasharray={`${2 * Math.PI * 50}`}
-            strokeDashoffset={`${2 * Math.PI * 50 * (1 - score / 100)}`}
+            strokeDashoffset={`${2 * Math.PI * 50 * (1 - safeScore / 100)}`}
             style={{ transition: 'stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1)' }}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-4xl font-extrabold font-hanken" style={{ color }}>{score}</span>
+          <span className="text-4xl font-extrabold font-hanken" style={{ color }}>{safeScore}</span>
           <span className="text-[10px] text-text-muted font-jetbrains">/100</span>
         </div>
       </div>
@@ -681,6 +691,48 @@ export default function AtsAnalyzerPage() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Score Breakdown */}
+              {result.breakdown && (
+                <Card className="bg-surface/50 border-white/5 rounded-2xl">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-bold font-hanken flex items-center gap-2">
+                      <BarChart3 className="w-4 h-4 text-primary" /> Score Breakdown
+                    </CardTitle>
+                    <p className="text-xs text-text-muted">How each scoring dimension contributes to your overall ATS rating.</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { key: 'keyword', label: 'Keyword Coverage', weight: 40, value: result.breakdown.keyword },
+                        { key: 'sections', label: 'Section Completeness', weight: 15, value: result.breakdown.sections },
+                        { key: 'action_verbs', label: 'Action Verbs', weight: 10, value: result.breakdown.action_verbs },
+                        { key: 'quantification', label: 'Quantified Impact', weight: 10, value: result.breakdown.quantification },
+                        { key: 'length', label: 'Length & Density', weight: 10, value: result.breakdown.length },
+                        { key: 'formatting', label: 'ATS Formatting', weight: 10, value: result.breakdown.formatting },
+                        { key: 'alignment', label: 'Role Alignment', weight: 5, value: result.breakdown.alignment },
+                      ].map(item => {
+                        const v = Math.max(0, Math.min(100, Math.round(item.value || 0)));
+                        const c = v >= 80 ? 'bg-emerald-500' : v >= 60 ? 'bg-cyan-500' : v >= 40 ? 'bg-amber-500' : 'bg-red-500';
+                        return (
+                          <div key={item.key} className="bg-surface-2 rounded-xl p-3 space-y-1.5">
+                            <div className="flex justify-between items-baseline">
+                              <span className="text-[10px] text-text-sub">{item.label}</span>
+                              <span className="text-[9px] text-text-muted font-jetbrains">{item.weight} pts</span>
+                            </div>
+                            <div className="flex justify-between items-baseline">
+                              <div className="h-1.5 flex-1 bg-surface rounded-full overflow-hidden mr-2">
+                                <div className={`h-full ${c} rounded-full transition-all duration-700`} style={{ width: `${v}%` }} />
+                              </div>
+                              <span className="text-xs font-bold text-text-main">{v}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Strengths */}
               {result.strengths?.length > 0 && (

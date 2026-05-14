@@ -20,7 +20,7 @@ export const ThemeToggle = () => {
   return (
     <button
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="relative w-9 h-9 rounded-xl bg-surface-2/50 border border-white/5 hover:border-primary/50 transition-all flex items-center justify-center group overflow-hidden"
+      className="relative w-9 h-9 rounded-xl bg-surface-2/50 border border-[var(--color-border-subtle)] hover:border-primary/50 transition-all flex items-center justify-center group overflow-hidden"
       aria-label="Toggle Theme"
     >
       <AnimatePresence mode="wait" initial={false}>

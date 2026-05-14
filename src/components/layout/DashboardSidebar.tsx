@@ -51,8 +51,8 @@ const Sidebar = () => {
   const navLinks = isAdmin ? adminNavLinks : userNavLinks;
 
   return (
-    <aside className="bg-[var(--color-surface)] border-r border-[#334155] w-72 flex flex-col h-screen fixed left-0 top-0 z-50 overflow-y-auto hidden lg:flex shrink-0">
-      <div className="p-6 border-b border-[#334155]">
+    <aside className="bg-[var(--color-surface)] border-r border-[var(--color-border-subtle)] w-72 flex flex-col h-screen fixed left-0 top-0 z-50 overflow-y-auto hidden lg:flex shrink-0">
+      <div className="p-6 border-b border-[var(--color-border-subtle)]">
         <Link href="/dashboard" className="flex items-center gap-2 group">
           <Image src="/Drouvana_logo.png" alt="Drouvana" width={28} height={28} className="rounded-lg" />
           <span className="text-xl font-bold font-hanken tracking-tight text-text-main">Drouvana</span>
@@ -76,8 +76,8 @@ const Sidebar = () => {
               key={link.name}
               href={link.href}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                isActive 
-                  ? 'bg-primary/10 text-primary' 
+                isActive
+                  ? 'bg-primary/15 dark:bg-primary/10 text-primary border border-primary/25 dark:border-transparent shadow-sm shadow-primary/10'
                   : 'text-text-sub hover:bg-surface-2 hover:text-text-main'
               }`}
             >
@@ -88,15 +88,15 @@ const Sidebar = () => {
         })}
       </nav>
 
-      <div className="p-4 border-t border-[#334155] mt-auto space-y-1">
-        <Link 
+      <div className="p-4 border-t border-[var(--color-border-subtle)] mt-auto space-y-1">
+        <Link
           href="/help"
           className="flex items-center gap-3 px-4 py-2 text-text-muted hover:text-text-main transition-colors rounded-xl text-sm font-medium"
         >
           <HelpCircle className="w-4 h-4" />
           Help Center
         </Link>
-        <button 
+        <button
           onClick={() => signOut()}
           className="flex items-center gap-3 px-4 py-2 text-text-muted hover:text-error transition-colors rounded-xl text-sm font-medium w-full text-left"
         >

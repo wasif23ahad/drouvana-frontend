@@ -28,6 +28,7 @@ import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import { ThemeToggle } from '@/components/shared/ThemeToggle';
 
 const NAV_LINKS = [
   { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
@@ -75,7 +76,7 @@ const DashboardNavbar = () => {
 
   return (
     <>
-      <header className="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-[#334155] shrink-0 bg-[#0F172A]/70 backdrop-blur-md sticky top-0 z-40 w-full">
+      <header className="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-[var(--color-border-subtle)] shrink-0 bg-[var(--bg-glass)] backdrop-blur-md sticky top-0 z-40 w-full">
         <div className="flex items-center gap-3">
           {/* Hamburger — mobile only */}
           <button
@@ -119,16 +120,18 @@ const DashboardNavbar = () => {
             />
           </form>
 
-          <button className="text-text-muted hover:text-primary transition-colors relative p-2 rounded-full hover:bg-white/5">
+          <button className="text-text-muted hover:text-primary transition-colors relative p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5">
             <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-[#0F172A]"></span>
+            <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-[var(--bg-base)]"></span>
           </button>
+
+          <ThemeToggle />
 
           {/* Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setProfileOpen(!profileOpen)}
-              className="flex items-center gap-2 sm:gap-3 pl-2 border-l border-[#334155] hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 sm:gap-3 pl-2 border-l border-[var(--color-border-subtle)] hover:opacity-80 transition-opacity"
             >
               <div className="hidden sm:block text-right">
                 <p className="text-xs font-bold text-text-main leading-none mb-1">{session?.user?.name}</p>
@@ -182,9 +185,9 @@ const DashboardNavbar = () => {
             onClick={() => setMobileOpen(false)}
           />
           {/* Drawer panel */}
-          <aside className="absolute left-0 top-0 h-full w-72 bg-[var(--color-surface)] border-r border-[#334155] flex flex-col overflow-y-auto animate-in slide-in-from-left duration-200">
+          <aside className="absolute left-0 top-0 h-full w-72 bg-[var(--color-surface)] border-r border-[var(--color-border-subtle)] flex flex-col overflow-y-auto animate-in slide-in-from-left duration-200">
             {/* Header */}
-            <div className="p-5 border-b border-[#334155] flex items-center justify-between">
+            <div className="p-5 border-b border-[var(--color-border-subtle)] flex items-center justify-between">
               <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-2">
                 <Image src="/Drouvana_logo.png" alt="Drouvana" width={26} height={26} className="rounded-lg" />
                 <span className="text-lg font-bold font-hanken tracking-tight text-text-main">Drouvana</span>
@@ -215,7 +218,7 @@ const DashboardNavbar = () => {
                     onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       isActive
-                        ? 'bg-primary/10 text-primary'
+                        ? 'bg-primary/15 dark:bg-primary/10 text-primary border border-primary/25 dark:border-transparent'
                         : 'text-text-sub hover:bg-surface-2 hover:text-text-main'
                     }`}
                   >
@@ -227,7 +230,7 @@ const DashboardNavbar = () => {
             </nav>
 
             {/* Footer */}
-            <div className="p-4 border-t border-[#334155] space-y-1">
+            <div className="p-4 border-t border-[var(--color-border-subtle)] space-y-1">
               <Link href="/help" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-text-muted hover:text-text-main rounded-xl text-sm font-medium">
                 <HelpCircle className="w-4 h-4" /> Help Center
               </Link>

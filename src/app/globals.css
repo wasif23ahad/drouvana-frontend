@@ -47,15 +47,15 @@
   }
 
   .light {
-    --bg-base: #F1F5F9;
-    --bg-surface: #E2E8F0;
-    --bg-surface-2: #CBD5E1;
-    --bg-glass: rgba(226, 232, 240, 0.8);
-    --text-primary: #0F172A;
-    --text-secondary: #334155;
-    --text-muted: #64748B;
-    --border-color: rgba(99, 102, 241, 0.12);
-    --mesh-opacity: 0.08;
+    --bg-base: #FFFFFF;
+    --bg-surface: #EEF1F6;
+    --bg-surface-2: #DDE3EC;
+    --bg-glass: rgba(238, 241, 246, 0.85);
+    --text-primary: #0B1424;
+    --text-secondary: #1E293B;
+    --text-muted: #475569;
+    --border-color: rgba(15, 23, 42, 0.10);
+    --mesh-opacity: 0.06;
     --radius-premium: 2.5rem;
   }
 
