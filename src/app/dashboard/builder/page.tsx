@@ -1,878 +1,721 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Eye, EyeOff, GripVertical, Plus, Trash2, ChevronDown, ChevronUp,
+  ArrowUp, ArrowDown, Download, Save, CheckCircle2, Loader2,
+  Sparkles, ChevronRight, Sliders, FileText, AlignLeft, AlignCenter,
+  AlignRight, Globe, Briefcase, GraduationCap, Code2, Award,
+  Users, FolderOpen, Palette, Layers, Languages, Phone,
+  Mail, MapPin, Link2, RefreshCw, X, Settings2
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Sparkles, Download, Save, CheckCircle2, Loader2, LayoutTemplate, FileText, ChevronRight, Sliders, ArrowUp, ArrowDown, AlignLeft, AlignCenter, AlignRight, Plus, Trash2, FolderOpen } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
 
-interface SectionItem {
+// ─── Types ─────────────────────────────────────────────────────────────────
+
+type TemplateId = 'modern' | 'classic' | 'executive' | 'sidebar' | 'minimal';
+type SectionType =
+  | 'personal' | 'summary' | 'experience' | 'education' | 'skills'
+  | 'projects' | 'certifications' | 'languages' | 'references' | 'custom';
+
+interface SectionDef {
   id: string;
+  type: SectionType;
   title: string;
-  enabled: boolean;
+  visible: boolean;
 }
+
+interface ExpEntry { id: string; role: string; company: string; location: string; dates: string; bullets: string; }
+interface EduEntry { id: string; institution: string; degree: string; field: string; dates: string; gpa: string; }
+interface SkillGroup { id: string; category: string; items: string; }
+interface ProjectEntry { id: string; name: string; description: string; tech: string; url: string; dates: string; }
+interface CertEntry { id: string; name: string; issuer: string; date: string; }
+interface LangEntry { id: string; language: string; proficiency: string; }
+interface RefEntry { id: string; name: string; title: string; company: string; contact: string; }
+interface CustomItem { id: string; heading: string; body: string; }
+
+interface ResumeData {
+  personal: { name: string; title: string; email: string; phone: string; location: string; linkedin: string; github: string; portfolio: string; x: string; };
+  summary: string;
+  experience: ExpEntry[];
+  education: EduEntry[];
+  skills: SkillGroup[];
+  projects: ProjectEntry[];
+  certifications: CertEntry[];
+  languages: LangEntry[];
+  references: RefEntry[];
+  custom: Record<string, CustomItem[]>;
+}
+
+interface AppearanceConfig {
+  template: TemplateId;
+  accentColor: string;
+  fontFamily: string;
+  fontSize: number;
+  lineHeight: number;
+  sectionGap: number;
+  headerAlign: 'left' | 'center' | 'right';
+}
+
+// ─── Constants ──────────────────────────────────────────────────────────────
+
+const uid = () => Math.random().toString(36).slice(2, 9);
+
+const SECTION_ICONS: Record<SectionType, React.ElementType> = {
+  personal: Globe, summary: FileText, experience: Briefcase,
+  education: GraduationCap, skills: Code2, projects: Layers,
+  certifications: Award, languages: Languages, references: Users, custom: Plus,
+};
+
+const DEFAULT_SECTIONS: SectionDef[] = [
+  { id: 'summary', type: 'summary', title: 'Professional Summary', visible: true },
+  { id: 'experience', type: 'experience', title: 'Work Experience', visible: true },
+  { id: 'education', type: 'education', title: 'Education', visible: true },
+  { id: 'skills', type: 'skills', title: 'Skills', visible: true },
+  { id: 'projects', type: 'projects', title: 'Projects', visible: true },
+  { id: 'certifications', type: 'certifications', title: 'Certifications', visible: true },
+  { id: 'languages', type: 'languages', title: 'Languages', visible: false },
+  { id: 'references', type: 'references', title: 'References', visible: false },
+];
+
+const TEMPLATES: { id: TemplateId; name: string; desc: string }[] = [
+  { id: 'modern', name: 'Modern', desc: 'Clean accent headings, pill skills' },
+  { id: 'classic', name: 'Classic', desc: 'Traditional serif, underlined headers' },
+  { id: 'executive', name: 'Executive', desc: 'Bold header block, formal layout' },
+  { id: 'sidebar', name: 'Sidebar', desc: 'Two-column with dark left panel' },
+  { id: 'minimal', name: 'Minimal', desc: 'Ultra-clean, maximum whitespace' },
+];
+
+const ACCENT_PRESETS = [
+  { hex: '#2563eb', label: 'Blue' }, { hex: '#0f766e', label: 'Teal' },
+  { hex: '#7c3aed', label: 'Violet' }, { hex: '#b91c1c', label: 'Red' },
+  { hex: '#b45309', label: 'Amber' }, { hex: '#1e40af', label: 'Navy' },
+  { hex: '#374151', label: 'Slate' }, { hex: '#166534', label: 'Forest' },
+];
+
+const DEFAULT_DATA: ResumeData = {
+  personal: { name: '', title: '', email: '', phone: '', location: '', linkedin: '', github: '', portfolio: '', x: '' },
+  summary: '',
+  experience: [],
+  education: [],
+  skills: [{ id: uid(), category: 'Technical Skills', items: '' }],
+  projects: [],
+  certifications: [],
+  languages: [],
+  references: [],
+  custom: {},
+};
+
+const DEFAULT_APPEARANCE: AppearanceConfig = {
+  template: 'modern', accentColor: '#2563eb', fontFamily: 'sans-serif',
+  fontSize: 12, lineHeight: 1.5, sectionGap: 18, headerAlign: 'left',
+};
+
+// ─── Component ──────────────────────────────────────────────────────────────
 
 export default function ResumeBuilderPage() {
   const { status } = useSession();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  
-  // Tab controller matching FlowCV core features
-  const [activeTab, setActiveTab] = useState<'content' | 'appearance' | 'versions'>('content');
-  
-  // Design configuration states
-  const [template, setTemplate] = useState<'modern' | 'minimal' | 'executive'>('modern');
-  const [fontFamily, setFontFamily] = useState<string>('sans-serif');
-  const [fontSize, setFontSize] = useState<number>(13);
-  const [lineSpacing, setLineSpacing] = useState<number>(1.5);
-  const [sectionGap, setSectionGap] = useState<number>(20);
-  const [headerAlign, setHeaderAlign] = useState<'left' | 'center' | 'right'>('left');
-  const [atsScore, setAtsScore] = useState(96);
 
-  // Open-Resume core features state
-  const [accentColor, setAccentColor] = useState<string>('#2563eb');
-  const [previewZoom, setPreviewZoom] = useState<number>(1);
+  const [activeTab, setActiveTab] = useState<'sections' | 'design' | 'history'>('sections');
+  const [expandedSection, setExpandedSection] = useState<string | null>('summary');
+  const [zoom, setZoom] = useState(0.75);
 
-  // FlowCV style custom section layout ordering controller
-  const [sectionsOrder, setSectionsOrder] = useState<SectionItem[]>([
-    { id: 'summary', title: 'Professional Summary', enabled: true },
-    { id: 'experience', title: 'Work Experience', enabled: true },
-    { id: 'skills', title: 'Core Competencies', enabled: true },
-    { id: 'education', title: 'Education History', enabled: true }
-  ]);
+  const [sections, setSections] = useState<SectionDef[]>(DEFAULT_SECTIONS);
+  const [data, setData] = useState<ResumeData>(DEFAULT_DATA);
+  const [appearance, setAppearance] = useState<AppearanceConfig>(DEFAULT_APPEARANCE);
+  const [savedVersions, setSavedVersions] = useState<Array<{ id: string; name: string; date: string; sections: SectionDef[]; data: ResumeData; appearance: AppearanceConfig }>>([]);
 
-  // Master Content payload state
-  const [profile, setProfile] = useState({
-    personalInfo: {
-      name: 'Sarah Jenkins',
-      email: 'sarah.jenkins@example.com',
-      phone: '+1 (555) 234-5678',
-      linkedin: 'linkedin.com/in/sarahjenkins',
-      address: 'San Francisco, CA'
-    },
-    summary: 'Senior Cloud Solutions Architect and systems builder with 8+ years of focused expertise in designing distributed message queues, migrating monolithic layers to AWS Kubernetes clusters, and driving multi-region reliability.',
-    experience: [
-      { 
-        company: 'CloudScale Infrastructure', 
-        role: 'Lead Backend Engineer', 
-        dates: '2022 - Present', 
-        description: 'Architected highly available REST/gRPC service topologies handling 120K req/sec. Redesigned connection pooling boundaries in Node.js/Go to drop database latency by 42% across global customer shards.' 
-      },
-      { 
-        company: 'DataStream Metrics', 
-        role: 'Software Engineer', 
-        dates: '2019 - 2022', 
-        description: 'Built high-throughput logging collectors leveraging Apache Kafka and Elasticsearch. Implemented unified JWT security barriers and optimized CI/CD GitHub Actions pipelines saving 20 dev-hours weekly.' 
-      }
-    ],
-    skills: 'Go, TypeScript, Python, Kubernetes, AWS (EKS, S3, RDS), Apache Kafka, PostgreSQL, Redis, Docker, gRPC',
-    education: [
-      {
-        institution: 'University of California, Berkeley',
-        degree: 'B.S. Electrical Engineering & Computer Science',
-        dates: '2015 - 2019'
-      }
-    ]
-  });
-
-  // Local storage cache for user-created custom versions
-  const [savedResumes, setSavedResumes] = useState<Array<{ id: string; name: string; date: string; profile: any; template: string }>>([]);
-
+  // Load from API and localStorage
   useEffect(() => {
-    // Load local storage saved versions if present
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem('flowcv_saved_resumes');
-        if (stored) setSavedResumes(JSON.parse(stored));
-      } catch (err) {}
-    }
+    try {
+      const stored = localStorage.getItem('drouvana_builder_versions');
+      if (stored) setSavedVersions(JSON.parse(stored));
+      const storedSections = localStorage.getItem('drouvana_builder_sections');
+      if (storedSections) setSections(JSON.parse(storedSections));
+      const storedAppearance = localStorage.getItem('drouvana_builder_appearance');
+      if (storedAppearance) setAppearance(JSON.parse(storedAppearance));
+    } catch (_) {}
 
-    if (status === 'unauthenticated') {
-      setLoading(false);
-      return;
-    }
-
+    if (status === 'unauthenticated') { setLoading(false); return; }
     if (status !== 'authenticated') return;
 
-    // Fetch primary profile data from backend
-    const fetchMasterProfile = async () => {
-      try {
-        const res = await api.get('/api/resume/master');
-        if (res.data?.data) {
-          const p = res.data.data;
-          setProfile(prev => ({
-            ...prev,
-            personalInfo: {
-              ...prev.personalInfo,
-              name: p.personalInfo?.name || prev.personalInfo.name,
-              email: p.personalInfo?.email || prev.personalInfo.email,
-              phone: p.personalInfo?.phone || prev.personalInfo.phone,
-              linkedin: p.personalInfo?.linkedin || prev.personalInfo.linkedin,
-              github: p.personalInfo?.github || (prev.personalInfo as any).github,
-              x: p.personalInfo?.x || (prev.personalInfo as any).x,
-              reddit: p.personalInfo?.reddit || (prev.personalInfo as any).reddit,
-              leetcode: p.personalInfo?.leetcode || (prev.personalInfo as any).leetcode,
-              portfolio: p.personalInfo?.portfolio || (prev.personalInfo as any).portfolio,
-            },
-            summary: p.summary || prev.summary,
-            experience: p.experience?.length ? p.experience : prev.experience,
-            skills: p.skills || prev.skills,
-          }));
-        }
-      } catch (error) {
-        // non-blocking fallback presentation
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMasterProfile();
+    api.get('/api/resume/master').then(res => {
+      const p = res.data?.data;
+      if (!p) return;
+      setData(prev => ({
+        ...prev,
+        personal: {
+          name: p.personalInfo?.name || '',
+          title: p.personalInfo?.title || '',
+          email: p.personalInfo?.email || '',
+          phone: p.personalInfo?.phone || '',
+          location: p.personalInfo?.location || p.personalInfo?.address || '',
+          linkedin: p.personalInfo?.linkedin || '',
+          github: p.personalInfo?.github || '',
+          portfolio: p.personalInfo?.portfolio || '',
+          x: p.personalInfo?.x || '',
+        },
+        summary: p.summary || '',
+        experience: Array.isArray(p.experience)
+          ? p.experience.map((e: any) => ({ id: uid(), role: e.role || '', company: e.company || '', location: '', dates: e.dates || '', bullets: e.description || '' }))
+          : [],
+        education: Array.isArray(p.education)
+          ? p.education.map((e: any) => ({ id: uid(), institution: e.institution || '', degree: e.degree || '', field: e.field || '', dates: e.dates || e.startDate || '', gpa: e.gpa || '' }))
+          : [],
+        skills: p.skills
+          ? [{ id: uid(), category: 'Skills', items: typeof p.skills === 'string' ? p.skills : '' }]
+          : prev.skills,
+        projects: Array.isArray(p.projects)
+          ? p.projects.map((pr: any) => ({ id: uid(), name: pr.name || '', description: pr.description || '', tech: pr.techStack || '', url: pr.url || '', dates: pr.dates || '' }))
+          : [],
+        certifications: Array.isArray(p.certifications)
+          ? p.certifications.map((c: any) => ({ id: uid(), name: c.name || '', issuer: c.issuer || '', date: c.date || '' }))
+          : [],
+      }));
+    }).catch(() => {}).finally(() => setLoading(false));
   }, [status]);
 
-  // Save current flow custom build state to persistent memory
-  const handleSaveVersion = (customVersionName?: string) => {
-    const nameToSave = customVersionName || `Formatted Layout — ${new Date().toLocaleDateString()}`;
-    const newEntry = {
-      id: Date.now().toString(),
-      name: nameToSave,
-      date: new Date().toLocaleString(),
-      profile,
-      template
-    };
+  // ── Section management ──────────────────────────────────────────────────
 
-    const updatedList = [newEntry, ...savedResumes];
-    setSavedResumes(updatedList);
-
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('flowcv_saved_resumes', JSON.stringify(updatedList));
-    }
-
-    toast.success(`Saved "${nameToSave}" to local history storage`);
+  const toggleVisible = (id: string) => {
+    setSections(prev => prev.map(s => s.id === id ? { ...s, visible: !s.visible } : s));
   };
 
-  // Sync to database backend profile table
-  const handleSyncBackend = async () => {
+  const moveSection = (id: string, dir: -1 | 1) => {
+    setSections(prev => {
+      const idx = prev.findIndex(s => s.id === id);
+      const next = idx + dir;
+      if (next < 0 || next >= prev.length) return prev;
+      const arr = [...prev];
+      [arr[idx], arr[next]] = [arr[next], arr[idx]];
+      return arr;
+    });
+  };
+
+  const renameSectionTitle = (id: string, title: string) => {
+    setSections(prev => prev.map(s => s.id === id ? { ...s, title } : s));
+  };
+
+  const addCustomSection = () => {
+    const id = `custom_${uid()}`;
+    setSections(prev => [...prev, { id, type: 'custom', title: 'Custom Section', visible: true }]);
+    setData(prev => ({ ...prev, custom: { ...prev.custom, [id]: [{ id: uid(), heading: '', body: '' }] } }));
+    setExpandedSection(id);
+    toast.success('Custom section added');
+  };
+
+  const deleteSection = (id: string) => {
+    setSections(prev => prev.filter(s => s.id !== id));
+    if (id.startsWith('custom_')) {
+      setData(prev => { const c = { ...prev.custom }; delete c[id]; return { ...prev, custom: c }; });
+    }
+    if (expandedSection === id) setExpandedSection(null);
+  };
+
+  // ── Data helpers ────────────────────────────────────────────────────────
+
+  const updExp = (idx: number, field: keyof ExpEntry, val: string) =>
+    setData(p => { const a = [...p.experience]; a[idx] = { ...a[idx], [field]: val }; return { ...p, experience: a }; });
+  const addExp = () => setData(p => ({ ...p, experience: [...p.experience, { id: uid(), role: '', company: '', location: '', dates: '', bullets: '' }] }));
+  const delExp = (idx: number) => setData(p => ({ ...p, experience: p.experience.filter((_, i) => i !== idx) }));
+
+  const updEdu = (idx: number, field: keyof EduEntry, val: string) =>
+    setData(p => { const a = [...p.education]; a[idx] = { ...a[idx], [field]: val }; return { ...p, education: a }; });
+  const addEdu = () => setData(p => ({ ...p, education: [...p.education, { id: uid(), institution: '', degree: '', field: '', dates: '', gpa: '' }] }));
+  const delEdu = (idx: number) => setData(p => ({ ...p, education: p.education.filter((_, i) => i !== idx) }));
+
+  const updSkill = (idx: number, field: keyof SkillGroup, val: string) =>
+    setData(p => { const a = [...p.skills]; a[idx] = { ...a[idx], [field]: val }; return { ...p, skills: a }; });
+  const addSkillGroup = () => setData(p => ({ ...p, skills: [...p.skills, { id: uid(), category: '', items: '' }] }));
+  const delSkillGroup = (idx: number) => setData(p => ({ ...p, skills: p.skills.filter((_, i) => i !== idx) }));
+
+  const updProj = (idx: number, field: keyof ProjectEntry, val: string) =>
+    setData(p => { const a = [...p.projects]; a[idx] = { ...a[idx], [field]: val }; return { ...p, projects: a }; });
+  const addProj = () => setData(p => ({ ...p, projects: [...p.projects, { id: uid(), name: '', description: '', tech: '', url: '', dates: '' }] }));
+  const delProj = (idx: number) => setData(p => ({ ...p, projects: p.projects.filter((_, i) => i !== idx) }));
+
+  const updCert = (idx: number, field: keyof CertEntry, val: string) =>
+    setData(p => { const a = [...p.certifications]; a[idx] = { ...a[idx], [field]: val }; return { ...p, certifications: a }; });
+  const addCert = () => setData(p => ({ ...p, certifications: [...p.certifications, { id: uid(), name: '', issuer: '', date: '' }] }));
+  const delCert = (idx: number) => setData(p => ({ ...p, certifications: p.certifications.filter((_, i) => i !== idx) }));
+
+  const updLang = (idx: number, field: keyof LangEntry, val: string) =>
+    setData(p => { const a = [...p.languages]; a[idx] = { ...a[idx], [field]: val }; return { ...p, languages: a }; });
+  const addLang = () => setData(p => ({ ...p, languages: [...p.languages, { id: uid(), language: '', proficiency: 'Professional' }] }));
+  const delLang = (idx: number) => setData(p => ({ ...p, languages: p.languages.filter((_, i) => i !== idx) }));
+
+  const updRef = (idx: number, field: keyof RefEntry, val: string) =>
+    setData(p => { const a = [...p.references]; a[idx] = { ...a[idx], [field]: val }; return { ...p, references: a }; });
+  const addRef = () => setData(p => ({ ...p, references: [...p.references, { id: uid(), name: '', title: '', company: '', contact: '' }] }));
+  const delRef = (idx: number) => setData(p => ({ ...p, references: p.references.filter((_, i) => i !== idx) }));
+
+  const updCustomItem = (secId: string, idx: number, field: keyof CustomItem, val: string) =>
+    setData(p => {
+      const items = [...(p.custom[secId] || [])];
+      items[idx] = { ...items[idx], [field]: val };
+      return { ...p, custom: { ...p.custom, [secId]: items } };
+    });
+  const addCustomItem = (secId: string) =>
+    setData(p => ({ ...p, custom: { ...p.custom, [secId]: [...(p.custom[secId] || []), { id: uid(), heading: '', body: '' }] } }));
+  const delCustomItem = (secId: string, idx: number) =>
+    setData(p => ({ ...p, custom: { ...p.custom, [secId]: (p.custom[secId] || []).filter((_, i) => i !== idx) } }));
+
+  // ── Save / load ─────────────────────────────────────────────────────────
+
+  const saveVersion = (name?: string) => {
+    const entry = { id: uid(), name: name || `Version — ${new Date().toLocaleDateString('en-US')}`, date: new Date().toLocaleString('en-US'), sections, data, appearance };
+    const updated = [entry, ...savedVersions].slice(0, 20);
+    setSavedVersions(updated);
+    localStorage.setItem('drouvana_builder_versions', JSON.stringify(updated));
+    localStorage.setItem('drouvana_builder_sections', JSON.stringify(sections));
+    localStorage.setItem('drouvana_builder_appearance', JSON.stringify(appearance));
+    toast.success(`Saved "${entry.name}"`);
+  };
+
+  const loadVersion = (v: typeof savedVersions[0]) => {
+    setSections(v.sections); setData(v.data); setAppearance(v.appearance);
+    toast.success(`Loaded "${v.name}"`);
+  };
+
+  const deleteVersion = (id: string) => {
+    const updated = savedVersions.filter(v => v.id !== id);
+    setSavedVersions(updated);
+    localStorage.setItem('drouvana_builder_versions', JSON.stringify(updated));
+  };
+
+  const syncToCloud = async () => {
     setSaving(true);
     try {
-      await api.put('/api/resume/master', { data: profile });
+      await api.put('/api/resume/master', {
+        data: {
+          personalInfo: { ...data.personal },
+          summary: data.summary,
+          experience: data.experience.map(e => ({ company: e.company, role: e.role, dates: e.dates, description: e.bullets })),
+          education: data.education.map(e => ({ institution: e.institution, degree: e.degree, field: e.field, dates: e.dates, gpa: e.gpa })),
+          skills: data.skills.map(g => g.items).join(', '),
+          projects: data.projects.map(p => ({ name: p.name, description: p.description, techStack: p.tech, url: p.url, dates: p.dates })),
+          certifications: data.certifications.map(c => ({ name: c.name, issuer: c.issuer, date: c.date })),
+        }
+      });
       setSaved(true);
-      toast.success('Resume Core Successfully Synchronized with Cloud Database');
+      toast.success('Synced to cloud');
       setTimeout(() => setSaved(false), 3000);
-    } catch (err) {
-      toast.error('Cloud API sync encountered timeout. Saved to Local Memory.');
-    } finally {
-      setSaving(false);
+    } catch { toast.error('Sync failed'); }
+    finally { setSaving(false); }
+  };
+
+  // ── Content editors ─────────────────────────────────────────────────────
+
+  const renderEditor = (sec: SectionDef) => {
+    const { id, type } = sec;
+    switch (type) {
+      case 'personal':
+        return (
+          <div className="grid grid-cols-2 gap-3 pt-3">
+            {([['name', 'Full Name'], ['title', 'Professional Title'], ['email', 'Email'], ['phone', 'Phone'], ['location', 'Location'], ['linkedin', 'LinkedIn'], ['github', 'GitHub'], ['portfolio', 'Portfolio'], ['x', 'X / Twitter']] as [keyof ResumeData['personal'], string][]).map(([f, label]) => (
+              <div key={f} className={f === 'name' || f === 'title' ? 'col-span-2' : ''}>
+                <Label className="text-[10px] text-text-muted uppercase tracking-wider font-jetbrains mb-1 block">{label}</Label>
+                <Input value={data.personal[f]} onChange={e => setData(p => ({ ...p, personal: { ...p.personal, [f]: e.target.value } }))} className="h-8 text-xs bg-surface border-white/10 rounded-lg" />
+              </div>
+            ))}
+          </div>
+        );
+      case 'summary':
+        return (
+          <div className="pt-3">
+            <textarea value={data.summary} onChange={e => setData(p => ({ ...p, summary: e.target.value }))} rows={4} placeholder="A compelling professional summary..." className="w-full bg-surface border border-white/10 rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
+          </div>
+        );
+      case 'experience':
+        return (
+          <div className="pt-3 space-y-3">
+            {data.experience.map((exp, idx) => (
+              <div key={exp.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+                <Button variant="ghost" size="icon" type="button" onClick={() => delExp(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
+                <div className="grid grid-cols-2 gap-2 pr-6">
+                  <Input placeholder="Job Title" value={exp.role} onChange={e => updExp(idx, 'role', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Company" value={exp.company} onChange={e => updExp(idx, 'company', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Location" value={exp.location} onChange={e => updExp(idx, 'location', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Dates (MM/YYYY – Present)" value={exp.dates} onChange={e => updExp(idx, 'dates', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                </div>
+                <textarea value={exp.bullets} onChange={e => updExp(idx, 'bullets', e.target.value)} rows={3} placeholder="• Led team of 5 engineers...&#10;• Reduced latency by 40%..." className="w-full bg-surface-2 border border-white/5 rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
+              </div>
+            ))}
+            <Button onClick={addExp} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Experience</Button>
+          </div>
+        );
+      case 'education':
+        return (
+          <div className="pt-3 space-y-3">
+            {data.education.map((edu, idx) => (
+              <div key={edu.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+                <Button variant="ghost" size="icon" type="button" onClick={() => delEdu(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
+                <Input placeholder="Institution" value={edu.institution} onChange={e => updEdu(idx, 'institution', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                <div className="grid grid-cols-2 gap-2">
+                  <Input placeholder="Degree (e.g. B.S.)" value={edu.degree} onChange={e => updEdu(idx, 'degree', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Field of Study" value={edu.field} onChange={e => updEdu(idx, 'field', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Dates" value={edu.dates} onChange={e => updEdu(idx, 'dates', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="GPA (optional)" value={edu.gpa} onChange={e => updEdu(idx, 'gpa', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                </div>
+              </div>
+            ))}
+            <Button onClick={addEdu} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Education</Button>
+          </div>
+        );
+      case 'skills':
+        return (
+          <div className="pt-3 space-y-2">
+            {data.skills.map((grp, idx) => (
+              <div key={grp.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+                <Button variant="ghost" size="icon" type="button" onClick={() => delSkillGroup(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
+                <Input placeholder="Category (e.g. Languages, Frameworks)" value={grp.category} onChange={e => updSkill(idx, 'category', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg pr-8" />
+                <Input placeholder="React, Node.js, TypeScript, PostgreSQL..." value={grp.items} onChange={e => updSkill(idx, 'items', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+              </div>
+            ))}
+            <Button onClick={addSkillGroup} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Skill Group</Button>
+          </div>
+        );
+      case 'projects':
+        return (
+          <div className="pt-3 space-y-3">
+            {data.projects.map((proj, idx) => (
+              <div key={proj.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+                <Button variant="ghost" size="icon" type="button" onClick={() => delProj(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
+                <div className="grid grid-cols-2 gap-2 pr-6">
+                  <Input placeholder="Project Name" value={proj.name} onChange={e => updProj(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Dates" value={proj.dates} onChange={e => updProj(idx, 'dates', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                </div>
+                <Input placeholder="Tech stack (React, Node.js, Docker...)" value={proj.tech} onChange={e => updProj(idx, 'tech', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                <Input placeholder="URL (optional)" value={proj.url} onChange={e => updProj(idx, 'url', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                <textarea value={proj.description} onChange={e => updProj(idx, 'description', e.target.value)} rows={2} placeholder="• What you built and the impact..." className="w-full bg-surface-2 border border-white/5 rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
+              </div>
+            ))}
+            <Button onClick={addProj} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Project</Button>
+          </div>
+        );
+      case 'certifications':
+        return (
+          <div className="pt-3 space-y-2">
+            {data.certifications.map((c, idx) => (
+              <div key={c.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+                <Button variant="ghost" size="icon" type="button" onClick={() => delCert(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
+                <Input placeholder="Certification Name" value={c.name} onChange={e => updCert(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg pr-8" />
+                <div className="grid grid-cols-2 gap-2">
+                  <Input placeholder="Issuer" value={c.issuer} onChange={e => updCert(idx, 'issuer', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Date (MM/YYYY)" value={c.date} onChange={e => updCert(idx, 'date', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                </div>
+              </div>
+            ))}
+            <Button onClick={addCert} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Certification</Button>
+          </div>
+        );
+      case 'languages':
+        return (
+          <div className="pt-3 space-y-2">
+            {data.languages.map((l, idx) => (
+              <div key={l.id} className="flex gap-2 items-center relative group">
+                <Input placeholder="Language" value={l.language} onChange={e => updLang(idx, 'language', e.target.value)} className="h-8 text-xs bg-surface border-white/10 rounded-lg flex-1" />
+                <select value={l.proficiency} onChange={e => updLang(idx, 'proficiency', e.target.value)} className="h-8 text-xs bg-surface border border-white/10 rounded-lg px-2 text-text-sub focus:outline-none">
+                  {['Native', 'Fluent', 'Professional', 'Conversational', 'Basic'].map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+                <Button variant="ghost" size="icon" onClick={() => delLang(idx)} className="h-7 w-7 p-0 text-error opacity-0 group-hover:opacity-100 rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
+              </div>
+            ))}
+            <Button onClick={addLang} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Language</Button>
+          </div>
+        );
+      case 'references':
+        return (
+          <div className="pt-3 space-y-2">
+            {data.references.map((r, idx) => (
+              <div key={r.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+                <Button variant="ghost" size="icon" type="button" onClick={() => delRef(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
+                <div className="grid grid-cols-2 gap-2 pr-6">
+                  <Input placeholder="Full Name" value={r.name} onChange={e => updRef(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Job Title" value={r.title} onChange={e => updRef(idx, 'title', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Company" value={r.company} onChange={e => updRef(idx, 'company', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Email / Phone" value={r.contact} onChange={e => updRef(idx, 'contact', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                </div>
+              </div>
+            ))}
+            <Button onClick={addRef} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Reference</Button>
+          </div>
+        );
+      case 'custom': {
+        const items = data.custom[id] || [];
+        return (
+          <div className="pt-3 space-y-2">
+            {items.map((item, idx) => (
+              <div key={item.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+                <Button variant="ghost" size="icon" type="button" onClick={() => delCustomItem(id, idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
+                <Input placeholder="Heading (optional)" value={item.heading} onChange={e => updCustomItem(id, idx, 'heading', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg pr-8" />
+                <textarea value={item.body} onChange={e => updCustomItem(id, idx, 'body', e.target.value)} rows={2} placeholder="Content..." className="w-full bg-surface-2 border border-white/5 rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
+              </div>
+            ))}
+            <Button onClick={() => addCustomItem(id)} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Item</Button>
+          </div>
+        );
+      }
+      default: return null;
     }
   };
 
-  // Switch/Load an entire old resume setup
-  const loadSavedVersion = (entry: any) => {
-    setProfile(entry.profile);
-    if (entry.template) setTemplate(entry.template);
-    toast.success(`Loaded saved configurations: ${entry.name}`);
-  };
+  if (loading) return (
+    <div className="flex h-[50vh] items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
 
-  const deleteSavedVersion = (id: string) => {
-    const filter = savedResumes.filter(item => item.id !== id);
-    setSavedResumes(filter);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('flowcv_saved_resumes', JSON.stringify(filter));
-    }
-    toast.info('Removed snapshot configuration');
-  };
-
-  // Section position adjustment functions
-  const moveSectionUp = (index: number) => {
-    if (index === 0) return;
-    const newOrder = [...sectionsOrder];
-    const temp = newOrder[index - 1];
-    newOrder[index - 1] = newOrder[index];
-    newOrder[index] = temp;
-    setSectionsOrder(newOrder);
-    toast.success('Section shift updated layout array');
-  };
-
-  const moveSectionDown = (index: number) => {
-    if (index === sectionsOrder.length - 1) return;
-    const newOrder = [...sectionsOrder];
-    const temp = newOrder[index + 1];
-    newOrder[index + 1] = newOrder[index];
-    newOrder[index] = temp;
-    setSectionsOrder(newOrder);
-    toast.success('Section shift updated layout array');
-  };
-
-  const toggleSectionEnabled = (id: string) => {
-    setSectionsOrder(sectionsOrder.map(s => s.id === id ? { ...s, enabled: !s.enabled } : s));
-  };
-
-  const handleSectionTitleChange = (id: string, newTitle: string) => {
-    setSectionsOrder(sectionsOrder.map(s => s.id === id ? { ...s, title: newTitle } : s));
-  };
-
-  const loadOpenResumePreset = (preset: 'fs' | 'cloud') => {
-    if (preset === 'fs') {
-      setProfile({
-        personalInfo: {
-          name: 'Alex Rivera',
-          email: 'alex.rivera@example.com',
-          phone: '+1 (555) 382-9102',
-          linkedin: 'linkedin.com/in/alexrivera-dev',
-          address: 'Austin, TX'
-        },
-        summary: 'Passionate Full Stack Software Engineer with 6+ years building scalable React/Next.js client applications and highly responsive Node.js web APIs. Dedicated to reducing load vectors and optimizing core user layout stability.',
-        experience: [
-          {
-            company: 'TechCraft Interactive',
-            role: 'Senior Frontend Engineer',
-            dates: '2021 - Present',
-            description: '• Spearheaded implementation of robust state machine workflows using Zustand and Next.js App Router architectures.\n• Optimized dynamic bundling strategies to cut Initial Server Response metrics by 35%.\n• Mentored 4 junior developers and established single-source-of-truth component tokens systems.'
-          },
-          {
-            company: 'Apex Web Studio',
-            role: 'Full Stack Engineer',
-            dates: '2018 - 2021',
-            description: '• Developed customized client intake forms scaling across 45,000 active dashboard sessions.\n• Integrated continuous authentication validation via secure serverless callback interceptors.\n• Designed distributed caching patterns over persistent Redis key structures.'
-          }
-        ],
-        skills: 'React, Next.js, TypeScript, TailwindCSS, Node.js, Express, Zustand, Prisma DB, REST APIs, Git Integration',
-        education: [
-          {
-            institution: 'University of Texas at Austin',
-            degree: 'B.S. Computer Science',
-            dates: '2014 - 2018'
-          }
-        ]
-      });
-      toast.success('Loaded Open-Resume preset: Full Stack Engineer');
-    } else {
-      setProfile({
-        personalInfo: {
-          name: 'Marcus Vance',
-          email: 'marcus.vance@example.com',
-          phone: '+1 (555) 849-2019',
-          linkedin: 'linkedin.com/in/marcus-v-cloud',
-          address: 'Seattle, WA'
-        },
-        summary: 'Cloud Infrastructure Developer & DevOps Architect focused on high-concurrency microservice meshing, Kubernetes state deployment synchronization, and optimized network barrier design.',
-        experience: [
-          {
-            company: 'HyperScale Networks',
-            role: 'Principal Systems Architect',
-            dates: '2020 - Present',
-            description: '• Designed multi-region failover automation across AWS CloudFront and global Edge clusters.\n• Automated continuous database snapshot pipelines using server-sent event trigger verification loops.\n• Reduced quarterly enterprise compute budget by $140,000 via systematic idle resource pruning.'
-          }
-        ],
-        skills: 'Kubernetes, AWS Infrastructure, Docker Containerization, CI/CD Actions, Terraform, Golang Systems, Redis Interception',
-        education: [
-          {
-            institution: 'University of Washington',
-            degree: 'B.S. Network Engineering',
-            dates: '2015 - 2019'
-          }
-        ]
-      });
-      toast.success('Loaded Open-Resume preset: Cloud Infrastructure');
-    }
-  };
-
-  // Experience updates
-  const handleExpChange = (index: number, field: string, value: string) => {
-    const updated = [...profile.experience];
-    updated[index] = { ...updated[index], [field]: value };
-    setProfile({ ...profile, experience: updated });
-  };
-
-  const addExperience = () => {
-    setProfile({
-      ...profile,
-      experience: [...profile.experience, { company: 'New Enterprise', role: 'Role Title', dates: '2024 - Present', description: 'Quantified impact metrics and delivery timeline updates go here.' }]
-    });
-  };
-
-  const deleteExperience = (idx: number) => {
-    const filter = profile.experience.filter((_, i) => i !== idx);
-    setProfile({ ...profile, experience: filter });
-  };
-
-  // Education updates
-  const handleEduChange = (index: number, field: string, value: string) => {
-    const updated = [...profile.education];
-    updated[index] = { ...updated[index], [field]: value };
-    setProfile({ ...profile, education: updated });
-  };
-
-  const addEducation = () => {
-    setProfile({
-      ...profile,
-      education: [...profile.education, { institution: 'University Name', degree: 'Degree Field', dates: '2020 - 2024' }]
-    });
-  };
-
-  if (loading) {
-    return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  const { template, accentColor, fontFamily, fontSize, lineHeight, sectionGap, headerAlign } = appearance;
+  const visibleSections = sections.filter(s => s.visible);
 
   return (
-    <div className="flex flex-col h-full gap-8 pb-20">
+    <div className="flex flex-col h-full gap-6 pb-20">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <div className="flex items-center text-xs text-text-muted gap-2 font-jetbrains uppercase tracking-widest mb-2">
             <Link href="/dashboard" className="hover:text-primary transition-colors">Workspace</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-primary font-bold">FlowCV Resume Studio</span>
+            <span className="text-primary font-bold">Resume Builder</span>
           </div>
-          <h1 className="text-3xl font-bold font-hanken">FlowCV Resume Studio</h1>
-          <p className="text-text-sub text-sm">Design professional A4 ratio documents with customizable section sorting, fine-grain font controls, and custom version storage.</p>
+          <h1 className="text-3xl font-bold font-hanken">Resume Builder</h1>
+          <p className="text-text-sub text-sm">Build, style, and export professional resumes. 5 templates, custom sections, full control.</p>
         </div>
-        
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          <Button 
-            onClick={() => handleSaveVersion()} 
-            variant="outline" 
-            className="rounded-xl gap-2 border-white/10 hover:bg-surface-2 h-10 text-xs"
-          >
-            <Save className="h-3.5 w-3.5 text-primary" /> Snapshot State
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button onClick={() => saveVersion()} variant="outline" className="rounded-xl gap-1.5 border-white/10 h-9 text-xs">
+            <Save className="h-3.5 w-3.5" /> Save Version
           </Button>
-          
-          <Button 
-            onClick={() => {
-              toast.success('Activating A4 printable rendering layers...');
-              window.print();
-            }} 
-            variant="secondary" 
-            className="rounded-xl gap-2 bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 h-10 text-xs"
-          >
-            <Download className="h-3.5 w-3.5" /> Download PDF
+          <Button onClick={() => { toast.info('Opening print dialog...'); window.print(); }} variant="outline" className="rounded-xl gap-1.5 border-white/10 h-9 text-xs">
+            <Download className="h-3.5 w-3.5" /> Export PDF
           </Button>
-
-          <Button 
-            onClick={handleSyncBackend} 
-            className="rounded-xl gap-2 shadow-lg shadow-primary/20 border-none h-10 text-xs font-bold" 
-            disabled={saving}
-          >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <CheckCircle2 className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
-            {saving ? 'Saving DB...' : saved ? 'Synchronized' : 'Sync Profile DB'}
+          <Button onClick={syncToCloud} disabled={saving} className="rounded-xl gap-1.5 border-none shadow-lg shadow-primary/20 h-9 text-xs">
+            {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : saved ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
+            {saving ? 'Saving...' : saved ? 'Synced' : 'Sync to Cloud'}
           </Button>
         </div>
       </div>
 
-      {/* Primary Layout Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left Control Column */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
-          
-          {/* Sub Navigation Tabs */}
-          <div className="flex bg-surface-2 p-1 rounded-2xl border border-white/5">
-            <button 
-              onClick={() => setActiveTab('content')}
-              className={`flex-1 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 ${
-                activeTab === 'content' ? 'bg-primary text-background shadow-md' : 'text-text-sub hover:text-text-main'
-              }`}
-            >
-              <FileText className="w-3.5 h-3.5" /> 1. Sections
-            </button>
-            <button 
-              onClick={() => setActiveTab('appearance')}
-              className={`flex-1 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 ${
-                activeTab === 'appearance' ? 'bg-primary text-background shadow-md' : 'text-text-sub hover:text-text-main'
-              }`}
-            >
-              <Sliders className="w-3.5 h-3.5" /> 2. Beautify
-            </button>
-            <button 
-              onClick={() => setActiveTab('versions')}
-              className={`flex-1 py-2.5 rounded-xl font-bold text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 ${
-                activeTab === 'versions' ? 'bg-primary text-background shadow-md' : 'text-text-sub hover:text-text-main'
-              }`}
-            >
-              <LayoutTemplate className="w-3.5 h-3.5" /> 3. History ({savedResumes.length})
-            </button>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        {/* ── Left Panel ─────────────────────────────────────────────── */}
+        <div className="lg:col-span-4 flex flex-col gap-4">
+
+          {/* Tab bar */}
+          <div className="flex bg-surface-2 p-1 rounded-2xl border border-white/5 gap-1">
+            {[
+              { id: 'sections', icon: Layers, label: 'Sections' },
+              { id: 'design', icon: Palette, label: 'Design' },
+              { id: 'history', icon: FolderOpen, label: `Saved (${savedVersions.length})` },
+            ].map(tab => {
+              const Icon = tab.icon;
+              return (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex-1 py-2 rounded-xl font-bold text-[11px] uppercase tracking-wide transition-all flex items-center justify-center gap-1.5 ${activeTab === tab.id ? 'bg-primary text-white shadow-md' : 'text-text-sub hover:text-text-main'}`}>
+                  <Icon className="w-3.5 h-3.5" /> {tab.label}
+                </button>
+              );
+            })}
           </div>
 
-          {/* TAB 1: Content & Ordering */}
-          {activeTab === 'content' && (
-            <div className="flex flex-col gap-6">
-              
-              {/* Open-Resume Feature: Interactive Preset Sample Loading */}
-              <Card className="bg-linear-to-r from-primary/10 to-violet-500/10 border-primary/20 backdrop-blur-md rounded-2xl p-4">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                  <div>
-                    <span className="text-xs font-bold text-primary font-jetbrains uppercase flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5" /> Open-Resume Intake Presets
-                    </span>
-                    <p className="text-xs text-text-sub mt-0.5">Instantly autofill structured data optimized for ATS analysis algorithms.</p>
-                  </div>
-                  <div className="flex gap-2 w-full sm:w-auto">
-                    <Button onClick={() => loadOpenResumePreset('fs')} size="sm" variant="secondary" className="flex-1 sm:flex-none text-[11px] h-8 rounded-lg">
-                      Full Stack Eng
-                    </Button>
-                    <Button onClick={() => loadOpenResumePreset('cloud')} size="sm" variant="secondary" className="flex-1 sm:flex-none text-[11px] h-8 rounded-lg">
-                      Cloud Architect
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Dynamic Section Position Ordering */}
-              <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-xs uppercase font-jetbrains text-primary tracking-wider flex items-center justify-between">
-                    <span>FlowCV Layout Sorting</span>
-                    <span className="text-[10px] text-text-muted normal-case font-sans">Shift up/down to arrange output</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {sectionsOrder.map((sec, idx) => (
-                    <div key={sec.id} className="flex items-center justify-between p-2.5 bg-surface-2 rounded-xl border border-white/5">
-                      <div className="flex items-center gap-2">
-                        <input 
-                          type="checkbox" 
-                          checked={sec.enabled} 
-                          onChange={() => toggleSectionEnabled(sec.id)}
-                          className="rounded border-white/10 accent-primary shrink-0"
-                        />
-                        <input 
+          {/* TAB: Sections */}
+          {activeTab === 'sections' && (
+            <div className="flex flex-col gap-3">
+              <div className="space-y-1.5">
+                {sections.map((sec, idx) => {
+                  const Icon = SECTION_ICONS[sec.type];
+                  const isExpanded = expandedSection === sec.id;
+                  const isCustom = sec.id.startsWith('custom_');
+                  return (
+                    <div key={sec.id} className={`rounded-xl border transition-all ${isExpanded ? 'border-primary/30 bg-surface/70' : 'border-white/5 bg-surface/40'}`}>
+                      {/* Section row */}
+                      <div className="flex items-center gap-2 px-3 py-2">
+                        <GripVertical className="w-3.5 h-3.5 text-text-muted shrink-0 cursor-grab" />
+                        <Icon className="w-3.5 h-3.5 text-text-muted shrink-0" />
+                        <input
                           type="text"
                           value={sec.title}
-                          onChange={(e) => handleSectionTitleChange(sec.id, e.target.value)}
-                          className={`text-xs font-bold bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-primary/50 rounded px-1 w-full ${sec.enabled ? 'text-text-main' : 'text-text-muted line-through opacity-50'}`}
+                          onChange={e => renameSectionTitle(sec.id, e.target.value)}
+                          className={`flex-1 text-xs font-bold bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-primary/50 rounded px-1 min-w-0 ${!sec.visible ? 'text-text-muted opacity-50' : 'text-text-main'}`}
                         />
+                        <div className="flex items-center gap-0.5 shrink-0">
+                          <button onClick={() => toggleVisible(sec.id)} className={`p-1 rounded-lg transition-colors ${sec.visible ? 'text-primary hover:bg-primary/10' : 'text-text-muted hover:bg-surface-2'}`} title={sec.visible ? 'Hide section' : 'Show section'}>
+                            {sec.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                          </button>
+                          <button onClick={() => moveSection(sec.id, -1)} disabled={idx === 0} className="p-1 rounded-lg text-text-muted hover:bg-surface-2 disabled:opacity-30 transition-colors">
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => moveSection(sec.id, 1)} disabled={idx === sections.length - 1} className="p-1 rounded-lg text-text-muted hover:bg-surface-2 disabled:opacity-30 transition-colors">
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => setExpandedSection(isExpanded ? null : sec.id)} className="p-1 rounded-lg text-text-muted hover:bg-surface-2 transition-colors">
+                            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                          </button>
+                          {isCustom && (
+                            <button onClick={() => deleteSection(sec.id)} className="p-1 rounded-lg text-error hover:bg-error/10 transition-colors">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
-                          onClick={() => moveSectionUp(idx)} 
-                          disabled={idx === 0}
-                          className="h-6 w-6 p-0 hover:bg-surface text-text-sub"
-                        >
-                          <ArrowUp className="w-3 h-3" />
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
-                          onClick={() => moveSectionDown(idx)} 
-                          disabled={idx === sectionsOrder.length - 1}
-                          className="h-6 w-6 p-0 hover:bg-surface text-text-sub"
-                        >
-                          <ArrowDown className="w-3 h-3" />
-                        </Button>
-                      </div>
+                      {/* Expanded editor */}
+                      {isExpanded && (
+                        <div className="px-3 pb-3 border-t border-white/5">
+                          {renderEditor(sec)}
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </CardContent>
-              </Card>
+                  );
+                })}
+              </div>
 
-              {/* Personal Details */}
-              <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-bold font-hanken text-text-main">Personal Info Block</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div>
-                    <Label className="text-[11px] text-text-sub mb-1 block">Full Name</Label>
-                    <Input 
-                      value={profile.personalInfo.name} 
-                      onChange={e => setProfile({...profile, personalInfo: {...profile.personalInfo, name: e.target.value}})}
-                      className="bg-surface border-white/10 rounded-xl h-9 text-xs" 
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div>
-                      <Label className="text-[11px] text-text-sub mb-1 block">Email</Label>
-                      <Input 
-                        value={profile.personalInfo.email} 
-                        onChange={e => setProfile({...profile, personalInfo: {...profile.personalInfo, email: e.target.value}})}
-                        className="bg-surface border-white/10 rounded-xl h-9 text-xs" 
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-[11px] text-text-sub mb-1 block">Phone</Label>
-                      <Input 
-                        value={profile.personalInfo.phone} 
-                        onChange={e => setProfile({...profile, personalInfo: {...profile.personalInfo, phone: e.target.value}})}
-                        className="bg-surface border-white/10 rounded-xl h-9 text-xs" 
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div>
-                      <Label className="text-[11px] text-text-sub mb-1 block">LinkedIn</Label>
-                      <Input 
-                        value={profile.personalInfo.linkedin} 
-                        onChange={e => setProfile({...profile, personalInfo: {...profile.personalInfo, linkedin: e.target.value}})}
-                        className="bg-surface border-white/10 rounded-xl h-9 text-xs" 
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-[11px] text-text-sub mb-1 block">Address / Location</Label>
-                      <Input 
-                        value={profile.personalInfo.address || ''} 
-                        onChange={e => setProfile({...profile, personalInfo: {...profile.personalInfo, address: e.target.value}})}
-                        placeholder="e.g. SF, California"
-                        className="bg-surface border-white/10 rounded-xl h-9 text-xs" 
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <Button onClick={addCustomSection} variant="ghost" className="w-full h-9 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-2">
+                <Plus className="w-3.5 h-3.5" /> Add Custom Section
+              </Button>
 
-              {/* Summary */}
-              <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-bold font-hanken text-text-main">Professional Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <textarea 
-                    value={profile.summary}
-                    onChange={e => setProfile({...profile, summary: e.target.value})}
-                    rows={3}
-                    className="w-full bg-surface border border-white/10 rounded-xl p-2.5 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
-                  />
-                </CardContent>
-              </Card>
-
-              {/* Experience */}
-              <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
-                <CardHeader className="pb-3 flex flex-row items-center justify-between">
-                  <CardTitle className="text-sm font-bold font-hanken text-text-main">Work Experience</CardTitle>
-                  <Button onClick={addExperience} size="sm" variant="ghost" className="h-7 text-xs text-primary px-2 hover:bg-surface">
-                    <Plus className="w-3.5 h-3.5 mr-1" /> Add Entry
-                  </Button>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {profile.experience.map((exp, idx) => (
-                    <div key={idx} className="p-3 bg-surface-2 rounded-xl border border-white/5 space-y-2.5 relative group">
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        onClick={() => deleteExperience(idx)}
-                        className="absolute top-2 right-2 h-6 w-6 p-0 text-text-muted hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                      <div className="grid grid-cols-2 gap-2 pr-6">
-                        <Input 
-                          placeholder="Company"
-                          value={exp.company}
-                          onChange={e => handleExpChange(idx, 'company', e.target.value)}
-                          className="h-8 text-xs bg-surface border-white/5 rounded-lg"
-                        />
-                        <Input 
-                          placeholder="Role"
-                          value={exp.role}
-                          onChange={e => handleExpChange(idx, 'role', e.target.value)}
-                          className="h-8 text-xs bg-surface border-white/5 rounded-lg"
-                        />
-                      </div>
-                      <Input 
-                        placeholder="Dates (e.g. 2022 - Present)"
-                        value={exp.dates}
-                        onChange={e => handleExpChange(idx, 'dates', e.target.value)}
-                        className="h-8 text-xs bg-surface border-white/5 rounded-lg w-1/2"
-                      />
-                      <textarea 
-                        value={exp.description}
-                        onChange={e => handleExpChange(idx, 'description', e.target.value)}
-                        rows={2}
-                        placeholder="Bullet responsibilities..."
-                        className="w-full bg-surface border border-white/5 rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
-                      />
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* Skills Array */}
-              <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-bold font-hanken text-text-main">Skills List</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Input 
-                    value={profile.skills}
-                    onChange={e => setProfile({...profile, skills: e.target.value})}
-                    placeholder="Comma separated string..."
-                    className="bg-surface border-white/10 rounded-xl h-9 text-xs"
-                  />
-                </CardContent>
-              </Card>
-
-              {/* Education Block */}
-              <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
-                <CardHeader className="pb-3 flex flex-row items-center justify-between">
-                  <CardTitle className="text-sm font-bold font-hanken text-text-main">Education History</CardTitle>
-                  <Button onClick={addEducation} size="sm" variant="ghost" className="h-7 text-xs text-primary px-2 hover:bg-surface">
-                    <Plus className="w-3.5 h-3.5 mr-1" /> Add Entry
-                  </Button>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {profile.education.map((edu, idx) => (
-                    <div key={idx} className="p-3 bg-surface-2 rounded-xl border border-white/5 space-y-2">
-                      <Input 
-                        placeholder="Institution"
-                        value={edu.institution}
-                        onChange={e => handleEduChange(idx, 'institution', e.target.value)}
-                        className="h-8 text-xs bg-surface border-white/5 rounded-lg"
-                      />
-                      <div className="grid grid-cols-2 gap-2">
-                        <Input 
-                          placeholder="Degree"
-                          value={edu.degree}
-                          onChange={e => handleEduChange(idx, 'degree', e.target.value)}
-                          className="h-8 text-xs bg-surface border-white/5 rounded-lg"
-                        />
-                        <Input 
-                          placeholder="Dates"
-                          value={edu.dates}
-                          onChange={e => handleEduChange(idx, 'dates', e.target.value)}
-                          className="h-8 text-xs bg-surface border-white/5 rounded-lg"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
+              <div className="text-[10px] text-text-muted font-jetbrains text-center">
+                <EyeOff className="w-3 h-3 inline mr-1" /> Hidden sections are preserved — click the eye icon to restore
+              </div>
             </div>
           )}
 
-          {/* TAB 2: Appearance & Beautification Controls */}
-          {activeTab === 'appearance' && (
-            <div className="flex flex-col gap-6">
-              
-              {/* Core Themes Switching (Transfers all active state seamlessly) */}
-              <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl p-5">
-                <span className="text-xs font-jetbrains uppercase text-primary tracking-wider block mb-3 font-bold">Layout Architectures</span>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: 'modern', name: 'Modern Accent' },
-                    { id: 'minimal', name: 'Pure Classic' },
-                    { id: 'executive', name: 'Executive Tier' }
-                  ].map(t => (
-                    <button
-                      key={t.id}
-                      onClick={() => setTemplate(t.id as any)}
-                      className={`p-3 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-1 ${
-                        template === t.id ? 'bg-primary/20 border-primary text-primary font-bold' : 'bg-surface border-white/5 text-text-muted hover:border-white/20'
-                      }`}
-                    >
-                      <span className="text-xs tracking-tight">{t.name}</span>
+          {/* TAB: Design */}
+          {activeTab === 'design' && (
+            <div className="flex flex-col gap-4">
+
+              {/* Template picker */}
+              <Card className="bg-surface/50 border-white/5 rounded-2xl">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xs font-jetbrains uppercase text-primary tracking-wider">Template</CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 gap-2">
+                  {TEMPLATES.map(t => (
+                    <button key={t.id} onClick={() => setAppearance(a => ({ ...a, template: t.id }))}
+                      className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${template === t.id ? 'border-primary bg-primary/10' : 'border-white/5 bg-surface hover:border-white/20'}`}>
+                      {/* Mini template thumbnail */}
+                      <div className="w-10 h-12 rounded border border-white/10 overflow-hidden shrink-0 bg-white relative">
+                        <TemplateThumbnail id={t.id} color={accentColor} />
+                      </div>
+                      <div>
+                        <p className={`text-xs font-bold ${template === t.id ? 'text-primary' : 'text-text-main'}`}>{t.name}</p>
+                        <p className="text-[10px] text-text-muted mt-0.5">{t.desc}</p>
+                      </div>
+                      {template === t.id && <CheckCircle2 className="w-4 h-4 text-primary ml-auto shrink-0" />}
                     </button>
                   ))}
-                </div>
+                </CardContent>
               </Card>
 
-              {/* Font Picker */}
-              <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl p-5">
-                <span className="text-xs font-jetbrains uppercase text-primary tracking-wider block mb-3 font-bold">Typography Families</span>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { id: 'sans-serif', name: 'Inter / System Default', fontClass: 'font-sans' },
-                    { id: 'Georgia, serif', name: 'Georgia Serif', fontClass: 'font-serif' },
-                    { id: '"Courier New", monospace', name: 'JetBrains / Mono', fontClass: 'font-mono' },
-                    { id: '"Arial", sans-serif', name: 'Clean Corporate Arial', fontClass: 'font-sans' }
-                  ].map(f => (
-                    <button
-                      key={f.id}
-                      onClick={() => setFontFamily(f.id)}
-                      className={`p-3 rounded-xl border text-left transition-all ${
-                        fontFamily === f.id ? 'bg-primary/10 border-primary text-text-main font-bold' : 'bg-surface border-white/5 text-text-sub hover:text-text-main'
-                      }`}
-                    >
-                      <span className="text-xs block truncate" style={{ fontFamily: f.id }}>{f.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </Card>
-
-              {/* Open-Resume Feature: Accent Theme Color Picker */}
-              <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl p-5">
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-xs font-jetbrains uppercase text-primary tracking-wider font-bold">Accent Color Theme</span>
-                  <div className="flex items-center gap-1.5">
+              {/* Accent color */}
+              <Card className="bg-surface/50 border-white/5 rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-jetbrains uppercase text-primary tracking-wider font-bold">Accent Color</span>
+                  <div className="flex items-center gap-2">
                     <span className="text-[10px] text-text-muted font-mono">{accentColor}</span>
-                    <input 
-                      type="color" 
-                      value={accentColor}
-                      onChange={e => setAccentColor(e.target.value)}
-                      className="w-5 h-5 rounded border-none cursor-pointer p-0 bg-transparent"
-                    />
+                    <input type="color" value={accentColor} onChange={e => setAppearance(a => ({ ...a, accentColor: e.target.value }))} className="w-6 h-6 rounded border-none cursor-pointer p-0 bg-transparent" />
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { hex: '#2563eb', label: 'Tech Blue' },
-                    { hex: '#059669', label: 'Emerald' },
-                    { hex: '#7c3aed', label: 'Royal Violet' },
-                    { hex: '#dc2626', label: 'Crimson' },
-                    { hex: '#ea580c', label: 'Amber' },
-                    { hex: '#0ea5e9', label: 'Sky' },
-                    { hex: '#475569', label: 'Slate' }
-                  ].map(c => (
-                    <button
-                      key={c.hex}
-                      onClick={() => setAccentColor(c.hex)}
-                      className={`h-7 px-2.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 border ${
-                        accentColor === c.hex ? 'border-white text-white font-bold scale-105' : 'border-white/5 text-text-muted hover:text-text-sub'
-                      }`}
-                      style={{ backgroundColor: `${c.hex}20` }}
-                    >
+                <div className="grid grid-cols-4 gap-1.5">
+                  {ACCENT_PRESETS.map(c => (
+                    <button key={c.hex} onClick={() => setAppearance(a => ({ ...a, accentColor: c.hex }))}
+                      className={`h-8 rounded-lg text-[10px] font-bold transition-all border flex items-center justify-center gap-1 ${accentColor === c.hex ? 'border-white scale-105' : 'border-white/10 hover:border-white/30'}`}
+                      style={{ backgroundColor: `${c.hex}25` }}>
                       <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: c.hex }} />
-                      {c.label}
+                      <span className="text-text-muted">{c.label}</span>
                     </button>
                   ))}
                 </div>
               </Card>
 
-              {/* Layout Alignment sliders */}
-              <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl p-5 space-y-5">
-                
-                {/* Header Align */}
+              {/* Typography & spacing */}
+              <Card className="bg-surface/50 border-white/5 rounded-2xl p-4 space-y-4">
+                <span className="text-xs font-jetbrains uppercase text-primary tracking-wider font-bold block">Typography & Spacing</span>
+
                 <div>
-                  <span className="text-xs font-jetbrains uppercase text-text-sub tracking-wider block mb-2">Header Title Alignment</span>
-                  <div className="flex bg-surface p-1 rounded-xl border border-white/5">
-                    {[
-                      { id: 'left', icon: AlignLeft, label: 'Left' },
-                      { id: 'center', icon: AlignCenter, label: 'Center' },
-                      { id: 'right', icon: AlignRight, label: 'Right' }
-                    ].map(a => (
-                      <button
-                        key={a.id}
-                        onClick={() => setHeaderAlign(a.id as any)}
-                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                          headerAlign === a.id ? 'bg-surface-2 text-primary shadow-sm' : 'text-text-muted hover:text-text-sub'
-                        }`}
-                      >
-                        <a.icon className="w-3.5 h-3.5" /> {a.label}
-                      </button>
+                  <Label className="text-[10px] text-text-muted uppercase tracking-wider mb-2 block">Font Family</Label>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {[['sans-serif', 'Sans-serif'], ['Georgia, serif', 'Serif'], ['"Courier New", monospace', 'Mono'], ['"Arial", sans-serif', 'Arial']].map(([val, label]) => (
+                      <button key={val} onClick={() => setAppearance(a => ({ ...a, fontFamily: val }))}
+                        className={`py-1.5 rounded-lg text-[11px] border transition-all ${fontFamily === val ? 'border-primary bg-primary/10 text-primary font-bold' : 'border-white/5 bg-surface text-text-muted hover:border-white/20'}`}
+                        style={{ fontFamily: val }}>{label}</button>
                     ))}
                   </div>
                 </div>
 
-                {/* Font Scaling Stepper */}
                 <div>
-                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-xs text-text-sub">Base Font Scale</span>
-                    <span className="text-xs font-bold font-mono text-primary">{fontSize}px</span>
+                  <div className="flex justify-between mb-1.5">
+                    <span className="text-xs text-text-sub">Font Size</span>
+                    <span className="text-xs font-mono font-bold text-primary">{fontSize}px</span>
                   </div>
-                  <input 
-                    type="range" 
-                    min={11} 
-                    max={16} 
-                    step={0.5} 
-                    value={fontSize}
-                    onChange={e => setFontSize(parseFloat(e.target.value))}
-                    className="w-full accent-primary bg-surface h-1.5 rounded-lg"
-                  />
+                  <input type="range" min={10} max={16} step={0.5} value={fontSize} onChange={e => setAppearance(a => ({ ...a, fontSize: parseFloat(e.target.value) }))} className="w-full accent-primary h-1.5 rounded-lg" />
                 </div>
 
-                {/* Line Spacing */}
                 <div>
-                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-xs text-text-sub">Vertical Line Spacing</span>
-                    <span className="text-xs font-bold font-mono text-primary">{lineSpacing}x</span>
+                  <div className="flex justify-between mb-1.5">
+                    <span className="text-xs text-text-sub">Line Height</span>
+                    <span className="text-xs font-mono font-bold text-primary">{lineHeight}x</span>
                   </div>
-                  <input 
-                    type="range" 
-                    min={1.1} 
-                    max={2.0} 
-                    step={0.1} 
-                    value={lineSpacing}
-                    onChange={e => setLineSpacing(parseFloat(e.target.value))}
-                    className="w-full accent-primary bg-surface h-1.5 rounded-lg"
-                  />
+                  <input type="range" min={1.1} max={2.0} step={0.1} value={lineHeight} onChange={e => setAppearance(a => ({ ...a, lineHeight: parseFloat(e.target.value) }))} className="w-full accent-primary h-1.5 rounded-lg" />
                 </div>
 
-                {/* Section Padding Spacer */}
                 <div>
-                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-xs text-text-sub">Section Block Separation</span>
-                    <span className="text-xs font-bold font-mono text-primary">{sectionGap}px</span>
+                  <div className="flex justify-between mb-1.5">
+                    <span className="text-xs text-text-sub">Section Gap</span>
+                    <span className="text-xs font-mono font-bold text-primary">{sectionGap}px</span>
                   </div>
-                  <input 
-                    type="range" 
-                    min={10} 
-                    max={35} 
-                    step={1} 
-                    value={sectionGap}
-                    onChange={e => setSectionGap(parseInt(e.target.value))}
-                    className="w-full accent-primary bg-surface h-1.5 rounded-lg"
-                  />
+                  <input type="range" min={10} max={36} step={1} value={sectionGap} onChange={e => setAppearance(a => ({ ...a, sectionGap: parseInt(e.target.value) }))} className="w-full accent-primary h-1.5 rounded-lg" />
                 </div>
 
+                <div>
+                  <Label className="text-[10px] text-text-muted uppercase tracking-wider mb-2 block">Header Alignment</Label>
+                  <div className="flex bg-surface p-1 rounded-xl border border-white/5">
+                    {[['left', AlignLeft], ['center', AlignCenter], ['right', AlignRight]].map(([val, Icon]) => {
+                      const I = Icon as React.ElementType;
+                      return (
+                        <button key={val as string} onClick={() => setAppearance(a => ({ ...a, headerAlign: val as any }))}
+                          className={`flex-1 py-1.5 rounded-lg text-xs transition-all flex items-center justify-center ${headerAlign === val ? 'bg-surface-2 text-primary shadow-sm' : 'text-text-muted hover:text-text-sub'}`}>
+                          <I className="w-3.5 h-3.5" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </Card>
-
-              {/* Live Score update meter */}
-              <div className="p-4 rounded-xl bg-surface-2 border border-white/5">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-text-muted font-jetbrains uppercase">A4 Page Parsing Factor</span>
-                  <span className="text-xs font-bold text-emerald-400">{atsScore}% Optimized</span>
-                </div>
-                <div className="w-full bg-surface h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-emerald-400 h-full rounded-full" style={{ width: `${atsScore}%` }} />
-                </div>
-              </div>
-
             </div>
           )}
 
-          {/* TAB 3: Custom Storage / History List */}
-          {activeTab === 'versions' && (
-            <div className="flex flex-col gap-4">
-              <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 flex flex-col gap-2">
-                <span className="text-xs font-bold text-primary font-jetbrains uppercase tracking-wider">Save Current Studio Setup</span>
-                <p className="text-xs text-text-sub leading-normal">Take persistent offline state snapshots instantly. Your active customized inputs and layout arrays transfer cleanly.</p>
-                <div className="flex gap-2 mt-1">
-                  <Button onClick={() => handleSaveVersion()} size="sm" className="h-8 text-xs font-bold rounded-lg border-none">
-                    Save New Snapshot Entry
-                  </Button>
-                </div>
-              </div>
+          {/* TAB: Saved versions */}
+          {activeTab === 'history' && (
+            <div className="flex flex-col gap-3">
+              <Button onClick={() => saveVersion()} className="w-full h-10 rounded-xl gap-2 text-xs font-bold border-none shadow-lg shadow-primary/20">
+                <Save className="w-3.5 h-3.5" /> Save Current Version
+              </Button>
 
-              <span className="text-xs font-jetbrains uppercase text-text-sub tracking-wider mt-2 block">Stored Snapshot Configurations</span>
-              
-              {savedResumes.length === 0 ? (
-                <div className="text-center p-8 bg-surface/20 rounded-xl border border-white/5">
-                  <p className="text-xs text-text-muted">No custom configuration snapshots preserved yet.</p>
+              {savedVersions.length === 0 ? (
+                <div className="text-center py-12 border border-dashed border-white/10 rounded-2xl">
+                  <p className="text-xs text-text-muted">No saved versions yet.</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {savedResumes.map((item) => (
-                    <div key={item.id} className="p-3.5 bg-surface-2 rounded-xl border border-white/5 flex items-center justify-between group">
-                      <div className="truncate pr-4">
-                        <span className="text-xs font-bold text-text-main block truncate">{item.name}</span>
-                        <span className="text-[10px] text-text-muted block mt-0.5">{item.date} • Template: <span className="capitalize">{item.template || 'modern'}</span></span>
+                <div className="space-y-2">
+                  {savedVersions.map(v => (
+                    <div key={v.id} className="p-3 bg-surface-2 rounded-xl border border-white/5 flex items-center justify-between group">
+                      <div className="min-w-0 mr-3">
+                        <p className="text-xs font-bold text-text-main truncate">{v.name}</p>
+                        <p className="text-[10px] text-text-muted">{v.date} · <span className="capitalize">{v.appearance.template}</span></p>
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <Button 
-                          onClick={() => loadSavedVersion(item)} 
-                          size="sm" 
-                          variant="ghost" 
-                          className="h-7 text-xs px-2.5 gap-1.5 text-primary hover:bg-surface rounded-lg"
-                        >
-                          <FolderOpen className="w-3.5 h-3.5" /> Load
-                        </Button>
-                        <Button 
-                          onClick={() => deleteSavedVersion(item.id)} 
-                          size="sm" 
-                          variant="ghost" 
-                          className="h-7 w-7 p-0 text-text-muted hover:text-red-400 hover:bg-surface rounded-lg"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button onClick={() => loadVersion(v)} size="sm" variant="ghost" className="h-7 px-2 text-xs text-primary rounded-lg gap-1"><FolderOpen className="w-3 h-3" /> Load</Button>
+                        <Button onClick={() => deleteVersion(v.id)} size="sm" variant="ghost" className="h-7 w-7 p-0 text-error rounded-lg"><Trash2 className="w-3 h-3" /></Button>
                       </div>
                     </div>
                   ))}
@@ -880,246 +723,576 @@ export default function ResumeBuilderPage() {
               )}
             </div>
           )}
-
         </div>
 
-        {/* Right Layout Canvas (Strict A4 Page Dimensions ratio mapping) */}
-        <div className="lg:col-span-7 flex flex-col gap-4">
-          {/* Open-Resume Feature: Live Preview Zoom Scale Controller */}
-          <div className="flex justify-between items-center bg-surface-2 px-4 py-2 rounded-xl border border-white/5">
-            <span className="text-xs text-text-sub flex items-center gap-1.5 font-medium">
-              <Sliders className="w-3.5 h-3.5 text-primary" /> Live Canvas Magnification
+        {/* ── Right Panel: A4 Preview ─────────────────────────────────── */}
+        <div className="lg:col-span-8 flex flex-col gap-3">
+
+          {/* Zoom controls */}
+          <div className="flex items-center justify-between bg-surface-2 px-4 py-2 rounded-xl border border-white/5">
+            <span className="text-xs text-text-sub font-medium flex items-center gap-1.5">
+              <Sliders className="w-3.5 h-3.5 text-primary" /> Preview Zoom
             </span>
             <div className="flex items-center gap-1.5">
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                onClick={() => setPreviewZoom(Math.max(0.5, previewZoom - 0.1))} 
-                className="h-6 w-6 p-0 text-xs text-text-muted hover:bg-surface"
-              >
-                -
-              </Button>
-              <span className="text-xs font-mono font-bold text-primary w-12 text-center">
-                {Math.round(previewZoom * 100)}%
-              </span>
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                onClick={() => setPreviewZoom(Math.min(1.5, previewZoom + 0.1))} 
-                className="h-6 w-6 p-0 text-xs text-text-muted hover:bg-surface"
-              >
-                +
-              </Button>
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                onClick={() => setPreviewZoom(1)} 
-                className="h-6 px-2 text-[10px] text-text-muted hover:bg-surface ml-1"
-              >
-                Reset
-              </Button>
+              {[0.5, 0.65, 0.75, 0.9, 1.0].map(z => (
+                <button key={z} onClick={() => setZoom(z)} className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all ${zoom === z ? 'bg-primary text-white font-bold' : 'text-text-muted hover:bg-surface'}`}>{Math.round(z * 100)}%</button>
+              ))}
             </div>
           </div>
 
-          <div className="sticky top-6 flex justify-center overflow-x-auto pb-6">
-            
-            {/* Inner A4 Printable Paper Boundary Container */}
-            <div 
-              className="bg-white text-black p-10 rounded-xl shadow-2xl transition-all select-text shrink-0 printable-resume flowcv-a4-canvas border border-neutral-300 origin-top"
-              style={{
-                width: '210mm',
-                minHeight: '297mm', // absolute A4 metrics standard
-                fontFamily: fontFamily,
-                fontSize: `${fontSize}px`,
-                lineHeight: lineSpacing,
-                color: '#1a1a1a', // true deep contrast printable black
-                transform: `scale(${previewZoom})`,
-                marginBottom: previewZoom > 1 ? `${(previewZoom - 1) * 300}px` : '0px'
-              }}
-            >
-              
-              {/* Header block with selected alignment layout */}
-              <div 
-                className={`border-b-2 pb-5 mb-5 ${
-                  template === 'executive' ? 'border-neutral-400' : template === 'modern' ? '' : 'border-neutral-200'
-                }`}
-                style={{
-                  textAlign: headerAlign,
-                  borderColor: template === 'modern' ? accentColor : undefined
-                }}
-              >
-                <h1 className="font-bold tracking-tight m-0 leading-tight" style={{ fontSize: `${fontSize * 2.2}px`, color: template === 'modern' ? accentColor : '#000' }}>
-                  {profile.personalInfo.name || 'Full Name'}
-                </h1>
-                
-                <div 
-                  className={`flex flex-wrap gap-x-3 gap-y-1 mt-2 text-neutral-600 font-medium`}
-                  style={{ 
-                    fontSize: `${fontSize * 0.85}px`,
-                    justifyContent: headerAlign === 'center' ? 'center' : headerAlign === 'right' ? 'flex-end' : 'flex-start'
-                  }}
-                >
-                  {profile.personalInfo.email && <span>{profile.personalInfo.email}</span>}
-                  {profile.personalInfo.phone && <span>• {profile.personalInfo.phone}</span>}
-                  {profile.personalInfo.address && <span>• {profile.personalInfo.address}</span>}
-                  {profile.personalInfo.linkedin && <span className="text-blue-800">• {profile.personalInfo.linkedin}</span>}
-                  {(profile.personalInfo as any).github && <span className="text-neutral-700">• {(profile.personalInfo as any).github}</span>}
-                  {(profile.personalInfo as any).portfolio && <span className="text-emerald-800">• {(profile.personalInfo as any).portfolio}</span>}
-                  {(profile.personalInfo as any).leetcode && <span className="text-amber-700">• {(profile.personalInfo as any).leetcode}</span>}
-                  {(profile.personalInfo as any).x && <span className="text-neutral-900">• {(profile.personalInfo as any).x}</span>}
-                  {(profile.personalInfo as any).reddit && <span className="text-orange-700">• {(profile.personalInfo as any).reddit}</span>}
-                </div>
-              </div>
-
-              {/* Dynamic sections ordered map based on FlowCV dragging logic */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: `${sectionGap}px` }}>
-                {sectionsOrder.map((sectionMeta) => {
-                  if (!sectionMeta.enabled) return null;
-
-                  // 1. Summary Block
-                  if (sectionMeta.id === 'summary' && profile.summary) {
-                    return (
-                      <div key={sectionMeta.id}>
-                        <h2 
-                          className="font-bold uppercase tracking-widest m-0 pb-1.5 mb-2 border-b border-neutral-200" 
-                          style={{ 
-                            fontSize: `${fontSize * 0.95}px`, 
-                            color: template === 'modern' ? accentColor : '#111',
-                            borderBottom: template === 'modern' ? `1px solid ${accentColor}40` : '1px solid #e5e5e5'
-                          }}
-                        >
-                          {sectionMeta.title}
-                        </h2>
-                        <p className="m-0 leading-relaxed text-justify text-neutral-800" style={{ fontSize: `${fontSize}px` }}>
-                          {profile.summary}
-                        </p>
-                      </div>
-                    );
-                  }
-
-                  // 2. Experience Block
-                  if (sectionMeta.id === 'experience' && profile.experience.length > 0) {
-                    return (
-                      <div key={sectionMeta.id}>
-                        <h2 
-                          className="font-bold uppercase tracking-widest m-0 pb-1.5 mb-3 border-b border-neutral-200" 
-                          style={{ 
-                            fontSize: `${fontSize * 0.95}px`, 
-                            color: template === 'modern' ? accentColor : '#111',
-                            borderBottom: template === 'modern' ? `1px solid ${accentColor}40` : '1px solid #e5e5e5'
-                          }}
-                        >
-                          {sectionMeta.title}
-                        </h2>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: `${sectionGap * 0.7}px` }}>
-                          {profile.experience.map((exp, eIdx) => (
-                            <div key={eIdx} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                              <div className="flex justify-between items-baseline">
-                                <span className="font-bold text-neutral-900" style={{ fontSize: `${fontSize * 1.05}px` }}>{exp.role || 'Role'}</span>
-                                <span className="text-neutral-500 font-mono" style={{ fontSize: `${fontSize * 0.85}px` }}>{exp.dates}</span>
-                              </div>
-                              <div className="font-medium text-neutral-700" style={{ fontSize: `${fontSize * 0.92}px` }}>{exp.company || 'Company'}</div>
-                              {exp.description && (
-                                <div className="mt-1">
-                                  {exp.description.split('\n').map((line, lIdx) => {
-                                    const tLine = line.trim();
-                                    if (!tLine) return null;
-                                    const isBullet = tLine.startsWith('•') || tLine.startsWith('-') || tLine.startsWith('*');
-                                    const cleanText = tLine.replace(/^[•\-*]\s*/, '');
-                                    return (
-                                      <div key={lIdx} className="flex items-start gap-2 text-neutral-700 text-justify leading-normal mt-0.5" style={{ fontSize: `${fontSize * 0.95}px` }}>
-                                        <span className="text-neutral-400 select-none shrink-0" style={{ fontSize: `${fontSize * 0.8}px`, marginTop: '2px' }}>
-                                          {isBullet ? '•' : '•'}
-                                        </span>
-                                        <span className="flex-1">{cleanText}</span>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  // 3. Skills Array Block
-                  if (sectionMeta.id === 'skills' && profile.skills) {
-                    return (
-                      <div key={sectionMeta.id}>
-                        <h2 
-                          className="font-bold uppercase tracking-widest m-0 pb-1.5 mb-2.5 border-b border-neutral-200" 
-                          style={{ 
-                            fontSize: `${fontSize * 0.95}px`, 
-                            color: template === 'modern' ? accentColor : '#111',
-                            borderBottom: template === 'modern' ? `1px solid ${accentColor}40` : '1px solid #e5e5e5'
-                          }}
-                        >
-                          {sectionMeta.title}
-                        </h2>
-                        <div className="flex flex-wrap gap-1.5">
-                          {profile.skills.split(',').map((sk, skIdx) => {
-                            const trimmed = sk.trim();
-                            if (!trimmed) return null;
-                            return (
-                              <span 
-                                key={skIdx} 
-                                className="rounded font-medium border border-neutral-200"
-                                style={{ 
-                                  padding: '2px 8px', 
-                                  fontSize: `${fontSize * 0.85}px`,
-                                  backgroundColor: template === 'modern' ? `${accentColor}10` : '#f5f5f5',
-                                  borderColor: template === 'modern' ? `${accentColor}30` : '#e5e5e5',
-                                  color: template === 'modern' ? accentColor : '#262626'
-                                }}
-                              >
-                                {trimmed}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  // 4. Education Block
-                  if (sectionMeta.id === 'education' && profile.education?.length > 0) {
-                    return (
-                      <div key={sectionMeta.id}>
-                        <h2 
-                          className="font-bold uppercase tracking-widest m-0 pb-1.5 mb-3 border-b border-neutral-200" 
-                          style={{ 
-                            fontSize: `${fontSize * 0.95}px`, 
-                            color: template === 'modern' ? accentColor : '#111',
-                            borderBottom: template === 'modern' ? `1px solid ${accentColor}40` : '1px solid #e5e5e5'
-                          }}
-                        >
-                          {sectionMeta.title}
-                        </h2>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: `${sectionGap * 0.5}px` }}>
-                          {profile.education.map((edu, edIdx) => (
-                            <div key={edIdx} className="flex justify-between items-baseline">
-                              <div>
-                                <span className="font-bold text-neutral-900 block" style={{ fontSize: `${fontSize}px` }}>{edu.degree || 'Degree'}</span>
-                                <span className="text-neutral-600 block mt-0.5" style={{ fontSize: `${fontSize * 0.9}px` }}>{edu.institution || 'Institution'}</span>
-                              </div>
-                              <span className="text-neutral-500 font-mono shrink-0" style={{ fontSize: `${fontSize * 0.85}px` }}>{edu.dates}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  return null;
-                })}
-              </div>
-
+          {/* A4 Canvas */}
+          <div className="overflow-x-auto overflow-y-auto pb-8 flex justify-center" style={{ minHeight: '600px' }}>
+            <div style={{ transform: `scale(${zoom})`, transformOrigin: 'top center', marginBottom: zoom < 1 ? `${(zoom - 1) * 297 * 3.78}px` : '0' }}>
+              <ResumeCanvas
+                data={data}
+                sections={visibleSections}
+                appearance={appearance}
+                allSections={sections}
+              />
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
 
+// ─── Template Thumbnail ─────────────────────────────────────────────────────
+
+function TemplateThumbnail({ id, color }: { id: TemplateId; color: string }) {
+  if (id === 'modern') return (
+    <div className="w-full h-full p-1">
+      <div className="h-2 rounded-sm mb-1" style={{ backgroundColor: color, opacity: 0.9 }} />
+      <div className="space-y-0.5">
+        {[1, 0.7, 0.5, 0.7, 0.5, 0.5].map((w, i) => <div key={i} className="h-0.5 rounded-full bg-gray-300" style={{ width: `${w * 100}%` }} />)}
+      </div>
+      <div className="h-px mt-1 mb-1" style={{ backgroundColor: color, opacity: 0.5 }} />
+      <div className="space-y-0.5">
+        {[0.8, 0.6, 0.6].map((w, i) => <div key={i} className="h-0.5 rounded-full bg-gray-300" style={{ width: `${w * 100}%` }} />)}
+      </div>
+    </div>
+  );
+  if (id === 'classic') return (
+    <div className="w-full h-full p-1">
+      <div className="text-center mb-1">
+        <div className="h-1.5 rounded-sm bg-gray-800 mx-auto mb-0.5" style={{ width: '70%' }} />
+        <div className="h-0.5 rounded-sm bg-gray-400 mx-auto" style={{ width: '50%' }} />
+      </div>
+      <div className="border-b border-gray-700 pb-0.5 mb-1">
+        <div className="h-0.5 bg-gray-700 rounded" style={{ width: '40%' }} />
+      </div>
+      <div className="space-y-0.5">
+        {[0.9, 0.7, 0.6].map((w, i) => <div key={i} className="h-0.5 rounded-full bg-gray-300" style={{ width: `${w * 100}%` }} />)}
+      </div>
+    </div>
+  );
+  if (id === 'executive') return (
+    <div className="w-full h-full">
+      <div className="h-4 w-full mb-1 flex items-center px-1.5" style={{ backgroundColor: color }}>
+        <div className="h-1 rounded-sm bg-white opacity-90" style={{ width: '60%' }} />
+      </div>
+      <div className="px-1 space-y-0.5">
+        <div className="flex items-center gap-0.5 mb-0.5">
+          <div className="h-3 w-0.5 rounded-full" style={{ backgroundColor: color }} />
+          <div className="h-0.5 rounded-full bg-gray-700" style={{ width: '40%' }} />
+        </div>
+        {[0.8, 0.6, 0.7].map((w, i) => <div key={i} className="h-0.5 rounded-full bg-gray-300" style={{ width: `${w * 100}%` }} />)}
+      </div>
+    </div>
+  );
+  if (id === 'sidebar') return (
+    <div className="w-full h-full flex">
+      <div className="w-2/5 h-full p-0.5 flex flex-col gap-0.5" style={{ backgroundColor: `${color}20` }}>
+        <div className="h-0.5 rounded bg-gray-600" style={{ width: '80%' }} />
+        <div className="h-0.5 rounded bg-gray-400" style={{ width: '60%' }} />
+        <div className="h-0.5 rounded bg-gray-400" style={{ width: '70%' }} />
+        <div className="h-0.5 rounded bg-gray-400" style={{ width: '50%' }} />
+      </div>
+      <div className="flex-1 p-0.5 space-y-0.5">
+        {[0.9, 0.7, 0.8, 0.6].map((w, i) => <div key={i} className="h-0.5 rounded-full bg-gray-300" style={{ width: `${w * 100}%` }} />)}
+      </div>
+    </div>
+  );
+  // minimal
+  return (
+    <div className="w-full h-full p-1.5">
+      <div className="h-1 rounded-sm bg-gray-800 mb-1.5" style={{ width: '55%' }} />
+      <div className="space-y-0.5 mb-1.5">
+        {[0.5, 0.4].map((w, i) => <div key={i} className="h-0.5 rounded-full bg-gray-300" style={{ width: `${w * 100}%` }} />)}
+      </div>
+      <div className="h-px bg-gray-200 mb-1" />
+      <div className="space-y-0.5">
+        {[0.8, 0.6, 0.7].map((w, i) => <div key={i} className="h-0.5 rounded-full bg-gray-200" style={{ width: `${w * 100}%` }} />)}
+      </div>
+    </div>
+  );
+}
+
+// ─── Resume Canvas ───────────────────────────────────────────────────────────
+
+interface CanvasProps {
+  data: ResumeData;
+  sections: SectionDef[];      // only visible ones
+  allSections: SectionDef[];   // all (for sidebar column logic)
+  appearance: AppearanceConfig;
+}
+
+function ResumeCanvas({ data, sections, appearance }: CanvasProps) {
+  const { template } = appearance;
+  if (template === 'sidebar') return <SidebarTemplate data={data} sections={sections} appearance={appearance} />;
+  return <SingleColumnTemplate data={data} sections={sections} appearance={appearance} />;
+}
+
+// ─── Single-column templates (Modern, Classic, Executive, Minimal) ───────────
+
+function SingleColumnTemplate({ data, sections, appearance }: { data: ResumeData; sections: SectionDef[]; appearance: AppearanceConfig }) {
+  const { template, accentColor, fontFamily, fontSize, lineHeight, sectionGap, headerAlign } = appearance;
+
+  const headingStyle = (): React.CSSProperties => {
+    if (template === 'modern') return { color: accentColor, borderBottom: `1.5px solid ${accentColor}40` };
+    if (template === 'classic') return { color: '#111', borderBottom: '2px solid #111' };
+    if (template === 'executive') return { color: '#111', borderLeft: `3px solid ${accentColor}`, paddingLeft: '8px' };
+    // minimal
+    return { color: '#555', borderBottom: '1px solid #e5e5e5', letterSpacing: '0.12em' };
+  };
+
+  const renderSectionHeading = (title: string) => (
+    <h2 style={{ fontSize: `${fontSize * 0.88}px`, fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', paddingBottom: '4px', display: 'block', ...headingStyle() }}>
+      {title}
+    </h2>
+  );
+
+  const renderBullets = (text: string) => text.split('\n').map((line, i) => {
+    const t = line.trim();
+    if (!t) return null;
+    const clean = t.replace(/^[•\-*]\s*/, '');
+    return (
+      <div key={i} style={{ display: 'flex', gap: '6px', marginTop: '3px', fontSize: `${fontSize * 0.95}px`, color: '#444', lineHeight }}>
+        <span style={{ color: accentColor, fontWeight: 700, marginTop: '1px', fontSize: `${fontSize * 0.8}px` }}>▸</span>
+        <span style={{ flex: 1 }}>{clean}</span>
+      </div>
+    );
+  });
+
+  const headerBg = template === 'executive' ? accentColor : 'transparent';
+  const headerTextColor = template === 'executive' ? '#fff' : template === 'modern' ? accentColor : '#111';
+  const headerSubColor = template === 'executive' ? 'rgba(255,255,255,0.8)' : '#555';
+
+  return (
+    <div className="printable-resume bg-white text-black shadow-2xl border border-neutral-200 rounded-sm" style={{ width: '794px', minHeight: '1123px', fontFamily, fontSize: `${fontSize}px`, lineHeight, color: '#222' }}>
+
+      {/* Header */}
+      <div style={{ backgroundColor: headerBg, padding: template === 'executive' ? '28px 40px 24px' : '36px 40px 20px', textAlign: headerAlign, borderBottom: template !== 'executive' ? `3px solid ${accentColor}` : 'none' }}>
+        <h1 style={{ fontSize: `${fontSize * 2.4}px`, fontWeight: 800, letterSpacing: '-0.5px', margin: 0, color: headerTextColor, lineHeight: 1.1 }}>
+          {data.personal.name || 'Your Name'}
+        </h1>
+        {data.personal.title && (
+          <p style={{ fontSize: `${fontSize * 1.1}px`, fontWeight: 500, margin: '4px 0 0', color: template === 'executive' ? 'rgba(255,255,255,0.85)' : accentColor }}>
+            {data.personal.title}
+          </p>
+        )}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 16px', marginTop: '10px', fontSize: `${fontSize * 0.85}px`, color: headerSubColor, justifyContent: headerAlign === 'center' ? 'center' : headerAlign === 'right' ? 'flex-end' : 'flex-start' }}>
+          {data.personal.email && <span>✉ {data.personal.email}</span>}
+          {data.personal.phone && <span>✆ {data.personal.phone}</span>}
+          {data.personal.location && <span>⊙ {data.personal.location}</span>}
+          {data.personal.linkedin && <span>in {data.personal.linkedin}</span>}
+          {data.personal.github && <span>⌥ {data.personal.github}</span>}
+          {data.personal.portfolio && <span>⇢ {data.personal.portfolio}</span>}
+          {data.personal.x && <span>𝕏 {data.personal.x}</span>}
+        </div>
+      </div>
+
+      {/* Sections */}
+      <div style={{ padding: '24px 40px', display: 'flex', flexDirection: 'column', gap: `${sectionGap}px` }}>
+        {sections.filter(s => s.type !== 'personal').map(sec => {
+          switch (sec.type) {
+            case 'summary':
+              if (!data.summary) return null;
+              return (
+                <div key={sec.id}>
+                  {renderSectionHeading(sec.title)}
+                  <p style={{ margin: 0, fontSize: `${fontSize}px`, color: '#333', lineHeight, textAlign: 'justify' }}>{data.summary}</p>
+                </div>
+              );
+            case 'experience':
+              if (!data.experience.length) return null;
+              return (
+                <div key={sec.id}>
+                  {renderSectionHeading(sec.title)}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: `${sectionGap * 0.65}px` }}>
+                    {data.experience.map((exp, i) => (
+                      <div key={i} style={{ borderLeft: template === 'executive' ? `2px solid ${accentColor}20` : 'none', paddingLeft: template === 'executive' ? '10px' : '0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                          <strong style={{ fontSize: `${fontSize * 1.05}px`, color: '#111' }}>{exp.role || 'Role'}</strong>
+                          <span style={{ fontSize: `${fontSize * 0.82}px`, color: '#888', fontStyle: 'italic' }}>{exp.dates}</span>
+                        </div>
+                        <div style={{ fontSize: `${fontSize * 0.92}px`, color: accentColor, fontWeight: 600, marginTop: '1px' }}>
+                          {exp.company}{exp.location ? ` · ${exp.location}` : ''}
+                        </div>
+                        {exp.bullets && <div style={{ marginTop: '5px' }}>{renderBullets(exp.bullets)}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            case 'education':
+              if (!data.education.length) return null;
+              return (
+                <div key={sec.id}>
+                  {renderSectionHeading(sec.title)}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: `${sectionGap * 0.4}px` }}>
+                    {data.education.map((edu, i) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <strong style={{ fontSize: `${fontSize}px`, color: '#111' }}>{edu.degree}{edu.field ? `, ${edu.field}` : ''}</strong>
+                          <div style={{ fontSize: `${fontSize * 0.9}px`, color: '#555', marginTop: '1px' }}>{edu.institution}{edu.gpa ? ` · GPA: ${edu.gpa}` : ''}</div>
+                        </div>
+                        <span style={{ fontSize: `${fontSize * 0.85}px`, color: '#888', whiteSpace: 'nowrap', marginLeft: '12px', marginTop: '2px' }}>{edu.dates}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            case 'skills':
+              if (!data.skills.some(g => g.items.trim())) return null;
+              return (
+                <div key={sec.id}>
+                  {renderSectionHeading(sec.title)}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {data.skills.map((grp, i) => {
+                      if (!grp.items.trim()) return null;
+                      const skillList = grp.items.split(',').map(s => s.trim()).filter(Boolean);
+                      return (
+                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                          {grp.category && (
+                            <span style={{ fontSize: `${fontSize * 0.85}px`, color: '#555', fontWeight: 600, minWidth: '90px', paddingTop: '2px' }}>{grp.category}:</span>
+                          )}
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', flex: 1 }}>
+                            {skillList.map((sk, j) => (
+                              <span key={j} style={{ fontSize: `${fontSize * 0.82}px`, padding: '2px 8px', borderRadius: '4px', border: `1px solid ${accentColor}30`, backgroundColor: template === 'minimal' ? 'transparent' : `${accentColor}0e`, color: template === 'minimal' ? '#444' : accentColor, fontWeight: 500 }}>{sk}</span>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            case 'projects':
+              if (!data.projects.length) return null;
+              return (
+                <div key={sec.id}>
+                  {renderSectionHeading(sec.title)}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: `${sectionGap * 0.65}px` }}>
+                    {data.projects.map((proj, i) => (
+                      <div key={i}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                          <span style={{ fontWeight: 700, fontSize: `${fontSize}px`, color: '#111' }}>{proj.name}</span>
+                          <span style={{ fontSize: `${fontSize * 0.82}px`, color: '#888', fontStyle: 'italic' }}>{proj.dates}</span>
+                        </div>
+                        {proj.tech && <div style={{ fontSize: `${fontSize * 0.85}px`, color: accentColor, fontWeight: 600, marginTop: '1px' }}>{proj.tech}</div>}
+                        {proj.url && <div style={{ fontSize: `${fontSize * 0.82}px`, color: '#777', marginTop: '1px' }}>{proj.url}</div>}
+                        {proj.description && <div style={{ marginTop: '4px' }}>{renderBullets(proj.description)}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            case 'certifications':
+              if (!data.certifications.length) return null;
+              return (
+                <div key={sec.id}>
+                  {renderSectionHeading(sec.title)}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    {data.certifications.map((c, i) => (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                        <span style={{ fontSize: `${fontSize}px`, color: '#111', fontWeight: 600 }}>{c.name}</span>
+                        <span style={{ fontSize: `${fontSize * 0.85}px`, color: '#888' }}>{c.issuer}{c.date ? ` · ${c.date}` : ''}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            case 'languages':
+              if (!data.languages.length) return null;
+              return (
+                <div key={sec.id}>
+                  {renderSectionHeading(sec.title)}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 20px' }}>
+                    {data.languages.map((l, i) => (
+                      <span key={i} style={{ fontSize: `${fontSize * 0.92}px`, color: '#333' }}>
+                        <strong>{l.language}</strong> <span style={{ color: '#777' }}>— {l.proficiency}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            case 'references':
+              if (!data.references.length) return null;
+              return (
+                <div key={sec.id}>
+                  {renderSectionHeading(sec.title)}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    {data.references.map((r, i) => (
+                      <div key={i} style={{ padding: '8px 10px', border: `1px solid ${accentColor}20`, borderRadius: '4px' }}>
+                        <div style={{ fontWeight: 700, fontSize: `${fontSize}px`, color: '#111' }}>{r.name}</div>
+                        <div style={{ fontSize: `${fontSize * 0.88}px`, color: accentColor }}>{r.title}{r.company ? `, ${r.company}` : ''}</div>
+                        {r.contact && <div style={{ fontSize: `${fontSize * 0.82}px`, color: '#666', marginTop: '2px' }}>{r.contact}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            case 'custom': {
+              const items = data.custom[sec.id] || [];
+              if (!items.length) return null;
+              return (
+                <div key={sec.id}>
+                  {renderSectionHeading(sec.title)}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {items.map((item, i) => (
+                      <div key={i}>
+                        {item.heading && <strong style={{ fontSize: `${fontSize}px`, color: '#111', display: 'block' }}>{item.heading}</strong>}
+                        {item.body && <p style={{ margin: '2px 0 0', fontSize: `${fontSize * 0.95}px`, color: '#444', lineHeight }}>{item.body}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            default: return null;
+          }
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Sidebar Template ────────────────────────────────────────────────────────
+
+function SidebarTemplate({ data, sections, appearance }: { data: ResumeData; sections: SectionDef[]; appearance: AppearanceConfig }) {
+  const { accentColor, fontFamily, fontSize, lineHeight, sectionGap } = appearance;
+
+  const SIDEBAR_TYPES: SectionType[] = ['skills', 'education', 'certifications', 'languages'];
+  const MAIN_TYPES: SectionType[] = ['summary', 'experience', 'projects', 'references', 'custom'];
+
+  const sidebarSections = sections.filter(s => SIDEBAR_TYPES.includes(s.type));
+  const mainSections = sections.filter(s => MAIN_TYPES.includes(s.type));
+
+  const sideHeading = (title: string) => (
+    <h2 style={{ fontSize: `${fontSize * 0.82}px`, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.9)', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: '4px', marginBottom: '8px' }}>
+      {title}
+    </h2>
+  );
+
+  const mainHeading = (title: string) => (
+    <h2 style={{ fontSize: `${fontSize * 0.88}px`, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: accentColor, borderBottom: `1.5px solid ${accentColor}35`, paddingBottom: '4px', marginBottom: '8px' }}>
+      {title}
+    </h2>
+  );
+
+  const renderBullets = (text: string, dark = false) => text.split('\n').map((line, i) => {
+    const t = line.trim();
+    if (!t) return null;
+    const clean = t.replace(/^[•\-*]\s*/, '');
+    return (
+      <div key={i} style={{ display: 'flex', gap: '5px', marginTop: '3px', fontSize: `${fontSize * 0.92}px`, color: dark ? 'rgba(255,255,255,0.75)' : '#444', lineHeight }}>
+        <span style={{ color: dark ? 'rgba(255,255,255,0.5)' : accentColor, marginTop: '1px', fontSize: `${fontSize * 0.75}px` }}>▸</span>
+        <span>{clean}</span>
+      </div>
+    );
+  });
+
+  return (
+    <div className="printable-resume bg-white text-black shadow-2xl border border-neutral-200 rounded-sm" style={{ width: '794px', minHeight: '1123px', fontFamily, fontSize: `${fontSize}px`, lineHeight, color: '#222', display: 'flex', flexDirection: 'column' }}>
+
+      {/* Header full width */}
+      <div style={{ backgroundColor: accentColor, padding: '28px 32px 22px', color: '#fff' }}>
+        <h1 style={{ fontSize: `${fontSize * 2.3}px`, fontWeight: 800, margin: 0, letterSpacing: '-0.5px', lineHeight: 1.1 }}>
+          {data.personal.name || 'Your Name'}
+        </h1>
+        {data.personal.title && (
+          <p style={{ fontSize: `${fontSize * 1.05}px`, margin: '4px 0 0', opacity: 0.85, fontWeight: 500 }}>{data.personal.title}</p>
+        )}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 16px', marginTop: '10px', fontSize: `${fontSize * 0.82}px`, opacity: 0.8 }}>
+          {data.personal.email && <span>✉ {data.personal.email}</span>}
+          {data.personal.phone && <span>✆ {data.personal.phone}</span>}
+          {data.personal.location && <span>⊙ {data.personal.location}</span>}
+          {data.personal.linkedin && <span>in {data.personal.linkedin}</span>}
+          {data.personal.github && <span>⌥ {data.personal.github}</span>}
+          {data.personal.portfolio && <span>⇢ {data.personal.portfolio}</span>}
+        </div>
+      </div>
+
+      {/* Two columns */}
+      <div style={{ display: 'flex', flex: 1 }}>
+
+        {/* Left sidebar */}
+        <div style={{ width: '260px', minWidth: '260px', backgroundColor: `${accentColor}12`, padding: '24px 20px', display: 'flex', flexDirection: 'column', gap: `${sectionGap * 0.9}px`, borderRight: `2px solid ${accentColor}20` }}>
+          {sidebarSections.map(sec => {
+            switch (sec.type) {
+              case 'skills':
+                if (!data.skills.some(g => g.items.trim())) return null;
+                return (
+                  <div key={sec.id}>
+                    {sideHeading(sec.title)}
+                    {data.skills.map((grp, i) => {
+                      if (!grp.items.trim()) return null;
+                      const skillList = grp.items.split(',').map(s => s.trim()).filter(Boolean);
+                      return (
+                        <div key={i} style={{ marginBottom: '8px' }}>
+                          {grp.category && <div style={{ fontSize: `${fontSize * 0.8}px`, fontWeight: 700, color: accentColor, marginBottom: '3px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{grp.category}</div>}
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
+                            {skillList.map((sk, j) => (
+                              <span key={j} style={{ fontSize: `${fontSize * 0.8}px`, padding: '1px 6px', borderRadius: '3px', backgroundColor: `${accentColor}18`, color: accentColor, border: `1px solid ${accentColor}30`, fontWeight: 500 }}>{sk}</span>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              case 'education':
+                if (!data.education.length) return null;
+                return (
+                  <div key={sec.id}>
+                    {sideHeading(sec.title)}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {data.education.map((edu, i) => (
+                        <div key={i}>
+                          <div style={{ fontWeight: 700, fontSize: `${fontSize * 0.88}px`, color: '#111' }}>{edu.degree}</div>
+                          {edu.field && <div style={{ fontSize: `${fontSize * 0.82}px`, color: '#444' }}>{edu.field}</div>}
+                          <div style={{ fontSize: `${fontSize * 0.82}px`, color: accentColor, fontWeight: 600 }}>{edu.institution}</div>
+                          <div style={{ fontSize: `${fontSize * 0.78}px`, color: '#666', marginTop: '1px' }}>{edu.dates}{edu.gpa ? ` · ${edu.gpa}` : ''}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              case 'certifications':
+                if (!data.certifications.length) return null;
+                return (
+                  <div key={sec.id}>
+                    {sideHeading(sec.title)}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {data.certifications.map((c, i) => (
+                        <div key={i}>
+                          <div style={{ fontWeight: 600, fontSize: `${fontSize * 0.85}px`, color: '#111' }}>{c.name}</div>
+                          <div style={{ fontSize: `${fontSize * 0.78}px`, color: '#666' }}>{c.issuer}{c.date ? ` · ${c.date}` : ''}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              case 'languages':
+                if (!data.languages.length) return null;
+                return (
+                  <div key={sec.id}>
+                    {sideHeading(sec.title)}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      {data.languages.map((l, i) => (
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: `${fontSize * 0.85}px` }}>
+                          <span style={{ fontWeight: 600, color: '#111' }}>{l.language}</span>
+                          <span style={{ color: '#777' }}>{l.proficiency}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              default: return null;
+            }
+          })}
+        </div>
+
+        {/* Right main */}
+        <div style={{ flex: 1, padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: `${sectionGap}px` }}>
+          {mainSections.map(sec => {
+            switch (sec.type) {
+              case 'summary':
+                if (!data.summary) return null;
+                return (
+                  <div key={sec.id}>
+                    {mainHeading(sec.title)}
+                    <p style={{ margin: 0, fontSize: `${fontSize}px`, color: '#333', lineHeight, textAlign: 'justify' }}>{data.summary}</p>
+                  </div>
+                );
+              case 'experience':
+                if (!data.experience.length) return null;
+                return (
+                  <div key={sec.id}>
+                    {mainHeading(sec.title)}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: `${sectionGap * 0.65}px` }}>
+                      {data.experience.map((exp, i) => (
+                        <div key={i}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                            <strong style={{ fontSize: `${fontSize * 1.02}px`, color: '#111' }}>{exp.role || 'Role'}</strong>
+                            <span style={{ fontSize: `${fontSize * 0.8}px`, color: '#888', fontStyle: 'italic' }}>{exp.dates}</span>
+                          </div>
+                          <div style={{ fontSize: `${fontSize * 0.9}px`, color: accentColor, fontWeight: 600, marginTop: '1px' }}>
+                            {exp.company}{exp.location ? ` · ${exp.location}` : ''}
+                          </div>
+                          {exp.bullets && <div style={{ marginTop: '5px' }}>{renderBullets(exp.bullets)}</div>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              case 'projects':
+                if (!data.projects.length) return null;
+                return (
+                  <div key={sec.id}>
+                    {mainHeading(sec.title)}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: `${sectionGap * 0.6}px` }}>
+                      {data.projects.map((proj, i) => (
+                        <div key={i}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ fontWeight: 700, fontSize: `${fontSize}px`, color: '#111' }}>{proj.name}</span>
+                            <span style={{ fontSize: `${fontSize * 0.82}px`, color: '#888' }}>{proj.dates}</span>
+                          </div>
+                          {proj.tech && <div style={{ fontSize: `${fontSize * 0.82}px`, color: accentColor, fontWeight: 600 }}>{proj.tech}</div>}
+                          {proj.description && <div style={{ marginTop: '3px' }}>{renderBullets(proj.description)}</div>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              case 'references':
+                if (!data.references.length) return null;
+                return (
+                  <div key={sec.id}>
+                    {mainHeading(sec.title)}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                      {data.references.map((r, i) => (
+                        <div key={i} style={{ padding: '8px', border: `1px solid ${accentColor}20`, borderRadius: '4px' }}>
+                          <div style={{ fontWeight: 700, fontSize: `${fontSize * 0.92}px`, color: '#111' }}>{r.name}</div>
+                          <div style={{ fontSize: `${fontSize * 0.82}px`, color: accentColor }}>{r.title}{r.company ? `, ${r.company}` : ''}</div>
+                          {r.contact && <div style={{ fontSize: `${fontSize * 0.78}px`, color: '#666' }}>{r.contact}</div>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              case 'custom': {
+                const items = data.custom[sec.id] || [];
+                if (!items.length) return null;
+                return (
+                  <div key={sec.id}>
+                    {mainHeading(sec.title)}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {items.map((item, i) => (
+                        <div key={i}>
+                          {item.heading && <strong style={{ fontSize: `${fontSize}px`, color: '#111', display: 'block' }}>{item.heading}</strong>}
+                          {item.body && <p style={{ margin: '2px 0 0', fontSize: `${fontSize * 0.95}px`, color: '#444', lineHeight }}>{item.body}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+              default: return null;
+            }
+          })}
+        </div>
       </div>
     </div>
   );

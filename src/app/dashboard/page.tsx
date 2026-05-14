@@ -214,7 +214,7 @@ export default function DashboardOverview() {
                       <div className="flex items-center gap-6">
                          <div className="hidden sm:block text-right">
                             <p className="text-xs text-text-sub font-jetbrains">
-                               {app.dateApplied ? new Date(app.dateApplied).toISOString().split('T')[0] : ''}
+                               {app.dateApplied ? new Date(app.dateApplied).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''}
                             </p>
                             <p className="text-[10px] text-text-muted uppercase tracking-tighter">Applied Date</p>
                          </div>

@@ -17,10 +17,18 @@ import { useDropzone } from 'react-dropzone';
 import api from '@/lib/api';
 import { toast } from 'sonner';
 
-const toStandardDate = (looseStr: string): string => {
-  if (!looseStr || looseStr.toLowerCase().includes('present')) return '';
-  const trimmed = looseStr.trim();
-  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+// Convert any stored date string to MM/DD/YYYY for display in date inputs
+const toDisplayDate = (stored: string): string => {
+  if (!stored || stored.toLowerCase().includes('present')) return '';
+  const trimmed = stored.trim();
+  // Already MM/DD/YYYY
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(trimmed)) return trimmed;
+  // ISO YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    const [y, m, d] = trimmed.split('-');
+    return `${m}/${d}/${y}`;
+  }
+  // Try parsing loosely
   const yearMatch = trimmed.match(/\b(19|20)\d{2}\b/);
   if (yearMatch) {
     const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
@@ -29,9 +37,30 @@ const toStandardDate = (looseStr: string): string => {
     for (let i = 0; i < months.length; i++) {
       if (lower.includes(months[i])) { monthIdx = i; break; }
     }
-    return `${yearMatch[0]}-${String(monthIdx + 1).padStart(2, '0')}-01`;
+    return `${String(monthIdx + 1).padStart(2, '0')}/01/${yearMatch[0]}`;
   }
-  return '';
+  return trimmed;
+};
+
+// Convert MM/DD/YYYY input back to stored value
+const fromDisplayDate = (display: string): string => display.trim();
+
+// Convert any stored month string to MM/YYYY for display
+const toDisplayMonth = (stored: string): string => {
+  if (!stored) return '';
+  const trimmed = stored.trim();
+  if (/^\d{2}\/\d{4}$/.test(trimmed)) return trimmed;
+  // ISO YYYY-MM
+  if (/^\d{4}-\d{2}$/.test(trimmed)) {
+    const [y, m] = trimmed.split('-');
+    return `${m}/${y}`;
+  }
+  // ISO YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    const [y, m] = trimmed.split('-');
+    return `${m}/${y}`;
+  }
+  return trimmed;
 };
 
 type SectionKey = 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications';
@@ -429,25 +458,26 @@ export default function MasterResumePage() {
                       <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Date Range</Label>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <span className="text-[9px] text-text-muted block font-jetbrains uppercase mb-1">From</span>
+                          <span className="text-[9px] text-text-muted block font-jetbrains uppercase mb-1">From (MM/DD/YYYY)</span>
                           <Input
-                            type="date"
-                            value={toStandardDate((watch(`experience.${index}.dates` as const) || '').split(' to ')[0]?.split(' - ')[0] || '')}
+                            type="text"
+                            placeholder="MM/DD/YYYY"
+                            value={toDisplayDate((watch(`experience.${index}.dates` as const) || '').split(' to ')[0]?.trim() || '')}
                             onChange={e => {
                               const curr = watch(`experience.${index}.dates` as const) || '';
-                              const toVal = curr.includes(' to ') ? curr.split(' to ')[1] : '';
-                              setValue(`experience.${index}.dates` as const, `${e.target.value}${toVal ? ` to ${toVal}` : ''}`, { shouldDirty: true });
+                              const toVal = curr.includes(' to ') ? curr.split(' to ')[1].trim() : '';
+                              setValue(`experience.${index}.dates` as const, `${fromDisplayDate(e.target.value)}${toVal ? ` to ${toVal}` : ''}`, { shouldDirty: true });
                             }}
                             className="bg-surface-2 border-none h-10 rounded-xl text-sm"
                           />
                         </div>
                         <div>
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-[9px] text-text-muted block font-jetbrains uppercase">To</span>
+                            <span className="text-[9px] text-text-muted block font-jetbrains uppercase">To (MM/DD/YYYY)</span>
                             <button type="button" onClick={() => {
                               const curr = watch(`experience.${index}.dates` as const) || '';
                               const isPresent = curr.toLowerCase().includes('present');
-                              const fromVal = curr.split(' to ')[0]?.split(' - ')[0] || curr.replace(/\s*(?:to|-)?\s*present/i, '').trim();
+                              const fromVal = curr.split(' to ')[0]?.trim() || curr.replace(/\s*(?:to|-)?\s*present/i, '').trim();
                               setValue(`experience.${index}.dates` as const, isPresent ? fromVal : `${fromVal ? `${fromVal} to ` : ''}Present`, { shouldDirty: true });
                             }}
                               className={`text-[9px] font-jetbrains uppercase px-1.5 py-0.5 rounded transition-all ${(watch(`experience.${index}.dates` as const) || '').toLowerCase().includes('present') ? 'bg-primary/20 text-primary border border-primary/30' : 'text-text-muted hover:text-text-main bg-surface-2'}`}>
@@ -456,17 +486,18 @@ export default function MasterResumePage() {
                           </div>
                           {(watch(`experience.${index}.dates` as const) || '').toLowerCase().includes('present') ? (
                             <div className="bg-primary/10 border border-primary/20 h-10 rounded-xl flex items-center px-3 text-xs text-primary font-bold cursor-pointer"
-                              onClick={() => { const curr = watch(`experience.${index}.dates` as const) || ''; setValue(`experience.${index}.dates` as const, curr.split(' to ')[0], { shouldDirty: true }); }}>
+                              onClick={() => { const curr = watch(`experience.${index}.dates` as const) || ''; setValue(`experience.${index}.dates` as const, curr.split(' to ')[0].trim(), { shouldDirty: true }); }}>
                               Present
                             </div>
                           ) : (
                             <Input
-                              type="date"
-                              value={toStandardDate((watch(`experience.${index}.dates` as const) || '').split(' to ')[1] || '')}
+                              type="text"
+                              placeholder="MM/DD/YYYY"
+                              value={toDisplayDate((watch(`experience.${index}.dates` as const) || '').split(' to ')[1]?.trim() || '')}
                               onChange={e => {
                                 const curr = watch(`experience.${index}.dates` as const) || '';
-                                const fromVal = curr.split(' to ')[0] || curr;
-                                setValue(`experience.${index}.dates` as const, `${fromVal ? `${fromVal} to ` : ''}${e.target.value}`, { shouldDirty: true });
+                                const fromVal = curr.split(' to ')[0]?.trim() || curr;
+                                setValue(`experience.${index}.dates` as const, `${fromVal ? `${fromVal} to ` : ''}${fromDisplayDate(e.target.value)}`, { shouldDirty: true });
                               }}
                               className="bg-surface-2 border-none h-10 rounded-xl text-sm"
                             />
@@ -543,12 +574,24 @@ export default function MasterResumePage() {
                       <Input {...register(`education.${index}.field` as const)} placeholder="e.g. Computer Science" className="bg-surface-2 border-none h-10 rounded-xl" />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Start Date</Label>
-                      <Input type="month" {...register(`education.${index}.startDate` as const)} className="bg-surface-2 border-none h-10 rounded-xl text-sm" />
+                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Start Date (MM/YYYY)</Label>
+                      <Input
+                        type="text"
+                        placeholder="MM/YYYY"
+                        value={toDisplayMonth(watch(`education.${index}.startDate` as const) || '')}
+                        onChange={e => setValue(`education.${index}.startDate` as const, e.target.value, { shouldDirty: true })}
+                        className="bg-surface-2 border-none h-10 rounded-xl text-sm"
+                      />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">End Date</Label>
-                      <Input type="month" {...register(`education.${index}.endDate` as const)} placeholder="Present if ongoing" className="bg-surface-2 border-none h-10 rounded-xl text-sm" />
+                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">End Date (MM/YYYY)</Label>
+                      <Input
+                        type="text"
+                        placeholder="MM/YYYY or Present"
+                        value={toDisplayMonth(watch(`education.${index}.endDate` as const) || '')}
+                        onChange={e => setValue(`education.${index}.endDate` as const, e.target.value, { shouldDirty: true })}
+                        className="bg-surface-2 border-none h-10 rounded-xl text-sm"
+                      />
                     </div>
                     <div className="space-y-1.5">
                       <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">GPA (optional)</Label>
@@ -691,8 +734,14 @@ export default function MasterResumePage() {
                       <Input {...register(`certifications.${index}.issuer` as const)} placeholder="e.g. Amazon Web Services" className="bg-surface-2 border-none h-10 rounded-xl" />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Date Earned</Label>
-                      <Input type="month" {...register(`certifications.${index}.date` as const)} className="bg-surface-2 border-none h-10 rounded-xl text-sm" />
+                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Date Earned (MM/YYYY)</Label>
+                      <Input
+                        type="text"
+                        placeholder="MM/YYYY"
+                        value={toDisplayMonth(watch(`certifications.${index}.date` as const) || '')}
+                        onChange={e => setValue(`certifications.${index}.date` as const, e.target.value, { shouldDirty: true })}
+                        className="bg-surface-2 border-none h-10 rounded-xl text-sm"
+                      />
                     </div>
                     <div className="space-y-1.5 sm:col-span-2">
                       <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Credential URL (optional)</Label>
