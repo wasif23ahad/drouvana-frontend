@@ -117,8 +117,10 @@ export function ApplicationList({ searchQuery }: { searchQuery: string }) {
                     {format(new Date(app.dateApplied), 'MMM d, yyyy')}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-text-sub hover:text-primary">
-                      <MoreHorizontal className="h-4 w-4" />
+                    <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-text-sub hover:text-primary">
+                      <Link href={`/dashboard/applications/${app.id}`}>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Link>
                     </Button>
                   </td>
                 </tr>
