@@ -23,7 +23,7 @@ export default function MasterResumePage() {
 
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
 
-  const { register, control, handleSubmit, reset, watch } = useForm({
+  const { register, control, handleSubmit, reset, watch, setValue, getValues } = useForm({
     defaultValues: {
       personalInfo: {
         name: session?.user?.name || '',
@@ -53,6 +53,19 @@ export default function MasterResumePage() {
     control,
     name: "experience"
   });
+
+  const onRemoveResume = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setValue('uploadedFileName', '');
+    setValue('uploadedPdfBase64', '');
+    toast.success('Resume deselected');
+    try {
+      const currentData = getValues();
+      await api.put('/api/resume/master', { data: currentData });
+    } catch (err) {
+      // non-blocking
+    }
+  };
 
   React.useEffect(() => {
     if (status === 'unauthenticated') {
@@ -246,8 +259,11 @@ export default function MasterResumePage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <Button size="sm" variant="ghost" className="h-8 px-2.5 text-xs hover:text-error font-jetbrains uppercase tracking-wider" onClick={(e) => { e.stopPropagation(); /* lets root input trigger */ }}>
+                <Button size="sm" variant="ghost" className="h-8 px-2.5 text-xs hover:text-primary font-jetbrains uppercase tracking-wider" onClick={(e) => { e.stopPropagation(); /* lets root input trigger */ }}>
                   <UploadCloud className="w-3.5 h-3.5 mr-1.5" /> Replace
+                </Button>
+                <Button size="sm" variant="ghost" type="button" className="h-8 px-2.5 text-xs text-text-muted hover:text-error font-jetbrains uppercase tracking-wider" onClick={onRemoveResume}>
+                  <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Remove
                 </Button>
               </div>
             </div>
@@ -307,7 +323,7 @@ export default function MasterResumePage() {
             </div>
             <div className="space-y-2">
               <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Phone</Label>
-              <Input {...register('personalInfo.phone')} placeholder="e.g. +1 (555) 019-2834" className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
+              <Input {...register('personalInfo.phone')} placeholder="e.g. 01923746512" className="bg-surface-2 border-none h-12 rounded-xl focus-visible:ring-primary" />
             </div>
             <div className="space-y-2">
               <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">LinkedIn URL</Label>
