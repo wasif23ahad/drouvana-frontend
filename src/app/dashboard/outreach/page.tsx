@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Send, Copy, CheckCircle2, Loader2, Sparkles, ChevronRight, Mail, RefreshCw, User } from 'lucide-react';
+import { Send, Copy, CheckCircle2, Loader2, Sparkles, ChevronRight, Mail, RefreshCw, User, Save } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
@@ -30,6 +30,8 @@ export default function OutreachPage() {
   const [loading, setLoading] = useState(false);
   const [copiedSubject, setCopiedSubject] = useState<number | null>(null);
   const [copiedBody, setCopiedBody] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [params, setParams] = useState({
     outreachType: 'COLD_OUTREACH',
@@ -53,6 +55,7 @@ export default function OutreachPage() {
 
     setLoading(true);
     setResult(null);
+    setSaved(false);
 
     try {
       const res = await api.post('/api/ai/generate-email', {
@@ -96,6 +99,24 @@ export default function OutreachPage() {
     setCopiedBody(true);
     toast.success('Email body copied to clipboard');
     setTimeout(() => setCopiedBody(false), 2000);
+  };
+
+  const saveEmail = async () => {
+    if (!result) return;
+    setIsSaving(true);
+    try {
+      await api.post('/api/documents/email-draft', {
+        subject: result.subject_lines[result.selectedSubjectIndex] || result.subject_lines[0] || '',
+        body: result.body,
+        emailType: params.outreachType,
+      });
+      setSaved(true);
+      toast.success('Email draft saved to your documents');
+    } catch {
+      toast.error('Failed to save email draft');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -276,14 +297,26 @@ export default function OutreachPage() {
                       )}
                     </div>
                   </div>
-                  <Button
-                    onClick={copyBody}
-                    size="sm"
-                    className="h-7 text-xs px-3 rounded-lg gap-1.5 shadow-md shadow-primary/10 border-none"
-                  >
-                    {copiedBody ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copiedBody ? 'Copied' : 'Copy Body'}
-                  </Button>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      onClick={copyBody}
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs px-3 rounded-lg gap-1.5"
+                    >
+                      {copiedBody ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedBody ? 'Copied' : 'Copy Body'}
+                    </Button>
+                    <Button
+                      onClick={saveEmail}
+                      disabled={isSaving || saved}
+                      size="sm"
+                      className="h-7 text-xs px-3 rounded-lg gap-1.5 shadow-md shadow-primary/10 border-none"
+                    >
+                      {saved ? <CheckCircle2 className="w-3.5 h-3.5" /> : isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                      {saved ? 'Saved' : 'Save Draft'}
+                    </Button>
+                  </div>
                 </div>
                 <CardContent className="p-6">
                   <textarea

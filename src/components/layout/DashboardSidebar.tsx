@@ -32,6 +32,7 @@ const Sidebar = () => {
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Job Tracker', href: '/dashboard/tracker', icon: ListTodo },
     { name: 'Profile Data', href: '/dashboard/resume', icon: FileText },
+    { name: 'Resume Versions', href: '/dashboard/resume/versions', icon: Layers },
     { name: 'Resume Builder', href: '/dashboard/builder', icon: Sparkles },
     { name: 'ATS Analyzer', href: '/dashboard/analyzer', icon: BarChart3 },
     { name: 'Cover Letters', href: '/dashboard/cover-letter', icon: Layers },

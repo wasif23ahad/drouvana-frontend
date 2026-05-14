@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Layers, ChevronRight, Loader2, Copy, CheckCircle2, Download, FileText, RefreshCw } from 'lucide-react';
+import { Sparkles, Layers, ChevronRight, Loader2, Copy, CheckCircle2, Download, FileText, RefreshCw, Save } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
+import api from '@/lib/api';
 
 interface CoverLetterVariant {
   type: string;
@@ -43,6 +44,8 @@ export default function CoverLetterPage() {
   });
 
   const [variants, setVariants] = useState<CoverLetterVariant[]>([]);
+  const [savedVariants, setSavedVariants] = useState<Set<number>>(new Set());
+  const [isSaving, setIsSaving] = useState(false);
 
   const getAPIBase = () => {
     if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
@@ -164,6 +167,25 @@ export default function CoverLetterPage() {
       highlighted = highlighted.replace(regex, `<mark class="bg-primary/20 text-primary rounded px-0.5">$&</mark>`);
     });
     return highlighted;
+  };
+
+  const saveVariant = async (variant: CoverLetterVariant, index: number) => {
+    setIsSaving(true);
+    try {
+      await api.post('/api/documents/cover-letter', {
+        content: variant.content,
+        variant: variant.type,
+        tone: params.tone,
+        wordCount: variant.word_count,
+        keywordScore: variant.keyword_score,
+      });
+      setSavedVariants(prev => new Set(prev).add(index));
+      toast.success('Cover letter saved to your documents');
+    } catch {
+      toast.error('Failed to save cover letter');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const currentVariant = variants[activeVariant];
@@ -366,6 +388,16 @@ export default function CoverLetterPage() {
                         className="h-7 text-xs px-2.5 gap-1 rounded-lg"
                       >
                         <Download className="w-3.5 h-3.5" /> PDF
+                      </Button>
+                      <Button
+                        onClick={() => saveVariant(currentVariant, activeVariant)}
+                        disabled={isSaving || savedVariants.has(activeVariant)}
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs px-2.5 gap-1 rounded-lg text-emerald-400 hover:text-emerald-300"
+                      >
+                        {savedVariants.has(activeVariant) ? <CheckCircle2 className="w-3.5 h-3.5" /> : isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                        {savedVariants.has(activeVariant) ? 'Saved' : 'Save'}
                       </Button>
                     </div>
                   </div>

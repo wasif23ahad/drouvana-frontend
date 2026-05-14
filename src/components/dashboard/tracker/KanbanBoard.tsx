@@ -3,6 +3,8 @@
 import React, { useMemo } from 'react';
 import { JobStatus, useAppStore } from '@/lib/store';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
+import api from '@/lib/api';
 import {
   DndContext,
   DragOverlay,
@@ -163,6 +165,8 @@ export function KanbanBoard({ searchQuery }: { searchQuery: string }) {
 
     if (activeApp && targetStatus && activeApp.status !== targetStatus) {
       updateApplicationStatus(activeApp.id, targetStatus);
+      api.patch(`/api/applications/${activeApp.id}/status`, { status: targetStatus })
+        .catch(() => toast.error('Failed to sync status — please refresh'));
     }
   };
 
