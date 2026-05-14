@@ -46,6 +46,12 @@ api.interceptors.request.use(async (config) => {
         localStorage.setItem('drouvana_cached_token', sessionToken);
       }
 
+      // If the session itself signals the refresh token is dead, force sign-out
+      if ((session as any)?.error === 'RefreshTokenExpired') {
+        localStorage.removeItem('drouvana_cached_token');
+        signOut({ callbackUrl: '/login?reason=session_expired', redirect: true }).catch(() => {});
+      }
+
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }

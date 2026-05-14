@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAppStore } from '@/lib/store';
-import { useSession } from 'next-auth/react';
+import { useSession, getSession, signOut } from 'next-auth/react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -90,21 +90,52 @@ export default function ChatInterface() {
     try {
       abortRef.current = new AbortController();
 
-      const token = (session?.user as any)?.accessToken;
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+      // Get the freshest token: prefer localStorage cache (kept up-to-date by api.ts interceptor),
+      // fall back to the session, then force a fresh session fetch.
+      const getToken = async (): Promise<string | null> => {
+        let token = localStorage.getItem('drouvana_cached_token');
+        if (!token) {
+          const s = await getSession();
+          token = (s?.user as any)?.accessToken || (s as any)?.accessToken || null;
+          if (token) localStorage.setItem('drouvana_cached_token', token);
+        }
+        return token;
+      };
 
-      const response = await fetch(`${API_URL}/api/ai/chat/sse`, {
+      const doPost = (t: string | null) => fetch(`${API_URL}/api/ai/chat/sse`, {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(t ? { Authorization: `Bearer ${t}` } : {}),
+        },
         credentials: 'include',
         body: JSON.stringify({ history, context }),
-        signal: abortRef.current.signal,
+        signal: abortRef.current!.signal,
       });
 
+      let token = await getToken();
+      let response = await doPost(token);
+
+      // Stale cached token — clear and retry once with a fresh session token
+      if (response.status === 401) {
+        localStorage.removeItem('drouvana_cached_token');
+        const freshSession = await getSession();
+        token = (freshSession?.user as any)?.accessToken || (freshSession as any)?.accessToken || null;
+        if (!token) {
+          signOut({ callbackUrl: '/login?reason=session_expired' }).catch(() => {});
+          return;
+        }
+        localStorage.setItem('drouvana_cached_token', token);
+        response = await doPost(token);
+      }
+
       if (!response.ok) {
+        if (response.status === 401) {
+          // Refresh token is also dead — force sign-out
+          localStorage.removeItem('drouvana_cached_token');
+          signOut({ callbackUrl: '/login?reason=session_expired' }).catch(() => {});
+          return;
+        }
         throw new Error(`Server error: ${response.status}`);
       }
 
