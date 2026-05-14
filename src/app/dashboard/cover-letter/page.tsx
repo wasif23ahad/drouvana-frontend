@@ -5,258 +5,418 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Layers, ChevronRight, Loader2, Copy, CheckCircle2, Download } from 'lucide-react';
+import { Sparkles, Layers, ChevronRight, Loader2, Copy, CheckCircle2, Download, FileText, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
+
+interface CoverLetterVariant {
+  type: string;
+  label: string;
+  content: string;
+  word_count: number;
+  keyword_score: number;
+  opening_line?: string;
+}
+
+const TONE_OPTIONS = [
+  { id: 'professional', label: 'Professional' },
+  { id: 'enthusiastic', label: 'Enthusiastic' },
+  { id: 'analytical', label: 'Analytical' },
+  { id: 'executive', label: 'Executive' },
+];
 
 export default function CoverLetterPage() {
+  const { status } = useSession();
   const [loading, setLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  
+  const [activeVariant, setActiveVariant] = useState(0);
+  const [streamingText, setStreamingText] = useState('');
+
   const [params, setParams] = useState({
-    jobTitle: 'Senior Infrastructure Engineer',
-    companyName: 'Stripe',
-    hiringManager: 'Engineering Team',
-    senderName: 'Sarah Jenkins',
-    tone: 'analytical',
-    customNotes: 'Emphasize scaling REST/gRPC API barriers and reducing connection overhead.'
+    jobTitle: '',
+    companyName: '',
+    hiringManager: '',
+    jobDescription: '',
+    tone: 'professional',
+    customInstructions: '',
   });
 
-  const [variants, setVariants] = useState<string[]>([]);
+  const [variants, setVariants] = useState<CoverLetterVariant[]>([]);
 
-  const generateCoverLetters = () => {
+  const getAPIBase = () => {
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+      const configured = process.env.NEXT_PUBLIC_API_URL || '';
+      if (!configured || configured.includes('localhost')) return 'https://douvana-backend.vercel.app';
+    }
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  };
+
+  const generateCoverLetters = async () => {
     if (!params.jobTitle.trim() || !params.companyName.trim()) {
       toast.warning('Please enter the target Job Title and Company Name');
+      return;
+    }
+    if (status === 'unauthenticated') {
+      toast.error('Please sign in to generate cover letters');
       return;
     }
 
     setLoading(true);
     setVariants([]);
+    setStreamingText('');
 
-    const fullTexts = [
-      `Dear ${params.hiringManager || 'Hiring Manager'},\n\nI am writing to express my strong interest in the ${params.jobTitle} position at ${params.companyName}. With deep engineering expertise in scaling high-concurrency microservices and optimizing data persistence layers, I am excited about the opportunity to drive concrete reliability metrics for your core continuous delivery pipelines.\n\nThroughout my professional career, I have focused heavily on designing highly available REST and gRPC API boundaries capable of supporting complex transaction throughput safely. My recent contributions directly resolve continuous integration bottlenecks, leveraging distributed message queues to streamline continuous deployment payloads.\n\nI would welcome the opportunity to connect briefly to discuss how my systems engineering fundamentals directly align with ${params.companyName}'s upcoming technical roadmap.\n\nSincerely,\n${params.senderName || '[Your Name]'}`,
-      
-      `Dear ${params.hiringManager || 'Hiring Manager'},\n\nWhen evaluating architectural choices for high-performance distributed systems, engineering teams must balance absolute latency bounds with reliable fault isolation. As a targeted systems builder with direct experience optimizing continuous delivery networks, I am eager to contribute my technical rigor to the ${params.jobTitle} opening at ${params.companyName}.\n\nIn my recent engineering initiatives, I successfully migrated distributed processing layers onto multi-region server clusters, dropping target execution overhead significantly. By establishing robust connection pooling patterns and unified authorization middleware, I ensure secure data broadcast continuity under extreme traffic constraints.\n\nI look forward to discussing how my targeted cloud architecture expertise can directly accelerate your engineering execution schedules.\n\nBest regards,\n${params.senderName || '[Your Name]'}`,
+    try {
+      const token = localStorage.getItem('drouvana_cached_token');
+      const response = await fetch(`${getAPIBase()}/api/ai/generate-cover-letter/direct`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(params),
+      });
 
-      `Dear ${params.hiringManager || 'Hiring Manager'},\n\nI am reaching out to submit my professional background for the ${params.jobTitle} vacancy at ${params.companyName}. Combining rigorous distributed programming fundamentals with proactive cross-functional leadership, I am confident in my capacity to deliver immediate positive impact across your core platform topologies.\n\nMy core competencies revolve around designing automated deployment manifests, monitoring persistent storage layers, and deploying memory-mapped caching frameworks safely. I am highly motivated by ${params.companyName}'s continuous pursuit of technical excellence.\n\nThank you for considering my application. I would welcome a brief exploratory screen.\n\nSincerely,\n${params.senderName || '[Your Name]'}`
-    ];
-
-    // Simulate progressive character streaming generation variant by variant
-    let v1 = "";
-    let v2 = "";
-    let v3 = "";
-    
-    // First variant stream
-    let i1 = 0;
-    const timer1 = setInterval(() => {
-      if (i1 < fullTexts[0].length) {
-        v1 += fullTexts[0][i1];
-        setVariants([v1]);
-        i1++;
-      } else {
-        clearInterval(timer1);
-        // Start variant 2 stream
-        let i2 = 0;
-        const timer2 = setInterval(() => {
-          if (i2 < fullTexts[1].length) {
-            v2 += fullTexts[1][i2];
-            setVariants([v1, v2]);
-            i2++;
-          } else {
-            clearInterval(timer2);
-            // Start variant 3 stream
-            let i3 = 0;
-            const timer3 = setInterval(() => {
-              if (i3 < fullTexts[2].length) {
-                v3 += fullTexts[2][i3];
-                setVariants([v1, v2, v3]);
-                i3++;
-              } else {
-                clearInterval(timer3);
-                setLoading(false);
-                toast.success('Generated 3 Tailored Cover Letter Variants');
-              }
-            }, 3);
-          }
-        }, 3);
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || `HTTP ${response.status}`);
       }
-    }, 3);
-  };
 
-  const highlightKeywords = (text: string) => {
-    const keywords = ['scaling', 'microservices', 'REST', 'gRPC', 'continuous delivery', 'pipelines', 'distributed', 'latency', 'clusters', 'middleware', 'architecture', 'caching'];
-    let highlighted = text;
-    keywords.forEach(kw => {
-      const regex = new RegExp(`\\b${kw}\\b`, 'gi');
-      highlighted = highlighted.replace(regex, `<mark class="bg-emerald-500/20 text-emerald-300 rounded px-1 py-0.5 font-mono text-[11px] border border-emerald-500/30">$&</mark>`);
-    });
-    return highlighted;
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let fullContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const data = line.slice(6).trim();
+          if (!data) continue;
+
+          try {
+            const event = JSON.parse(data);
+            if (event.type === 'delta') {
+              fullContent += event.content || '';
+              setStreamingText(fullContent.slice(-120));
+            } else if (event.type === 'complete') {
+              const rawJson = event.fullContent || fullContent;
+              const jsonMatch = rawJson.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (parsed.variants && Array.isArray(parsed.variants)) {
+                  setVariants(parsed.variants);
+                  setActiveVariant(0);
+                  toast.success('Generated 3 tailored cover letter variants');
+                }
+              }
+            } else if (event.type === 'error') {
+              throw new Error(event.message);
+            }
+          } catch (_) {
+            // partial delta
+          }
+        }
+      }
+
+      // Final parse attempt
+      if (!variants.length && fullContent) {
+        try {
+          const jsonMatch = fullContent.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (parsed.variants) {
+              setVariants(parsed.variants);
+              setActiveVariant(0);
+              toast.success('Generated 3 tailored cover letter variants');
+            }
+          }
+        } catch (_) { /* silent */ }
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Generation failed. Please try again.');
+    } finally {
+      setLoading(false);
+      setStreamingText('');
+    }
   };
 
   const copyVariant = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
-    toast.success(`Copied Variant ${index + 1} to clipboard`);
+    toast.success('Cover letter copied to clipboard');
     setTimeout(() => setCopiedIndex(null), 2500);
   };
 
+  const highlightKeywords = (text: string) => {
+    if (!params.jobTitle && !params.companyName) return text;
+    const base = [params.companyName, params.jobTitle].filter(Boolean);
+    let highlighted = text;
+    base.forEach(kw => {
+      if (kw.length < 3) return;
+      const regex = new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+      highlighted = highlighted.replace(regex, `<mark class="bg-primary/20 text-primary rounded px-0.5">$&</mark>`);
+    });
+    return highlighted;
+  };
+
+  const currentVariant = variants[activeVariant];
+
   return (
     <div className="flex flex-col h-full gap-8 pb-20">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <div className="flex items-center text-xs text-text-muted gap-2 font-jetbrains uppercase tracking-widest mb-2">
             <Link href="/dashboard" className="hover:text-primary transition-colors">Workspace</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-primary font-bold">Cover Letters Studio</span>
+            <span className="text-primary font-bold">Cover Letter Studio</span>
           </div>
-          <h1 className="text-3xl font-bold font-hanken">Cover Letters Studio</h1>
-          <p className="text-text-sub text-sm">International standard layouts supporting AI progressive streaming and keyword optimization.</p>
+          <h1 className="text-3xl font-bold font-hanken">Cover Letter Studio</h1>
+          <p className="text-text-sub text-sm">Generate 3 tailored cover letter variants powered by your resume profile and job requirements.</p>
         </div>
-        
-        <div className="flex items-center gap-2">
-          <Button 
-            onClick={() => {
-              toast.success('Preparing layout export...');
-              window.print();
-            }} 
-            variant="outline" 
-            className="rounded-xl gap-2 border-white/10 hover:bg-surface-2 text-xs h-10"
+        {variants.length > 0 && (
+          <Button
+            onClick={() => { setVariants([]); }}
+            variant="outline"
+            className="rounded-xl gap-2 border-white/10 text-xs h-9"
           >
-            <Download className="w-3.5 h-3.5" /> Export PDF
+            <RefreshCw className="w-3.5 h-3.5" /> New Generation
           </Button>
-        </div>
+        )}
       </div>
 
-      {/* Layout Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left Side: Controllers */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
-          <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
+        {/* Left: Form */}
+        <div className="lg:col-span-4 flex flex-col gap-5">
+          <Card className="bg-surface/50 border-white/5 rounded-2xl">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base font-bold font-hanken text-primary">Prompt Specifications</CardTitle>
+              <CardTitle className="text-sm font-bold font-hanken text-primary">Job Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label className="text-xs text-text-sub mb-1.5 block">Target Role Title</Label>
-                <Input 
+                <Label className="text-[10px] text-text-muted uppercase tracking-wider font-jetbrains mb-1.5 block">Job Title *</Label>
+                <Input
                   value={params.jobTitle}
-                  onChange={e => setParams({...params, jobTitle: e.target.value})}
+                  onChange={e => setParams({ ...params, jobTitle: e.target.value })}
+                  placeholder="e.g. Senior Backend Engineer"
                   className="bg-surface border-white/10 rounded-xl text-xs h-10"
                 />
               </div>
 
               <div>
-                <Label className="text-xs text-text-sub mb-1.5 block">Company Destination</Label>
-                <Input 
+                <Label className="text-[10px] text-text-muted uppercase tracking-wider font-jetbrains mb-1.5 block">Company *</Label>
+                <Input
                   value={params.companyName}
-                  onChange={e => setParams({...params, companyName: e.target.value})}
+                  onChange={e => setParams({ ...params, companyName: e.target.value })}
+                  placeholder="e.g. Stripe"
                   className="bg-surface border-white/10 rounded-xl text-xs h-10"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label className="text-xs text-text-sub mb-1.5 block">Recipient</Label>
-                  <Input 
-                    value={params.hiringManager}
-                    onChange={e => setParams({...params, hiringManager: e.target.value})}
-                    className="bg-surface border-white/10 rounded-xl text-xs h-10"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs text-text-sub mb-1.5 block">Sender Name</Label>
-                  <Input 
-                    value={params.senderName}
-                    onChange={e => setParams({...params, senderName: e.target.value})}
-                    className="bg-surface border-white/10 rounded-xl text-xs h-10"
-                  />
-                </div>
+              <div>
+                <Label className="text-[10px] text-text-muted uppercase tracking-wider font-jetbrains mb-1.5 block">Hiring Manager (optional)</Label>
+                <Input
+                  value={params.hiringManager}
+                  onChange={e => setParams({ ...params, hiringManager: e.target.value })}
+                  placeholder="e.g. Sarah Chen"
+                  className="bg-surface border-white/10 rounded-xl text-xs h-10"
+                />
               </div>
 
               <div>
-                <Label className="text-xs text-text-sub mb-1.5 block">Narrative Tone Focus</Label>
-                <div className="grid grid-cols-3 gap-1.5 mt-1">
-                  {(['analytical', 'enthusiastic', 'executive'] as const).map(t => (
+                <Label className="text-[10px] text-text-muted uppercase tracking-wider font-jetbrains mb-1.5 block">Tone</Label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {TONE_OPTIONS.map(t => (
                     <button
-                      key={t}
-                      onClick={() => setParams({...params, tone: t})}
-                      className={`py-1.5 rounded-lg text-[11px] font-bold capitalize border transition-all ${
-                        params.tone === t ? 'bg-primary/20 border-primary text-primary' : 'bg-surface border-white/5 text-text-muted hover:border-white/20'
-                      }`}
+                      key={t.id}
+                      onClick={() => setParams({ ...params, tone: t.id })}
+                      className={`py-1.5 rounded-lg text-[11px] font-bold capitalize border transition-all ${params.tone === t.id ? 'bg-primary/20 border-primary text-primary' : 'bg-surface border-white/5 text-text-muted hover:border-white/20'}`}
                     >
-                      {t}
+                      {t.label}
                     </button>
                   ))}
                 </div>
               </div>
-
-              <div>
-                <Label className="text-xs text-text-sub mb-1.5 block">Custom Guidance Parameters</Label>
-                <textarea 
-                  value={params.customNotes}
-                  onChange={e => setParams({...params, customNotes: e.target.value})}
-                  rows={3}
-                  placeholder="Specific technologies or key impact areas..."
-                  className="w-full bg-surface border border-white/10 rounded-xl p-2.5 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
-                />
-              </div>
-
-              <Button 
-                onClick={generateCoverLetters}
-                disabled={loading}
-                className="w-full rounded-xl py-5 font-bold text-xs shadow-lg shadow-primary/20 border-none mt-2 gap-2"
-              >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                {loading ? 'Streaming Streams...' : 'Stream 3 Tailored Variants'}
-              </Button>
             </CardContent>
           </Card>
+
+          <Card className="bg-surface/50 border-white/5 rounded-2xl">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-bold font-hanken text-primary">Job Description</CardTitle>
+              <p className="text-xs text-text-muted">Optional but improves tailoring significantly.</p>
+            </CardHeader>
+            <CardContent>
+              <textarea
+                value={params.jobDescription}
+                onChange={e => setParams({ ...params, jobDescription: e.target.value })}
+                rows={4}
+                placeholder="Paste the job description here..."
+                className="w-full bg-surface border border-white/10 rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="bg-surface/50 border-white/5 rounded-2xl">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-bold font-hanken text-primary">Custom Instructions</CardTitle>
+              <p className="text-xs text-text-muted">Any specific points to emphasize.</p>
+            </CardHeader>
+            <CardContent>
+              <textarea
+                value={params.customInstructions}
+                onChange={e => setParams({ ...params, customInstructions: e.target.value })}
+                rows={3}
+                placeholder="e.g. Emphasize my experience with distributed systems and team leadership..."
+                className="w-full bg-surface border border-white/10 rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
+              />
+            </CardContent>
+          </Card>
+
+          <Button
+            onClick={generateCoverLetters}
+            disabled={loading}
+            className="w-full rounded-xl py-5 font-bold text-xs shadow-lg shadow-primary/20 border-none gap-2"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            {loading ? 'Generating...' : 'Generate 3 Variants'}
+          </Button>
+
+          <p className="text-[10px] text-text-muted text-center font-jetbrains">
+            Your resume profile is automatically used as context.{' '}
+            <Link href="/dashboard/resume" className="text-primary hover:underline">Update profile →</Link>
+          </p>
         </div>
 
-        {/* Right Side: Generated variants list */}
-        <div className="lg:col-span-8 flex flex-col gap-6">
-          {variants.length === 0 && !loading ? (
-            <Card className="bg-surface/20 border-white/5 rounded-2xl h-[450px] flex flex-col items-center justify-center p-8 text-center">
-              <Layers className="w-12 h-12 text-text-muted mb-4 opacity-40" />
-              <h3 className="text-sm font-bold text-text-sub font-jetbrains uppercase tracking-wider mb-2">No Generation Triggered</h3>
-              <p className="text-xs text-text-muted max-w-sm">Provide your application specifications on the left to stream 3 customized international cover letter variations progressively.</p>
-            </Card>
-          ) : (
-            variants.map((vText, idx) => (
-              <Card key={idx} className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl overflow-hidden relative">
-                <div className="bg-surface-2 px-5 py-3 border-b border-white/5 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-primary" />
-                    <span className="text-xs font-bold font-jetbrains text-text-main uppercase tracking-wider">
-                      Variant {idx + 1} <span className="text-text-muted capitalize font-normal">({idx === 0 ? 'Technical Core' : idx === 1 ? 'Architecture Balance' : 'Leadership Pitch'})</span>
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Button 
-                      onClick={() => copyVariant(vText, idx)} 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-7 text-xs px-2 gap-1 text-text-sub hover:text-text-main hover:bg-surface rounded-lg"
-                    >
-                      {copiedIndex === idx ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                      {copiedIndex === idx ? 'Copied' : 'Copy'}
-                    </Button>
-                  </div>
+        {/* Right: Output */}
+        <div className="lg:col-span-8 flex flex-col gap-5">
+          {loading && !variants.length ? (
+            <Card className="bg-surface/30 border-white/5 rounded-2xl h-[500px] flex flex-col items-center justify-center gap-5 p-8">
+              <div className="relative">
+                <div className="w-16 h-16 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+                <FileText className="absolute inset-0 m-auto w-6 h-6 text-primary" />
+              </div>
+              <div className="text-center space-y-1">
+                <p className="text-sm font-bold font-hanken animate-pulse">Crafting your cover letters...</p>
+                <p className="text-xs text-text-muted">Tailoring 3 distinct variants to match the role</p>
+              </div>
+              {streamingText && (
+                <div className="w-full max-w-sm bg-surface-2 rounded-xl p-3 border border-white/5">
+                  <p className="text-[10px] text-text-muted font-jetbrains mb-1 uppercase">Writing</p>
+                  <p className="text-xs text-text-sub font-mono leading-relaxed">{streamingText}</p>
                 </div>
-                
-                <CardContent className="p-6">
-                  <div 
-                    dangerouslySetInnerHTML={{ __html: highlightKeywords(vText).replace(/\n/g, '<br/>') }}
-                    className="text-xs text-text-sub leading-relaxed font-sans text-justify selection:bg-primary/20"
-                  />
-                </CardContent>
-              </Card>
-            ))
+              )}
+            </Card>
+          ) : variants.length > 0 ? (
+            <div className="flex flex-col gap-5">
+              {/* Variant selector tabs */}
+              <div className="flex gap-2 flex-wrap">
+                {variants.map((v, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveVariant(i)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all ${activeVariant === i ? 'bg-primary/20 border-primary text-primary' : 'bg-surface border-white/5 text-text-muted hover:border-white/20'}`}
+                  >
+                    <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center text-[10px]">{i + 1}</span>
+                    {v.label || v.type || `Variant ${i + 1}`}
+                  </button>
+                ))}
+              </div>
+
+              {currentVariant && (
+                <Card className="bg-surface/50 border-white/5 rounded-2xl overflow-hidden">
+                  {/* Header */}
+                  <div className="bg-surface-2 px-5 py-3 border-b border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-text-main">{currentVariant.label || currentVariant.type}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {currentVariant.word_count > 0 && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-surface text-text-muted font-jetbrains border border-white/5">
+                            {currentVariant.word_count} words
+                          </span>
+                        )}
+                        {currentVariant.keyword_score > 0 && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-jetbrains border border-emerald-500/20">
+                            {currentVariant.keyword_score}% keyword match
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Button
+                        onClick={() => copyVariant(currentVariant.content, activeVariant)}
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs px-2.5 gap-1 rounded-lg"
+                      >
+                        {copiedIndex === activeVariant ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copiedIndex === activeVariant ? 'Copied' : 'Copy'}
+                      </Button>
+                      <Button
+                        onClick={() => { toast.info('Preparing PDF...'); window.print(); }}
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 text-xs px-2.5 gap-1 rounded-lg"
+                      >
+                        <Download className="w-3.5 h-3.5" /> PDF
+                      </Button>
+                    </div>
+                  </div>
+
+                  <CardContent className="p-6">
+                    <div
+                      className="text-xs text-text-sub leading-relaxed font-sans text-justify selection:bg-primary/20 whitespace-pre-wrap"
+                      dangerouslySetInnerHTML={{ __html: highlightKeywords(currentVariant.content) }}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* All variants quick nav */}
+              <div className="grid grid-cols-3 gap-3">
+                {variants.map((v, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveVariant(i)}
+                    className={`p-3 rounded-xl border text-left transition-all ${activeVariant === i ? 'border-primary/50 bg-primary/5' : 'border-white/5 bg-surface/30 hover:border-white/15'}`}
+                  >
+                    <p className="text-[11px] font-bold text-text-main mb-1">{v.label || `Variant ${i + 1}`}</p>
+                    <p className="text-[10px] text-text-muted line-clamp-2 leading-relaxed">{v.opening_line || v.content?.slice(0, 80)}...</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <Card className="bg-surface/20 border-white/5 rounded-2xl h-[500px] flex flex-col items-center justify-center p-8 text-center">
+              <Layers className="w-14 h-14 text-text-muted mb-5 opacity-30" />
+              <h3 className="text-sm font-bold font-hanken text-text-sub mb-2">3 Variants Ready to Generate</h3>
+              <p className="text-xs text-text-muted max-w-xs leading-relaxed">
+                Fill in the job details on the left. Your resume profile is automatically used to personalize each variant.
+              </p>
+              <div className="mt-5 flex flex-col gap-2 text-[11px] text-text-muted">
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full bg-primary/20 text-primary flex items-center justify-center text-[9px] font-bold">1</span>
+                  ATS-Optimized — keyword-dense for Applicant Tracking Systems
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full bg-secondary/20 text-secondary flex items-center justify-center text-[9px] font-bold">2</span>
+                  Narrative — story-driven with strong opening hook
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded-full bg-accent/20 text-accent flex items-center justify-center text-[9px] font-bold">3</span>
+                  Results-First — achievement-led, quantified impact
+                </div>
+              </div>
+            </Card>
           )}
         </div>
-
       </div>
     </div>
   );
