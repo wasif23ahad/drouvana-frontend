@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Sparkles, MoreHorizontal, AlertCircle, RefreshCw } from 'lucide-react';
+import { Send, Bot, User, Sparkles, MoreHorizontal, AlertCircle, RefreshCw, Copy, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -15,12 +15,12 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  "Which of my applications need a follow-up this week?",
+  "Where should I practice coding problems for a FAANG interview?",
+  "Explain dynamic programming with a simple example I can use in interviews",
+  "Walk me through how to approach a system design question",
   "What are the top 5 things I should prepare for a technical interview?",
   "Help me write a LinkedIn connection request to a recruiter at Stripe",
   "What salary should I negotiate for a Senior Engineer role at a Series B startup?",
-  "Review my job search strategy and suggest improvements",
-  "How do I handle a rejection professionally and turn it into a networking opportunity?",
 ];
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -29,7 +29,7 @@ export default function ChatInterface() {
   const { data: session } = useSession();
   const { applications } = useAppStore();
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hi there! I\'m your Drouvana AI Career Coach. I can help with interview prep, resume advice, email drafts, and job search strategy. What can I help you with today?' }
+    { role: 'assistant', content: "Hi there! I'm your Drouvana AI Career Coach. I can help with **tech questions** (languages, frameworks, system design, databases, AI/ML), **problem solving** (DSA + where to practice — LeetCode, NeetCode, Codeforces, and more), **interview prep**, **resume work**, and **job-search strategy**. What can I help you with today?" }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -245,12 +245,15 @@ export default function ChatInterface() {
                 {m.role === 'assistant' ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
               </div>
               <div className={cn(
-                "p-4 rounded-2xl text-sm leading-relaxed",
+                "group relative p-4 rounded-2xl text-sm leading-relaxed",
                 m.role === 'user'
                   ? "bg-primary text-white rounded-tr-none whitespace-pre-wrap"
-                  : "bg-surface border border-[var(--color-border-subtle)] text-text-main rounded-tl-none w-full overflow-x-auto"
+                  : "bg-surface border border-[var(--color-border-subtle)] text-text-main rounded-tl-none w-full overflow-x-auto pr-10"
               )}>
                 {m.role === 'user' ? m.content : renderMarkdown(m.content)}
+                {m.role === 'assistant' && (
+                  <CopyButton text={m.content} className="absolute top-2.5 right-2.5" />
+                )}
               </div>
             </motion.div>
           ))}
@@ -266,9 +269,10 @@ export default function ChatInterface() {
             <div className="h-9 w-9 rounded-full flex-shrink-0 flex items-center justify-center bg-primary/10 text-primary border border-primary/10">
               <Bot className="h-4 w-4" />
             </div>
-            <div className="p-4 rounded-2xl bg-surface border border-[var(--color-border-subtle)] text-text-main rounded-tl-none text-sm leading-relaxed flex-1 overflow-x-auto">
+            <div className="group relative p-4 rounded-2xl bg-surface border border-[var(--color-border-subtle)] text-text-main rounded-tl-none text-sm leading-relaxed flex-1 overflow-x-auto pr-10">
               {renderMarkdown(streamingContent)}
               <span className="inline-block w-1.5 h-4 bg-primary animate-pulse mt-2 rounded-sm" />
+              <CopyButton text={streamingContent} className="absolute top-2.5 right-2.5" />
             </div>
           </motion.div>
         )}
@@ -330,57 +334,201 @@ export default function ChatInterface() {
   );
 }
 
-// Helper for inline bolding formatting — eye-soothing crisp white text
+// Small reusable copy-to-clipboard button. Shows a check + "Copied" for 1.6s.
+function CopyButton({
+  text,
+  className,
+  label = 'Copy',
+}: { text: string; className?: string; label?: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!text) return;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for non-secure contexts
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch (err) {
+      console.error('Copy failed:', err);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      aria-label={copied ? 'Copied to clipboard' : 'Copy message'}
+      title={copied ? 'Copied!' : 'Copy to clipboard'}
+      className={cn(
+        'inline-flex items-center gap-1 h-7 px-2 rounded-md text-[10px] font-jetbrains uppercase tracking-wider',
+        'border border-[var(--color-border-subtle)] bg-surface-2/60 backdrop-blur-sm',
+        'text-text-muted hover:text-primary hover:border-primary/40 hover:bg-primary/10',
+        'opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all',
+        copied && 'opacity-100 text-success border-success/40 bg-success/10 hover:text-success',
+        className,
+      )}
+    >
+      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+      <span>{copied ? 'Copied' : label}</span>
+    </button>
+  );
+}
+
+// Inline formatter: **bold**, *italic*, `code`
 const formatInline = (line: string): React.ReactNode[] => {
   if (!line) return [];
-  const parts = line.split(/(\*\*.*?\*\*)/g);
+  // Tokenize on bold/italic/inline-code in a single pass
+  const regex = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+  const parts = line.split(regex);
   return parts.map((part, idx) => {
+    if (!part) return null;
     if (part.startsWith('**') && part.endsWith('**')) {
       return <strong key={idx} className="font-semibold text-white">{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return (
+        <code
+          key={idx}
+          className="px-1.5 py-0.5 mx-0.5 rounded-md bg-surface-2 border border-[var(--color-border-subtle)] text-primary font-jetbrains text-[0.85em]"
+        >
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+      return <em key={idx} className="italic text-white/90">{part.slice(1, -1)}</em>;
     }
     return part;
   });
 };
 
-// State-of-the-art line-by-line native React Markdown parser
+// Block renderer that supports headings, lists, paragraphs, and fenced code blocks.
 const renderMarkdown = (text: string) => {
   if (!text) return null;
-  const lines = text.split('\n');
+
+  // First, split out fenced code blocks (```lang\n ... \n```)
+  // We process the text into an array of either { type: 'code', lang, body } or { type: 'text', body }
+  const segments: Array<{ type: 'code' | 'text'; body: string; lang?: string }> = [];
+  const codeFence = /```([a-zA-Z0-9_+-]*)\n?([\s\S]*?)(?:```|$)/g;
+  let cursor = 0;
+  let match: RegExpExecArray | null;
+  while ((match = codeFence.exec(text)) !== null) {
+    if (match.index > cursor) {
+      segments.push({ type: 'text', body: text.slice(cursor, match.index) });
+    }
+    segments.push({ type: 'code', lang: match[1] || '', body: match[2] || '' });
+    cursor = match.index + match[0].length;
+  }
+  if (cursor < text.length) {
+    segments.push({ type: 'text', body: text.slice(cursor) });
+  }
+
   return (
     <div className="space-y-1.5 w-full text-text-main">
-      {lines.map((line, lineIdx) => {
-        const trimmed = line.trim();
-        if (!trimmed) return <div key={lineIdx} className="h-1.5" />;
-
-        if (trimmed.startsWith('### ')) {
+      {segments.map((seg, sIdx) => {
+        if (seg.type === 'code') {
           return (
-            <h4 key={lineIdx} className="font-bold text-white text-base mt-3 mb-1">
-              {formatInline(trimmed.replace(/^###\s+/, ''))}
-            </h4>
-          );
-        }
-        if (trimmed.startsWith('## ')) {
-          return (
-            <h3 key={lineIdx} className="font-bold text-white text-lg mt-3 mb-1 border-b border-[var(--color-border-subtle)] pb-1">
-              {formatInline(trimmed.replace(/^##\s+/, ''))}
-            </h3>
-          );
-        }
-        if (trimmed.startsWith('# ')) {
-          return (
-            <h2 key={lineIdx} className="font-bold text-white text-xl mt-4 mb-1 border-b border-[var(--color-border-subtle)] pb-1">
-              {formatInline(trimmed.replace(/^#\s+/, ''))}
-            </h2>
+            <div
+              key={`code-${sIdx}`}
+              className="group/code relative my-3 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-bg-base)] overflow-hidden"
+            >
+              <div className="flex items-center justify-between px-3 py-1.5 border-b border-[var(--color-border-subtle)] bg-surface-2/40">
+                <span className="text-[10px] font-jetbrains uppercase tracking-widest text-text-muted">
+                  {seg.lang || 'code'}
+                </span>
+                <CopyButton text={seg.body} className="!opacity-100" label="Copy" />
+              </div>
+              <pre className="p-3 overflow-x-auto text-[12.5px] leading-relaxed">
+                <code className="font-jetbrains text-white/90 whitespace-pre">{seg.body}</code>
+              </pre>
+            </div>
           );
         }
 
-        const isListItem = trimmed.startsWith('-') || trimmed.startsWith('•') || trimmed.startsWith('*');
-        const textContent = trimmed.replace(/^[-•*]\s*/, '');
+        // Render text segment line-by-line, recognising tables as a small extension
+        const lines = seg.body.split('\n');
         return (
-          <div key={lineIdx} className={cn(isListItem ? "flex gap-2 pl-2.5" : "", "text-sm leading-relaxed text-text-main")}>
-            {isListItem && <span className="text-white/60 select-none mt-0.5">•</span>}
-            <span className="flex-1">{formatInline(textContent)}</span>
-          </div>
+          <React.Fragment key={`txt-${sIdx}`}>
+            {lines.map((line, lineIdx) => {
+              const trimmed = line.trim();
+              if (!trimmed) return <div key={lineIdx} className="h-1.5" />;
+
+              if (trimmed.startsWith('### ')) {
+                return (
+                  <h4 key={lineIdx} className="font-bold text-white text-base mt-3 mb-1">
+                    {formatInline(trimmed.replace(/^###\s+/, ''))}
+                  </h4>
+                );
+              }
+              if (trimmed.startsWith('## ')) {
+                return (
+                  <h3 key={lineIdx} className="font-bold text-white text-lg mt-3 mb-1 border-b border-[var(--color-border-subtle)] pb-1">
+                    {formatInline(trimmed.replace(/^##\s+/, ''))}
+                  </h3>
+                );
+              }
+              if (trimmed.startsWith('# ')) {
+                return (
+                  <h2 key={lineIdx} className="font-bold text-white text-xl mt-4 mb-1 border-b border-[var(--color-border-subtle)] pb-1">
+                    {formatInline(trimmed.replace(/^#\s+/, ''))}
+                  </h2>
+                );
+              }
+
+              // Numbered list item: "1. text"
+              const numberedMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+              if (numberedMatch) {
+                return (
+                  <div key={lineIdx} className="flex gap-2 pl-2.5 text-sm leading-relaxed text-text-main">
+                    <span className="text-primary font-jetbrains font-semibold select-none mt-0.5">{numberedMatch[1]}.</span>
+                    <span className="flex-1">{formatInline(numberedMatch[2])}</span>
+                  </div>
+                );
+              }
+
+              // Bullet list item
+              const isListItem = trimmed.startsWith('- ') || trimmed.startsWith('• ') || trimmed.startsWith('* ');
+              if (isListItem) {
+                const textContent = trimmed.replace(/^[-•*]\s+/, '');
+                return (
+                  <div key={lineIdx} className="flex gap-2 pl-2.5 text-sm leading-relaxed text-text-main">
+                    <span className="text-primary/80 select-none mt-0.5">•</span>
+                    <span className="flex-1">{formatInline(textContent)}</span>
+                  </div>
+                );
+              }
+
+              // Blockquote
+              if (trimmed.startsWith('> ')) {
+                return (
+                  <div key={lineIdx} className="border-l-2 border-primary/40 pl-3 my-1 text-text-sub italic">
+                    {formatInline(trimmed.slice(2))}
+                  </div>
+                );
+              }
+
+              // Regular paragraph line
+              return (
+                <p key={lineIdx} className="text-sm leading-relaxed text-text-main">
+                  {formatInline(trimmed)}
+                </p>
+              );
+            })}
+          </React.Fragment>
         );
       })}
     </div>

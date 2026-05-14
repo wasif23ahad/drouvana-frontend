@@ -6,9 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import {
-  Sparkles, Plus, Trash2, GripVertical, ChevronRight, Save,
+  Sparkles, Plus, Trash2, ChevronRight, Save,
   CheckCircle2, Loader2, UploadCloud, FileText, Eye, X,
-  MapPin, Briefcase, GraduationCap, Code2, Award, Globe
+  MapPin, Briefcase, GraduationCap, Code2, Award, Globe, BookOpen, Info, ArrowRight,
 } from 'lucide-react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import Link from 'next/link';
@@ -16,54 +16,10 @@ import { useSession } from 'next-auth/react';
 import { useDropzone } from 'react-dropzone';
 import api from '@/lib/api';
 import { toast } from 'sonner';
+import { MonthYearPicker, MonthYearRange } from '@/components/ui/month-year-picker';
+import { parseToMonthYear, isPresentToken, serializeDateRange, parseDateRange } from '@/lib/monthYear';
 
-// Convert any stored date string to MM/DD/YYYY for display in date inputs
-const toDisplayDate = (stored: string): string => {
-  if (!stored || stored.toLowerCase().includes('present')) return '';
-  const trimmed = stored.trim();
-  // Already MM/DD/YYYY
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(trimmed)) return trimmed;
-  // ISO YYYY-MM-DD
-  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-    const [y, m, d] = trimmed.split('-');
-    return `${m}/${d}/${y}`;
-  }
-  // Try parsing loosely
-  const yearMatch = trimmed.match(/\b(19|20)\d{2}\b/);
-  if (yearMatch) {
-    const months = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-    const lower = trimmed.toLowerCase();
-    let monthIdx = 0;
-    for (let i = 0; i < months.length; i++) {
-      if (lower.includes(months[i])) { monthIdx = i; break; }
-    }
-    return `${String(monthIdx + 1).padStart(2, '0')}/01/${yearMatch[0]}`;
-  }
-  return trimmed;
-};
-
-// Convert MM/DD/YYYY input back to stored value
-const fromDisplayDate = (display: string): string => display.trim();
-
-// Convert any stored month string to MM/YYYY for display
-const toDisplayMonth = (stored: string): string => {
-  if (!stored) return '';
-  const trimmed = stored.trim();
-  if (/^\d{2}\/\d{4}$/.test(trimmed)) return trimmed;
-  // ISO YYYY-MM
-  if (/^\d{4}-\d{2}$/.test(trimmed)) {
-    const [y, m] = trimmed.split('-');
-    return `${m}/${y}`;
-  }
-  // ISO YYYY-MM-DD
-  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-    const [y, m] = trimmed.split('-');
-    return `${m}/${y}`;
-  }
-  return trimmed;
-};
-
-type SectionKey = 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications';
+type SectionKey = 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'projects' | 'certifications' | 'training';
 
 const SECTIONS: { key: SectionKey; label: string; icon: React.ElementType }[] = [
   { key: 'personal', label: 'Personal Info', icon: Globe },
@@ -73,7 +29,46 @@ const SECTIONS: { key: SectionKey; label: string; icon: React.ElementType }[] = 
   { key: 'skills', label: 'Skills', icon: Code2 },
   { key: 'projects', label: 'Projects', icon: Code2 },
   { key: 'certifications', label: 'Certifications', icon: Award },
+  { key: 'training', label: 'Training', icon: BookOpen },
 ];
+
+// Normalize whatever the API or AI parser returns into our canonical shape.
+// Accepts legacy "dates: 'MM/YYYY – Present'" entries as well as the new
+// structured startDate/endDate fields.
+function normalizeIncoming(raw: any) {
+  const fixRange = (e: any) => {
+    if (e?.startDate || e?.endDate) {
+      return {
+        ...e,
+        startDate: parseToMonthYear(e.startDate || ''),
+        endDate: isPresentToken(e.endDate || '') ? 'Present' : parseToMonthYear(e.endDate || ''),
+        dates: serializeDateRange({
+          start: parseToMonthYear(e.startDate || ''),
+          end: parseToMonthYear(e.endDate || ''),
+          current: isPresentToken(e.endDate || ''),
+        }),
+      };
+    }
+    const parsed = parseDateRange(e?.dates || '');
+    return {
+      ...e,
+      startDate: parsed.start,
+      endDate: parsed.current ? 'Present' : parsed.end,
+      dates: serializeDateRange(parsed),
+    };
+  };
+
+  return {
+    ...raw,
+    experience: Array.isArray(raw?.experience) ? raw.experience.map(fixRange) : [],
+    education: Array.isArray(raw?.education) ? raw.education.map(fixRange) : [],
+    projects: Array.isArray(raw?.projects) ? raw.projects.map(fixRange) : [],
+    certifications: Array.isArray(raw?.certifications)
+      ? raw.certifications.map((c: any) => ({ ...c, date: parseToMonthYear(c?.date || '') }))
+      : [],
+    training: Array.isArray(raw?.training) ? raw.training.map(fixRange) : [],
+  };
+}
 
 export default function MasterResumePage() {
   const { data: session, status } = useSession();
@@ -87,10 +82,11 @@ export default function MasterResumePage() {
   const [enhancingBulletId, setEnhancingBulletId] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<SectionKey>('personal');
 
-  const { register, control, handleSubmit, reset, watch, setValue, getValues } = useForm({
+  const { register, control, handleSubmit, reset, watch, setValue, getValues } = useForm<any>({
     defaultValues: {
       personalInfo: {
         name: session?.user?.name || '',
+        title: '',
         email: session?.user?.email || '',
         phone: '',
         location: '',
@@ -102,11 +98,12 @@ export default function MasterResumePage() {
         leetcode: '',
       },
       summary: '',
-      experience: [{ id: '1', company: '', role: '', dates: '', description: '' }],
-      education: [{ id: '1', institution: '', degree: '', field: '', startDate: '', endDate: '', gpa: '' }],
+      experience: [{ id: '1', company: '', role: '', location: '', startDate: '', endDate: '', dates: '', description: '' }],
+      education: [{ id: '1', institution: '', degree: '', field: '', startDate: '', endDate: '', dates: '', gpa: '' }],
       skills: '',
-      projects: [{ id: '1', name: '', description: '', techStack: '', url: '' }],
+      projects: [{ id: '1', name: '', description: '', techStack: '', url: '', startDate: '', endDate: '', dates: '' }],
       certifications: [{ id: '1', name: '', issuer: '', date: '', url: '' }],
+      training: [{ id: '1', name: '', provider: '', startDate: '', endDate: '', dates: '', description: '' }],
       uploadedFileName: '',
       uploadedPdfBase64: '',
     }
@@ -119,12 +116,13 @@ export default function MasterResumePage() {
   const eduFields = useFieldArray({ control, name: 'education' });
   const projFields = useFieldArray({ control, name: 'projects' });
   const certFields = useFieldArray({ control, name: 'certifications' });
+  const trainFields = useFieldArray({ control, name: 'training' });
 
   React.useEffect(() => {
     if (status === 'unauthenticated') { setLoading(false); return; }
     if (status !== 'authenticated') return;
     api.get('/api/resume/master').then(res => {
-      if (res.data.data) reset(res.data.data);
+      if (res.data.data) reset(normalizeIncoming(res.data.data));
     }).catch(() => {}).finally(() => setLoading(false));
   }, [reset, status]);
 
@@ -200,18 +198,21 @@ export default function MasterResumePage() {
 
     if (!extractedData?.personalInfo?.name) {
       extractedData = {
-        personalInfo: { name: session?.user?.name || '', email: session?.user?.email || '', phone: '', location: '', linkedin: '', github: '', portfolio: '', x: '', reddit: '', leetcode: '' },
-        summary: '', experience: [{ id: 'exp_1', company: '', role: '', dates: '', description: '' }],
-        education: [], skills: '', projects: [], certifications: [],
+        personalInfo: { name: session?.user?.name || '', title: '', email: session?.user?.email || '', phone: '', location: '', linkedin: '', github: '', portfolio: '', x: '', reddit: '', leetcode: '' },
+        summary: '',
+        experience: [{ id: 'exp_1', company: '', role: '', location: '', startDate: '', endDate: '', description: '' }],
+        education: [], skills: '', projects: [], certifications: [], training: [],
       };
     }
 
-    extractedData.uploadedFileName = file.name;
-    extractedData.uploadedPdfBase64 = fileBase64;
+    // Normalise dates returned by the AI parser into our canonical MM-YYYY shape.
+    const normalised = normalizeIncoming(extractedData);
+    normalised.uploadedFileName = file.name;
+    normalised.uploadedPdfBase64 = fileBase64;
 
     setTimeout(async () => {
-      reset(extractedData);
-      try { await api.put('/api/resume/master', { data: extractedData }); } catch { /* non-blocking */ }
+      reset(normalised);
+      try { await api.put('/api/resume/master', { data: normalised }); } catch { /* non-blocking */ }
       setParsing(false);
       setParseSuccessMsg(true);
       toast.success('Resume parsed successfully!');
@@ -260,19 +261,45 @@ export default function MasterResumePage() {
           <div className="flex items-center text-xs text-text-muted gap-2 font-jetbrains uppercase tracking-widest mb-2">
             <Link href="/dashboard" className="hover:text-primary transition-colors">Workspace</Link>
             <ChevronRight className="w-3 h-3" />
-            <span className="text-primary font-bold">Resume Builder</span>
+            <span className="text-primary font-bold">Profile Data</span>
           </div>
-          <h1 className="text-3xl font-bold font-hanken">Resume Builder</h1>
-          <p className="text-text-sub text-sm">Build your master resume. All AI features use this data automatically.</p>
+          <h1 className="text-3xl font-bold font-hanken">Profile Data</h1>
+          <p className="text-text-sub text-sm">Your single source of truth — every resume, cover letter, and AI feature reads from here.</p>
         </div>
-        <Button
-          onClick={handleSubmit(onSubmit)}
-          className="rounded-xl gap-2 shadow-lg shadow-primary/20 border-none"
-          disabled={saving}
-        >
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <CheckCircle2 className="h-4 w-4" /> : <Save className="h-4 w-4" />}
-          {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Resume'}
-        </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link href="/dashboard/builder">
+            <Button variant="outline" className="rounded-xl gap-2 border-[var(--color-border-subtle)] h-10">
+              Continue to Resume Builder <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+          <Button
+            onClick={handleSubmit(onSubmit)}
+            className="rounded-xl gap-2 shadow-lg shadow-primary/20 border-none"
+            disabled={saving}
+          >
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <CheckCircle2 className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+            {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Profile'}
+          </Button>
+        </div>
+      </div>
+
+      {/* How-it-works explainer */}
+      <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+        <div className="flex items-start gap-4">
+          <div className="w-9 h-9 rounded-xl bg-primary/15 text-primary flex items-center justify-center shrink-0">
+            <Info className="w-4 h-4" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-bold text-text-main mb-1">How your Profile Data flows</h3>
+            <p className="text-xs text-text-sub leading-relaxed">
+              <span className="font-bold text-primary">1. Dump</span> — upload an existing resume and AI parses every section.
+              <span className="mx-1 text-text-muted">→</span>
+              <span className="font-bold text-primary">2. Curate</span> — review, edit, add/remove entries here. Dates use the <span className="font-jetbrains text-primary">MM-YYYY</span> picker; ongoing roles toggle to <span className="font-bold text-primary">Present</span>.
+              <span className="mx-1 text-text-muted">→</span>
+              <span className="font-bold text-primary">3. Build</span> — head to the Resume Builder, pick a template, hide sections you don&apos;t need, and export.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* PDF Upload */}
@@ -456,54 +483,10 @@ export default function MasterResumePage() {
                     </div>
                     <div className="space-y-1.5 sm:col-span-2">
                       <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Date Range</Label>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <span className="text-[9px] text-text-muted block font-jetbrains uppercase mb-1">From (MM/DD/YYYY)</span>
-                          <Input
-                            type="text"
-                            placeholder="MM/DD/YYYY"
-                            value={toDisplayDate((watch(`experience.${index}.dates` as const) || '').split(' to ')[0]?.trim() || '')}
-                            onChange={e => {
-                              const curr = watch(`experience.${index}.dates` as const) || '';
-                              const toVal = curr.includes(' to ') ? curr.split(' to ')[1].trim() : '';
-                              setValue(`experience.${index}.dates` as const, `${fromDisplayDate(e.target.value)}${toVal ? ` to ${toVal}` : ''}`, { shouldDirty: true });
-                            }}
-                            className="bg-surface-2 border-none h-10 rounded-xl text-sm"
-                          />
-                        </div>
-                        <div>
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[9px] text-text-muted block font-jetbrains uppercase">To (MM/DD/YYYY)</span>
-                            <button type="button" onClick={() => {
-                              const curr = watch(`experience.${index}.dates` as const) || '';
-                              const isPresent = curr.toLowerCase().includes('present');
-                              const fromVal = curr.split(' to ')[0]?.trim() || curr.replace(/\s*(?:to|-)?\s*present/i, '').trim();
-                              setValue(`experience.${index}.dates` as const, isPresent ? fromVal : `${fromVal ? `${fromVal} to ` : ''}Present`, { shouldDirty: true });
-                            }}
-                              className={`text-[9px] font-jetbrains uppercase px-1.5 py-0.5 rounded transition-all ${(watch(`experience.${index}.dates` as const) || '').toLowerCase().includes('present') ? 'bg-primary/20 text-primary border border-primary/30' : 'text-text-muted hover:text-text-main bg-surface-2'}`}>
-                              ✓ Present
-                            </button>
-                          </div>
-                          {(watch(`experience.${index}.dates` as const) || '').toLowerCase().includes('present') ? (
-                            <div className="bg-primary/10 border border-primary/20 h-10 rounded-xl flex items-center px-3 text-xs text-primary font-bold cursor-pointer"
-                              onClick={() => { const curr = watch(`experience.${index}.dates` as const) || ''; setValue(`experience.${index}.dates` as const, curr.split(' to ')[0].trim(), { shouldDirty: true }); }}>
-                              Present
-                            </div>
-                          ) : (
-                            <Input
-                              type="text"
-                              placeholder="MM/DD/YYYY"
-                              value={toDisplayDate((watch(`experience.${index}.dates` as const) || '').split(' to ')[1]?.trim() || '')}
-                              onChange={e => {
-                                const curr = watch(`experience.${index}.dates` as const) || '';
-                                const fromVal = curr.split(' to ')[0]?.trim() || curr;
-                                setValue(`experience.${index}.dates` as const, `${fromVal ? `${fromVal} to ` : ''}${fromDisplayDate(e.target.value)}`, { shouldDirty: true });
-                              }}
-                              className="bg-surface-2 border-none h-10 rounded-xl text-sm"
-                            />
-                          )}
-                        </div>
-                      </div>
+                      <MonthYearRange
+                        value={watch(`experience.${index}.dates` as const) || ''}
+                        onChange={next => setValue(`experience.${index}.dates` as const, next, { shouldDirty: true })}
+                      />
                       <input type="hidden" {...register(`experience.${index}.dates` as const)} />
                     </div>
                   </div>
@@ -573,27 +556,26 @@ export default function MasterResumePage() {
                       <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Field of Study</Label>
                       <Input {...register(`education.${index}.field` as const)} placeholder="e.g. Computer Science" className="bg-surface-2 border-none h-10 rounded-xl" />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Start Date (MM/YYYY)</Label>
-                      <Input
-                        type="text"
-                        placeholder="MM/YYYY"
-                        value={toDisplayMonth(watch(`education.${index}.startDate` as const) || '')}
-                        onChange={e => setValue(`education.${index}.startDate` as const, e.target.value, { shouldDirty: true })}
-                        className="bg-surface-2 border-none h-10 rounded-xl text-sm"
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Date Range</Label>
+                      <MonthYearRange
+                        value={watch(`education.${index}.dates` as const) || serializeDateRange({
+                          start: parseToMonthYear(watch(`education.${index}.startDate` as const) || ''),
+                          end: parseToMonthYear(watch(`education.${index}.endDate` as const) || ''),
+                          current: isPresentToken(watch(`education.${index}.endDate` as const) || ''),
+                        })}
+                        onChange={next => {
+                          const parsed = parseDateRange(next);
+                          setValue(`education.${index}.dates` as const, next, { shouldDirty: true });
+                          setValue(`education.${index}.startDate` as const, parsed.start, { shouldDirty: true });
+                          setValue(`education.${index}.endDate` as const, parsed.current ? 'Present' : parsed.end, { shouldDirty: true });
+                        }}
                       />
+                      <input type="hidden" {...register(`education.${index}.dates` as const)} />
+                      <input type="hidden" {...register(`education.${index}.startDate` as const)} />
+                      <input type="hidden" {...register(`education.${index}.endDate` as const)} />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">End Date (MM/YYYY)</Label>
-                      <Input
-                        type="text"
-                        placeholder="MM/YYYY or Present"
-                        value={toDisplayMonth(watch(`education.${index}.endDate` as const) || '')}
-                        onChange={e => setValue(`education.${index}.endDate` as const, e.target.value, { shouldDirty: true })}
-                        className="bg-surface-2 border-none h-10 rounded-xl text-sm"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
+                    <div className="space-y-1.5 sm:col-span-2">
                       <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">GPA (optional)</Label>
                       <Input {...register(`education.${index}.gpa` as const)} placeholder="e.g. 3.9 / 4.0" className="bg-surface-2 border-none h-10 rounded-xl" />
                     </div>
@@ -631,7 +613,7 @@ export default function MasterResumePage() {
               <div className="mt-3">
                 {watch('skills') && (
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {watch('skills').split(',').filter(s => s.trim()).map((skill, i) => (
+                    {String(watch('skills') || '').split(',').filter((s: string) => s.trim()).map((skill: string, i: number) => (
                       <span key={i} className="text-xs px-2.5 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 font-medium">
                         {skill.trim()}
                       </span>
@@ -734,14 +716,12 @@ export default function MasterResumePage() {
                       <Input {...register(`certifications.${index}.issuer` as const)} placeholder="e.g. Amazon Web Services" className="bg-surface-2 border-none h-10 rounded-xl" />
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Date Earned (MM/YYYY)</Label>
-                      <Input
-                        type="text"
-                        placeholder="MM/YYYY"
-                        value={toDisplayMonth(watch(`certifications.${index}.date` as const) || '')}
-                        onChange={e => setValue(`certifications.${index}.date` as const, e.target.value, { shouldDirty: true })}
-                        className="bg-surface-2 border-none h-10 rounded-xl text-sm"
+                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Date Earned (MM-YYYY)</Label>
+                      <MonthYearPicker
+                        value={parseToMonthYear(watch(`certifications.${index}.date` as const) || '')}
+                        onChange={next => setValue(`certifications.${index}.date` as const, next, { shouldDirty: true })}
                       />
+                      <input type="hidden" {...register(`certifications.${index}.date` as const)} />
                     </div>
                     <div className="space-y-1.5 sm:col-span-2">
                       <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Credential URL (optional)</Label>
@@ -755,6 +735,80 @@ export default function MasterResumePage() {
                   <p className="text-sm text-text-muted mb-3">No certifications added yet</p>
                   <Button type="button" size="sm" onClick={() => certFields.append({ id: Math.random().toString(), name: '', issuer: '', date: '', url: '' })}>
                     <Plus className="w-3.5 h-3.5 mr-1" /> Add Certification
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Training & Courses */}
+        {activeSection === 'training' && (
+          <Card className="border-[var(--color-border-subtle)] shadow-xl">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <div>
+                <CardTitle className="font-hanken text-lg flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-secondary" /> Training & Courses
+                </CardTitle>
+                <CardDescription className="text-xs mt-1">Bootcamps, online courses, workshops, and structured training — separate from formal education.</CardDescription>
+              </div>
+              <Button size="sm" type="button" onClick={() => trainFields.append({ id: Math.random().toString(), name: '', provider: '', startDate: '', endDate: '', dates: '', description: '' })}
+                className="rounded-full h-8 text-[10px] uppercase tracking-widest border-none">
+                <Plus className="w-3.5 h-3.5 mr-1" /> Add
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              {trainFields.fields.map((field, index) => (
+                <div key={field.id} className="relative p-5 rounded-2xl border border-[var(--color-border-subtle)] bg-surface/30 group hover:border-primary/20 transition-all">
+                  <Button variant="ghost" size="icon" type="button" onClick={() => trainFields.remove(index)}
+                    className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 bg-surface border border-[var(--color-border-subtle)] text-error rounded-full h-7 w-7">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Program / Course Name</Label>
+                      <Input {...register(`training.${index}.name` as const)} placeholder="e.g. Full-Stack Web Development Bootcamp" className="bg-surface-2 border-none h-10 rounded-xl" />
+                    </div>
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Provider / Institution</Label>
+                      <Input {...register(`training.${index}.provider` as const)} placeholder="e.g. Coursera, Udemy, freeCodeCamp" className="bg-surface-2 border-none h-10 rounded-xl" />
+                    </div>
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Date Range</Label>
+                      <MonthYearRange
+                        value={watch(`training.${index}.dates` as const) || serializeDateRange({
+                          start: parseToMonthYear(watch(`training.${index}.startDate` as const) || ''),
+                          end: parseToMonthYear(watch(`training.${index}.endDate` as const) || ''),
+                          current: isPresentToken(watch(`training.${index}.endDate` as const) || ''),
+                        })}
+                        onChange={next => {
+                          const parsed = parseDateRange(next);
+                          setValue(`training.${index}.dates` as const, next, { shouldDirty: true });
+                          setValue(`training.${index}.startDate` as const, parsed.start, { shouldDirty: true });
+                          setValue(`training.${index}.endDate` as const, parsed.current ? 'Present' : parsed.end, { shouldDirty: true });
+                        }}
+                      />
+                      <input type="hidden" {...register(`training.${index}.dates` as const)} />
+                      <input type="hidden" {...register(`training.${index}.startDate` as const)} />
+                      <input type="hidden" {...register(`training.${index}.endDate` as const)} />
+                    </div>
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-text-muted font-jetbrains">Description (optional)</Label>
+                      <textarea
+                        {...register(`training.${index}.description` as const)}
+                        rows={3}
+                        placeholder="Key topics covered, capstone project, certificate awarded..."
+                        className="w-full p-3 rounded-xl border-none bg-surface-2 text-text-main focus:ring-2 focus:ring-primary text-sm leading-relaxed resize-y"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {trainFields.fields.length === 0 && (
+                <div className="text-center py-8 border border-dashed border-[var(--color-border-subtle)] rounded-2xl">
+                  <p className="text-sm text-text-muted mb-3">No training added yet</p>
+                  <Button type="button" size="sm" onClick={() => trainFields.append({ id: Math.random().toString(), name: '', provider: '', startDate: '', endDate: '', dates: '', description: '' })}>
+                    <Plus className="w-3.5 h-3.5 mr-1" /> Add Training
                   </Button>
                 </div>
               )}

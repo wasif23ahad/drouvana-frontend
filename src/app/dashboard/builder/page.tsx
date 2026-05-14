@@ -7,7 +7,7 @@ import {
   Sparkles, ChevronRight, Sliders, FileText, AlignLeft, AlignCenter,
   AlignRight, Globe, Briefcase, GraduationCap, Code2, Award,
   Users, FolderOpen, Palette, Layers, Languages, Phone,
-  Mail, MapPin, Link2, RefreshCw, X, Settings2
+  Mail, MapPin, Link2, RefreshCw, X, Settings2, BookOpen, Info,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,13 +17,21 @@ import Link from 'next/link';
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
+import { MonthYearPicker, MonthYearRange } from '@/components/ui/month-year-picker';
+import {
+  parseDateRange,
+  serializeDateRange,
+  parseToMonthYear,
+  isPresentToken,
+  formatRangeForPreview,
+} from '@/lib/monthYear';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
 type TemplateId = 'modern' | 'classic' | 'executive' | 'sidebar' | 'minimal';
 type SectionType =
   | 'personal' | 'summary' | 'experience' | 'education' | 'skills'
-  | 'projects' | 'certifications' | 'languages' | 'references' | 'custom';
+  | 'projects' | 'certifications' | 'training' | 'languages' | 'references' | 'custom';
 
 interface SectionDef {
   id: string;
@@ -37,6 +45,7 @@ interface EduEntry { id: string; institution: string; degree: string; field: str
 interface SkillGroup { id: string; category: string; items: string; }
 interface ProjectEntry { id: string; name: string; description: string; tech: string; url: string; dates: string; }
 interface CertEntry { id: string; name: string; issuer: string; date: string; }
+interface TrainingEntry { id: string; name: string; provider: string; dates: string; description: string; }
 interface LangEntry { id: string; language: string; proficiency: string; }
 interface RefEntry { id: string; name: string; title: string; company: string; contact: string; }
 interface CustomItem { id: string; heading: string; body: string; }
@@ -49,6 +58,7 @@ interface ResumeData {
   skills: SkillGroup[];
   projects: ProjectEntry[];
   certifications: CertEntry[];
+  training: TrainingEntry[];
   languages: LangEntry[];
   references: RefEntry[];
   custom: Record<string, CustomItem[]>;
@@ -71,7 +81,7 @@ const uid = () => Math.random().toString(36).slice(2, 9);
 const SECTION_ICONS: Record<SectionType, React.ElementType> = {
   personal: Globe, summary: FileText, experience: Briefcase,
   education: GraduationCap, skills: Code2, projects: Layers,
-  certifications: Award, languages: Languages, references: Users, custom: Plus,
+  certifications: Award, training: BookOpen, languages: Languages, references: Users, custom: Plus,
 };
 
 const DEFAULT_SECTIONS: SectionDef[] = [
@@ -81,6 +91,7 @@ const DEFAULT_SECTIONS: SectionDef[] = [
   { id: 'skills', type: 'skills', title: 'Skills', visible: true },
   { id: 'projects', type: 'projects', title: 'Projects', visible: true },
   { id: 'certifications', type: 'certifications', title: 'Certifications', visible: true },
+  { id: 'training', type: 'training', title: 'Training & Courses', visible: false },
   { id: 'languages', type: 'languages', title: 'Languages', visible: false },
   { id: 'references', type: 'references', title: 'References', visible: false },
 ];
@@ -108,10 +119,27 @@ const DEFAULT_DATA: ResumeData = {
   skills: [{ id: uid(), category: 'Technical Skills', items: '' }],
   projects: [],
   certifications: [],
+  training: [],
   languages: [],
   references: [],
   custom: {},
 };
+
+// Best-effort: turn any incoming date representation into our canonical
+// "MM-YYYY to MM-YYYY|Present" range string.
+function buildDateString(e: any): string {
+  const explicit = e?.dates || '';
+  if (explicit) {
+    return serializeDateRange(parseDateRange(explicit));
+  }
+  const start = parseToMonthYear(e?.startDate || '');
+  const endRaw = e?.endDate || '';
+  return serializeDateRange({
+    start,
+    end: isPresentToken(endRaw) ? '' : parseToMonthYear(endRaw),
+    current: isPresentToken(endRaw),
+  });
+}
 
 const DEFAULT_APPEARANCE: AppearanceConfig = {
   template: 'modern', accentColor: '#2563eb', fontFamily: 'sans-serif',
@@ -134,6 +162,7 @@ export default function ResumeBuilderPage() {
   const [data, setData] = useState<ResumeData>(DEFAULT_DATA);
   const [appearance, setAppearance] = useState<AppearanceConfig>(DEFAULT_APPEARANCE);
   const [savedVersions, setSavedVersions] = useState<Array<{ id: string; name: string; date: string; sections: SectionDef[]; data: ResumeData; appearance: AppearanceConfig }>>([]);
+  const [prefilledBanner, setPrefilledBanner] = useState(false);
 
   // Load from API and localStorage
   useEffect(() => {
@@ -152,6 +181,12 @@ export default function ResumeBuilderPage() {
     api.get('/api/resume/master').then(res => {
       const p = res.data?.data;
       if (!p) return;
+
+      const hasPrefill =
+        Boolean(p.personalInfo?.name) ||
+        (Array.isArray(p.experience) && p.experience.length > 0) ||
+        (Array.isArray(p.education) && p.education.length > 0);
+
       setData(prev => ({
         ...prev,
         personal: {
@@ -167,21 +202,64 @@ export default function ResumeBuilderPage() {
         },
         summary: p.summary || '',
         experience: Array.isArray(p.experience)
-          ? p.experience.map((e: any) => ({ id: uid(), role: e.role || '', company: e.company || '', location: '', dates: e.dates || '', bullets: e.description || '' }))
+          ? p.experience.map((e: any) => ({
+              id: uid(),
+              role: e.role || '',
+              company: e.company || '',
+              location: e.location || '',
+              dates: buildDateString(e),
+              bullets: e.description || '',
+            }))
           : [],
         education: Array.isArray(p.education)
-          ? p.education.map((e: any) => ({ id: uid(), institution: e.institution || '', degree: e.degree || '', field: e.field || '', dates: e.dates || e.startDate || '', gpa: e.gpa || '' }))
+          ? p.education.map((e: any) => ({
+              id: uid(),
+              institution: e.institution || '',
+              degree: e.degree || '',
+              field: e.field || '',
+              dates: buildDateString(e),
+              gpa: e.gpa || '',
+            }))
           : [],
         skills: p.skills
           ? [{ id: uid(), category: 'Skills', items: typeof p.skills === 'string' ? p.skills : '' }]
           : prev.skills,
         projects: Array.isArray(p.projects)
-          ? p.projects.map((pr: any) => ({ id: uid(), name: pr.name || '', description: pr.description || '', tech: pr.techStack || '', url: pr.url || '', dates: pr.dates || '' }))
+          ? p.projects.map((pr: any) => ({
+              id: uid(),
+              name: pr.name || '',
+              description: pr.description || '',
+              tech: pr.techStack || '',
+              url: pr.url || '',
+              dates: buildDateString(pr),
+            }))
           : [],
         certifications: Array.isArray(p.certifications)
-          ? p.certifications.map((c: any) => ({ id: uid(), name: c.name || '', issuer: c.issuer || '', date: c.date || '' }))
+          ? p.certifications.map((c: any) => ({
+              id: uid(),
+              name: c.name || '',
+              issuer: c.issuer || '',
+              date: parseToMonthYear(c.date || ''),
+            }))
+          : [],
+        training: Array.isArray(p.training)
+          ? p.training.map((t: any) => ({
+              id: uid(),
+              name: t.name || '',
+              provider: t.provider || '',
+              dates: buildDateString(t),
+              description: t.description || '',
+            }))
           : [],
       }));
+
+      if (hasPrefill) {
+        // Auto-show the training section in the builder if the profile has any.
+        if (Array.isArray(p.training) && p.training.length > 0) {
+          setSections(prev => prev.map(s => (s.type === 'training' ? { ...s, visible: true } : s)));
+        }
+        setPrefilledBanner(true);
+      }
     }).catch(() => {}).finally(() => setLoading(false));
   }, [status]);
 
@@ -249,6 +327,11 @@ export default function ResumeBuilderPage() {
   const addCert = () => setData(p => ({ ...p, certifications: [...p.certifications, { id: uid(), name: '', issuer: '', date: '' }] }));
   const delCert = (idx: number) => setData(p => ({ ...p, certifications: p.certifications.filter((_, i) => i !== idx) }));
 
+  const updTrain = (idx: number, field: keyof TrainingEntry, val: string) =>
+    setData(p => { const a = [...p.training]; a[idx] = { ...a[idx], [field]: val }; return { ...p, training: a }; });
+  const addTrain = () => setData(p => ({ ...p, training: [...p.training, { id: uid(), name: '', provider: '', dates: '', description: '' }] }));
+  const delTrain = (idx: number) => setData(p => ({ ...p, training: p.training.filter((_, i) => i !== idx) }));
+
   const updLang = (idx: number, field: keyof LangEntry, val: string) =>
     setData(p => { const a = [...p.languages]; a[idx] = { ...a[idx], [field]: val }; return { ...p, languages: a }; });
   const addLang = () => setData(p => ({ ...p, languages: [...p.languages, { id: uid(), language: '', proficiency: 'Professional' }] }));
@@ -293,6 +376,18 @@ export default function ResumeBuilderPage() {
     localStorage.setItem('drouvana_builder_versions', JSON.stringify(updated));
   };
 
+  // Split a builder-side dates string back into the master-resume
+  // structured fields (startDate, endDate, dates) so Profile Data + AI
+  // services keep working without a schema migration.
+  const expandRange = (raw: string) => {
+    const r = parseDateRange(raw || '');
+    return {
+      startDate: r.start,
+      endDate: r.current ? 'Present' : r.end,
+      dates: serializeDateRange(r),
+    };
+  };
+
   const syncToCloud = async () => {
     setSaving(true);
     try {
@@ -300,17 +395,34 @@ export default function ResumeBuilderPage() {
         data: {
           personalInfo: { ...data.personal },
           summary: data.summary,
-          experience: data.experience.map(e => ({ company: e.company, role: e.role, dates: e.dates, description: e.bullets })),
-          education: data.education.map(e => ({ institution: e.institution, degree: e.degree, field: e.field, dates: e.dates, gpa: e.gpa })),
+          experience: data.experience.map(e => ({
+            company: e.company, role: e.role, location: e.location,
+            ...expandRange(e.dates),
+            description: e.bullets,
+          })),
+          education: data.education.map(e => ({
+            institution: e.institution, degree: e.degree, field: e.field,
+            ...expandRange(e.dates),
+            gpa: e.gpa,
+          })),
           skills: data.skills.map(g => g.items).join(', '),
-          projects: data.projects.map(p => ({ name: p.name, description: p.description, techStack: p.tech, url: p.url, dates: p.dates })),
-          certifications: data.certifications.map(c => ({ name: c.name, issuer: c.issuer, date: c.date })),
+          projects: data.projects.map(p => ({
+            name: p.name, description: p.description, techStack: p.tech, url: p.url,
+            ...expandRange(p.dates),
+          })),
+          certifications: data.certifications.map(c => ({
+            name: c.name, issuer: c.issuer, date: parseToMonthYear(c.date),
+          })),
+          training: data.training.map(t => ({
+            name: t.name, provider: t.provider, description: t.description,
+            ...expandRange(t.dates),
+          })),
         }
       });
       setSaved(true);
-      toast.success('Synced to cloud');
+      toast.success('Saved as your Master Copy');
       setTimeout(() => setSaved(false), 3000);
-    } catch { toast.error('Sync failed'); }
+    } catch { toast.error('Save failed'); }
     finally { setSaving(false); }
   };
 
@@ -345,9 +457,9 @@ export default function ResumeBuilderPage() {
                 <div className="grid grid-cols-2 gap-2 pr-6">
                   <Input placeholder="Job Title" value={exp.role} onChange={e => updExp(idx, 'role', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
                   <Input placeholder="Company" value={exp.company} onChange={e => updExp(idx, 'company', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
-                  <Input placeholder="Location" value={exp.location} onChange={e => updExp(idx, 'location', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
-                  <Input placeholder="Dates (MM/YYYY – Present)" value={exp.dates} onChange={e => updExp(idx, 'dates', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="Location" value={exp.location} onChange={e => updExp(idx, 'location', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg col-span-2" />
                 </div>
+                <MonthYearRange size="sm" value={exp.dates} onChange={next => updExp(idx, 'dates', next)} />
                 <textarea value={exp.bullets} onChange={e => updExp(idx, 'bullets', e.target.value)} rows={3} placeholder="• Led team of 5 engineers...&#10;• Reduced latency by 40%..." className="w-full bg-surface-2 border border-[var(--color-border-subtle)] rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
               </div>
             ))}
@@ -364,9 +476,9 @@ export default function ResumeBuilderPage() {
                 <div className="grid grid-cols-2 gap-2">
                   <Input placeholder="Degree (e.g. B.S.)" value={edu.degree} onChange={e => updEdu(idx, 'degree', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
                   <Input placeholder="Field of Study" value={edu.field} onChange={e => updEdu(idx, 'field', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
-                  <Input placeholder="Dates" value={edu.dates} onChange={e => updEdu(idx, 'dates', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
-                  <Input placeholder="GPA (optional)" value={edu.gpa} onChange={e => updEdu(idx, 'gpa', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="GPA (optional)" value={edu.gpa} onChange={e => updEdu(idx, 'gpa', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg col-span-2" />
                 </div>
+                <MonthYearRange size="sm" value={edu.dates} onChange={next => updEdu(idx, 'dates', next)} />
               </div>
             ))}
             <Button onClick={addEdu} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-[var(--color-border-subtle)] rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Education</Button>
@@ -391,10 +503,8 @@ export default function ResumeBuilderPage() {
             {data.projects.map((proj, idx) => (
               <div key={proj.id} className="p-3 bg-surface rounded-xl border border-[var(--color-border-subtle)] space-y-2 relative group">
                 <Button variant="ghost" size="icon" type="button" onClick={() => delProj(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
-                <div className="grid grid-cols-2 gap-2 pr-6">
-                  <Input placeholder="Project Name" value={proj.name} onChange={e => updProj(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
-                  <Input placeholder="Dates" value={proj.dates} onChange={e => updProj(idx, 'dates', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
-                </div>
+                <Input placeholder="Project Name" value={proj.name} onChange={e => updProj(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg pr-8" />
+                <MonthYearRange size="sm" value={proj.dates} onChange={next => updProj(idx, 'dates', next)} />
                 <Input placeholder="Tech stack (React, Node.js, Docker...)" value={proj.tech} onChange={e => updProj(idx, 'tech', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
                 <Input placeholder="URL (optional)" value={proj.url} onChange={e => updProj(idx, 'url', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
                 <textarea value={proj.description} onChange={e => updProj(idx, 'description', e.target.value)} rows={2} placeholder="• What you built and the impact..." className="w-full bg-surface-2 border border-[var(--color-border-subtle)] rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
@@ -410,13 +520,29 @@ export default function ResumeBuilderPage() {
               <div key={c.id} className="p-3 bg-surface rounded-xl border border-[var(--color-border-subtle)] space-y-2 relative group">
                 <Button variant="ghost" size="icon" type="button" onClick={() => delCert(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
                 <Input placeholder="Certification Name" value={c.name} onChange={e => updCert(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg pr-8" />
-                <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="Issuer" value={c.issuer} onChange={e => updCert(idx, 'issuer', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
-                  <Input placeholder="Date (MM/YYYY)" value={c.date} onChange={e => updCert(idx, 'date', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                <Input placeholder="Issuer" value={c.issuer} onChange={e => updCert(idx, 'issuer', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                <div>
+                  <Label className="text-[9px] text-text-muted uppercase tracking-wider font-jetbrains mb-1 block">Date Earned (MM-YYYY)</Label>
+                  <MonthYearPicker size="sm" value={parseToMonthYear(c.date)} onChange={next => updCert(idx, 'date', next)} />
                 </div>
               </div>
             ))}
             <Button onClick={addCert} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-[var(--color-border-subtle)] rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Certification</Button>
+          </div>
+        );
+      case 'training':
+        return (
+          <div className="pt-3 space-y-3">
+            {data.training.map((t, idx) => (
+              <div key={t.id} className="p-3 bg-surface rounded-xl border border-[var(--color-border-subtle)] space-y-2 relative group">
+                <Button variant="ghost" size="icon" type="button" onClick={() => delTrain(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
+                <Input placeholder="Program / Course Name" value={t.name} onChange={e => updTrain(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg pr-8" />
+                <Input placeholder="Provider (e.g. Coursera, freeCodeCamp)" value={t.provider} onChange={e => updTrain(idx, 'provider', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                <MonthYearRange size="sm" value={t.dates} onChange={next => updTrain(idx, 'dates', next)} />
+                <textarea value={t.description} onChange={e => updTrain(idx, 'description', e.target.value)} rows={2} placeholder="Key topics, capstone project, certificate awarded..." className="w-full bg-surface-2 border border-[var(--color-border-subtle)] rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
+              </div>
+            ))}
+            <Button onClick={addTrain} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-[var(--color-border-subtle)] rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Training</Button>
           </div>
         );
       case 'languages':
@@ -490,7 +616,7 @@ export default function ResumeBuilderPage() {
             <span className="text-primary font-bold">Resume Builder</span>
           </div>
           <h1 className="text-3xl font-bold font-hanken">Resume Builder</h1>
-          <p className="text-text-sub text-sm">Build, style, and export professional resumes. 5 templates, custom sections, full control.</p>
+          <p className="text-text-sub text-sm">Curate your Profile Data into a polished resume. Pick a template, hide sections you don&apos;t need, export to PDF.</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Button onClick={() => saveVersion()} variant="outline" className="rounded-xl gap-1.5 border-[var(--color-border-subtle)] h-9 text-xs">
@@ -501,10 +627,31 @@ export default function ResumeBuilderPage() {
           </Button>
           <Button onClick={syncToCloud} disabled={saving} className="rounded-xl gap-1.5 border-none shadow-lg shadow-primary/20 h-9 text-xs">
             {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : saved ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
-            {saving ? 'Saving...' : saved ? 'Synced' : 'Sync to Cloud'}
+            {saving ? 'Saving...' : saved ? 'Saved' : 'Save as Master Copy'}
           </Button>
         </div>
       </div>
+
+      {/* Pre-fill banner — shown the first time data was loaded from the user's Profile Data. */}
+      {prefilledBanner && (
+        <div className="rounded-2xl border border-primary/30 bg-primary/5 px-4 py-3 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-primary/15 text-primary flex items-center justify-center shrink-0">
+            <Info className="w-4 h-4" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-text-main">Loaded from your Profile Data</p>
+            <p className="text-[11px] text-text-sub">
+              Your personal info, experience, education, projects, certifications and training are pre-filled.
+              Tweak anything here without touching the source — or
+              <Link href="/dashboard/resume" className="text-primary font-bold hover:underline mx-1">edit in Profile Data</Link>
+              to update everywhere.
+            </p>
+          </div>
+          <Button variant="ghost" size="sm" onClick={() => setPrefilledBanner(false)} className="h-7 px-2 text-xs text-text-muted hover:text-text-main">
+            <X className="w-3.5 h-3.5" />
+          </Button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
@@ -924,7 +1071,7 @@ function SingleColumnTemplate({ data, sections, appearance }: { data: ResumeData
                       <div key={i} style={{ borderLeft: template === 'executive' ? `2px solid ${accentColor}20` : 'none', paddingLeft: template === 'executive' ? '10px' : '0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                           <strong style={{ fontSize: `${fontSize * 1.05}px`, color: '#111' }}>{exp.role || 'Role'}</strong>
-                          <span style={{ fontSize: `${fontSize * 0.82}px`, color: '#888', fontStyle: 'italic' }}>{exp.dates}</span>
+                          <span style={{ fontSize: `${fontSize * 0.82}px`, color: '#888', fontStyle: 'italic' }}>{formatRangeForPreview(parseDateRange(exp.dates || ''))}</span>
                         </div>
                         <div style={{ fontSize: `${fontSize * 0.92}px`, color: accentColor, fontWeight: 600, marginTop: '1px' }}>
                           {exp.company}{exp.location ? ` · ${exp.location}` : ''}
@@ -947,7 +1094,7 @@ function SingleColumnTemplate({ data, sections, appearance }: { data: ResumeData
                           <strong style={{ fontSize: `${fontSize}px`, color: '#111' }}>{edu.degree}{edu.field ? `, ${edu.field}` : ''}</strong>
                           <div style={{ fontSize: `${fontSize * 0.9}px`, color: '#555', marginTop: '1px' }}>{edu.institution}{edu.gpa ? ` · GPA: ${edu.gpa}` : ''}</div>
                         </div>
-                        <span style={{ fontSize: `${fontSize * 0.85}px`, color: '#888', whiteSpace: 'nowrap', marginLeft: '12px', marginTop: '2px' }}>{edu.dates}</span>
+                        <span style={{ fontSize: `${fontSize * 0.85}px`, color: '#888', whiteSpace: 'nowrap', marginLeft: '12px', marginTop: '2px' }}>{formatRangeForPreview(parseDateRange(edu.dates || ''))}</span>
                       </div>
                     ))}
                   </div>
@@ -988,7 +1135,7 @@ function SingleColumnTemplate({ data, sections, appearance }: { data: ResumeData
                       <div key={i}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                           <span style={{ fontWeight: 700, fontSize: `${fontSize}px`, color: '#111' }}>{proj.name}</span>
-                          <span style={{ fontSize: `${fontSize * 0.82}px`, color: '#888', fontStyle: 'italic' }}>{proj.dates}</span>
+                          <span style={{ fontSize: `${fontSize * 0.82}px`, color: '#888', fontStyle: 'italic' }}>{formatRangeForPreview(parseDateRange(proj.dates || ''))}</span>
                         </div>
                         {proj.tech && <div style={{ fontSize: `${fontSize * 0.85}px`, color: accentColor, fontWeight: 600, marginTop: '1px' }}>{proj.tech}</div>}
                         {proj.url && <div style={{ fontSize: `${fontSize * 0.82}px`, color: '#777', marginTop: '1px' }}>{proj.url}</div>}
@@ -1007,7 +1154,30 @@ function SingleColumnTemplate({ data, sections, appearance }: { data: ResumeData
                     {data.certifications.map((c, i) => (
                       <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                         <span style={{ fontSize: `${fontSize}px`, color: '#111', fontWeight: 600 }}>{c.name}</span>
-                        <span style={{ fontSize: `${fontSize * 0.85}px`, color: '#888' }}>{c.issuer}{c.date ? ` · ${c.date}` : ''}</span>
+                        <span style={{ fontSize: `${fontSize * 0.85}px`, color: '#888' }}>{c.issuer}{c.date ? ` · ${formatRangeForPreview({ start: parseToMonthYear(c.date), end: '', current: false })}` : ''}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            case 'training':
+              if (!data.training?.length) return null;
+              return (
+                <div key={sec.id}>
+                  {renderSectionHeading(sec.title)}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {data.training.map((t, i) => (
+                      <div key={i}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                          <span style={{ fontSize: `${fontSize}px`, color: '#111', fontWeight: 600 }}>
+                            {t.name}
+                            {t.provider && <span style={{ color: '#666', fontWeight: 400 }}> — {t.provider}</span>}
+                          </span>
+                          <span style={{ fontSize: `${fontSize * 0.85}px`, color: '#888' }}>
+                            {formatRangeForPreview(parseDateRange(t.dates || ''))}
+                          </span>
+                        </div>
+                        {t.description && <div style={{ marginTop: '2px' }}>{renderBullets(t.description)}</div>}
                       </div>
                     ))}
                   </div>
@@ -1163,7 +1333,7 @@ function SidebarTemplate({ data, sections, appearance }: { data: ResumeData; sec
                           <div style={{ fontWeight: 700, fontSize: `${fontSize * 0.88}px`, color: '#111' }}>{edu.degree}</div>
                           {edu.field && <div style={{ fontSize: `${fontSize * 0.82}px`, color: '#444' }}>{edu.field}</div>}
                           <div style={{ fontSize: `${fontSize * 0.82}px`, color: accentColor, fontWeight: 600 }}>{edu.institution}</div>
-                          <div style={{ fontSize: `${fontSize * 0.78}px`, color: '#666', marginTop: '1px' }}>{edu.dates}{edu.gpa ? ` · ${edu.gpa}` : ''}</div>
+                          <div style={{ fontSize: `${fontSize * 0.78}px`, color: '#666', marginTop: '1px' }}>{formatRangeForPreview(parseDateRange(edu.dates || ''))}{edu.gpa ? ` · ${edu.gpa}` : ''}</div>
                         </div>
                       ))}
                     </div>
@@ -1178,7 +1348,7 @@ function SidebarTemplate({ data, sections, appearance }: { data: ResumeData; sec
                       {data.certifications.map((c, i) => (
                         <div key={i}>
                           <div style={{ fontWeight: 600, fontSize: `${fontSize * 0.85}px`, color: '#111' }}>{c.name}</div>
-                          <div style={{ fontSize: `${fontSize * 0.78}px`, color: '#666' }}>{c.issuer}{c.date ? ` · ${c.date}` : ''}</div>
+                          <div style={{ fontSize: `${fontSize * 0.78}px`, color: '#666' }}>{c.issuer}{c.date ? ` · ${formatRangeForPreview({ start: parseToMonthYear(c.date), end: '', current: false })}` : ''}</div>
                         </div>
                       ))}
                     </div>
@@ -1226,7 +1396,7 @@ function SidebarTemplate({ data, sections, appearance }: { data: ResumeData; sec
                         <div key={i}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                             <strong style={{ fontSize: `${fontSize * 1.02}px`, color: '#111' }}>{exp.role || 'Role'}</strong>
-                            <span style={{ fontSize: `${fontSize * 0.8}px`, color: '#888', fontStyle: 'italic' }}>{exp.dates}</span>
+                            <span style={{ fontSize: `${fontSize * 0.8}px`, color: '#888', fontStyle: 'italic' }}>{formatRangeForPreview(parseDateRange(exp.dates || ''))}</span>
                           </div>
                           <div style={{ fontSize: `${fontSize * 0.9}px`, color: accentColor, fontWeight: 600, marginTop: '1px' }}>
                             {exp.company}{exp.location ? ` · ${exp.location}` : ''}
@@ -1247,10 +1417,33 @@ function SidebarTemplate({ data, sections, appearance }: { data: ResumeData; sec
                         <div key={i}>
                           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <span style={{ fontWeight: 700, fontSize: `${fontSize}px`, color: '#111' }}>{proj.name}</span>
-                            <span style={{ fontSize: `${fontSize * 0.82}px`, color: '#888' }}>{proj.dates}</span>
+                            <span style={{ fontSize: `${fontSize * 0.82}px`, color: '#888' }}>{formatRangeForPreview(parseDateRange(proj.dates || ''))}</span>
                           </div>
                           {proj.tech && <div style={{ fontSize: `${fontSize * 0.82}px`, color: accentColor, fontWeight: 600 }}>{proj.tech}</div>}
                           {proj.description && <div style={{ marginTop: '3px' }}>{renderBullets(proj.description)}</div>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              case 'training':
+                if (!data.training?.length) return null;
+                return (
+                  <div key={sec.id}>
+                    {mainHeading(sec.title)}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: `${sectionGap * 0.55}px` }}>
+                      {data.training.map((t, i) => (
+                        <div key={i}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                            <span style={{ fontWeight: 700, fontSize: `${fontSize}px`, color: '#111' }}>
+                              {t.name}
+                              {t.provider && <span style={{ color: '#666', fontWeight: 400 }}> — {t.provider}</span>}
+                            </span>
+                            <span style={{ fontSize: `${fontSize * 0.82}px`, color: '#888', fontStyle: 'italic' }}>
+                              {formatRangeForPreview(parseDateRange(t.dates || ''))}
+                            </span>
+                          </div>
+                          {t.description && <div style={{ marginTop: '3px' }}>{renderBullets(t.description)}</div>}
                         </div>
                       ))}
                     </div>
