@@ -232,7 +232,7 @@ export default function AnalyticsPage() {
                             <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
                           ))}
                         </Pie>
-                        <Tooltip formatter={(val: number) => [`${val}%`, '']} />
+                        <Tooltip formatter={(val) => [`${Number(val)}%`, '']} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
