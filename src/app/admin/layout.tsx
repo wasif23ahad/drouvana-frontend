@@ -36,8 +36,8 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen bg-background text-on-background font-sans">
       {/* Admin Sidebar */}
-      <aside className="w-64 bg-surface-container backdrop-blur-xl border-r border-white/10 h-screen fixed left-0 top-0 z-50 overflow-y-auto hidden md:flex flex-col shrink-0">
-        <div className="p-6 border-b border-white/5">
+      <aside className="w-64 bg-surface-container backdrop-blur-xl border-r border-[var(--color-border-subtle)] h-screen fixed left-0 top-0 z-50 overflow-y-auto hidden md:flex flex-col shrink-0">
+        <div className="p-6 border-b border-[var(--color-border-subtle)]">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary to-tertiary flex items-center justify-center text-on-primary font-bold text-lg">D</div>
             <div>
@@ -58,7 +58,7 @@ export default function AdminLayout({
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all border-l-4 ${
                     isActive 
                       ? 'bg-primary/10 text-primary border-primary' 
-                      : 'text-on-surface-variant hover:bg-white/5 hover:text-on-surface border-transparent'
+                      : 'text-on-surface-variant hover:bg-black/5 dark:hover:bg-white/5 hover:text-on-surface border-transparent'
                   }`}
                 >
                   <link.icon className={`w-5 h-5 ${isActive ? 'fill-primary/20' : ''}`} />
@@ -69,10 +69,10 @@ export default function AdminLayout({
           </nav>
         </div>
 
-        <div className="p-4 border-t border-white/5">
+        <div className="p-4 border-t border-[var(--color-border-subtle)]">
           <Link 
             href="/dashboard"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-on-surface-variant hover:text-on-surface transition-all border-l-4 border-transparent hover:bg-white/5"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-on-surface-variant hover:text-on-surface transition-all border-l-4 border-transparent hover:bg-black/5 dark:hover:bg-white/5"
           >
             <ArrowLeft className="w-5 h-5" />
             Exit Admin
@@ -85,7 +85,7 @@ export default function AdminLayout({
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
 
         {/* TopNavBar */}
-        <header className="bg-surface/80 backdrop-blur-lg border-b border-white/10 sticky top-0 z-40 flex justify-between items-center px-8 py-4 w-full h-16">
+        <header className="bg-surface/80 backdrop-blur-lg border-b border-[var(--color-border-subtle)] sticky top-0 z-40 flex justify-between items-center px-8 py-4 w-full h-16">
           <div className="flex items-center gap-4">
             <div className="text-on-surface-variant font-sans text-xs flex items-center gap-2">
               <span>Admin</span>
@@ -100,7 +100,7 @@ export default function AdminLayout({
               <Bell className="w-5 h-5" />
               <span className="absolute top-0 right-0 w-2 h-2 bg-error rounded-full border border-background"></span>
             </button>
-            <Avatar className="w-8 h-8 border border-white/10">
+            <Avatar className="w-8 h-8 border border-[var(--color-border-subtle)]">
               <AvatarImage src={session?.user?.image || ''} />
               <AvatarFallback className="bg-surface-bright text-xs font-bold">{session?.user?.name?.charAt(0) || 'A'}</AvatarFallback>
             </Avatar>

@@ -131,7 +131,7 @@ export function AddApplicationModal({ open, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-lg bg-surface border border-white/10 rounded-2xl shadow-2xl z-10 overflow-hidden">
+      <div className="relative w-full max-w-lg bg-surface border border-[var(--color-border-subtle)] rounded-2xl shadow-2xl z-10 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4">
           <div>
@@ -144,7 +144,7 @@ export function AddApplicationModal({ open, onClose }: Props) {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-white/5 px-6">
+        <div className="flex border-b border-[var(--color-border-subtle)] px-6">
           {(['basic', 'details'] as const).map(tab => (
             <button
               key={tab}
@@ -172,7 +172,7 @@ export function AddApplicationModal({ open, onClose }: Props) {
                     value={form.jobTitle}
                     onChange={e => set('jobTitle', e.target.value)}
                     placeholder="e.g. Senior Software Engineer"
-                    className="bg-surface-2 border-white/10 rounded-xl text-sm h-10"
+                    className="bg-surface-2 border-[var(--color-border-subtle)] rounded-xl text-sm h-10"
                     autoFocus
                   />
                 </div>
@@ -184,7 +184,7 @@ export function AddApplicationModal({ open, onClose }: Props) {
                     value={form.company}
                     onChange={e => set('company', e.target.value)}
                     placeholder="e.g. Stripe"
-                    className="bg-surface-2 border-white/10 rounded-xl text-sm h-10"
+                    className="bg-surface-2 border-[var(--color-border-subtle)] rounded-xl text-sm h-10"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -193,7 +193,7 @@ export function AddApplicationModal({ open, onClose }: Props) {
                     <select
                       value={form.status}
                       onChange={e => set('status', e.target.value)}
-                      className="w-full bg-surface-2 border border-white/10 rounded-xl px-3 text-sm h-10 text-text-main focus:outline-none focus:border-primary/50"
+                      className="w-full bg-surface-2 border border-[var(--color-border-subtle)] rounded-xl px-3 text-sm h-10 text-text-main focus:outline-none focus:border-primary/50"
                     >
                       {STATUS_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -205,7 +205,7 @@ export function AddApplicationModal({ open, onClose }: Props) {
                     <select
                       value={form.priority}
                       onChange={e => set('priority', Number(e.target.value))}
-                      className="w-full bg-surface-2 border border-white/10 rounded-xl px-3 text-sm h-10 text-text-main focus:outline-none focus:border-primary/50"
+                      className="w-full bg-surface-2 border border-[var(--color-border-subtle)] rounded-xl px-3 text-sm h-10 text-text-main focus:outline-none focus:border-primary/50"
                     >
                       {PRIORITY_OPTIONS.map(opt => (
                         <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -221,7 +221,7 @@ export function AddApplicationModal({ open, onClose }: Props) {
                     value={form.location}
                     onChange={e => set('location', e.target.value)}
                     placeholder="e.g. Remote / San Francisco, CA"
-                    className="bg-surface-2 border-white/10 rounded-xl text-sm h-10"
+                    className="bg-surface-2 border-[var(--color-border-subtle)] rounded-xl text-sm h-10"
                   />
                 </div>
                 <div>
@@ -232,7 +232,7 @@ export function AddApplicationModal({ open, onClose }: Props) {
                     value={form.jobUrl}
                     onChange={e => set('jobUrl', e.target.value)}
                     placeholder="https://..."
-                    className="bg-surface-2 border-white/10 rounded-xl text-sm h-10"
+                    className="bg-surface-2 border-[var(--color-border-subtle)] rounded-xl text-sm h-10"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -245,7 +245,7 @@ export function AddApplicationModal({ open, onClose }: Props) {
                       value={form.salaryMin}
                       onChange={e => set('salaryMin', e.target.value)}
                       placeholder="e.g. 120000"
-                      className="bg-surface-2 border-white/10 rounded-xl text-sm h-10"
+                      className="bg-surface-2 border-[var(--color-border-subtle)] rounded-xl text-sm h-10"
                     />
                   </div>
                   <div>
@@ -255,7 +255,7 @@ export function AddApplicationModal({ open, onClose }: Props) {
                       value={form.salaryMax}
                       onChange={e => set('salaryMax', e.target.value)}
                       placeholder="e.g. 160000"
-                      className="bg-surface-2 border-white/10 rounded-xl text-sm h-10"
+                      className="bg-surface-2 border-[var(--color-border-subtle)] rounded-xl text-sm h-10"
                     />
                   </div>
                 </div>
@@ -286,7 +286,7 @@ export function AddApplicationModal({ open, onClose }: Props) {
                     onChange={e => set('jobDescription', e.target.value)}
                     placeholder="Paste the full job description here. Click 'AI Parse' to auto-fill job title, company, and location."
                     rows={8}
-                    className="w-full bg-surface-2 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-text-sub placeholder:text-text-muted focus:outline-none focus:border-primary/50 resize-none font-sans"
+                    className="w-full bg-surface-2 border border-[var(--color-border-subtle)] rounded-xl px-3 py-2.5 text-sm text-text-sub placeholder:text-text-muted focus:outline-none focus:border-primary/50 resize-none font-sans"
                   />
                   <p className="text-[10px] text-text-muted mt-1">Paste the JD and use AI Parse to auto-fill fields on the Basic tab.</p>
                 </div>
@@ -299,15 +299,15 @@ export function AddApplicationModal({ open, onClose }: Props) {
                     onChange={e => set('notes', e.target.value)}
                     placeholder="Recruiter name, referral source, important deadlines..."
                     rows={3}
-                    className="w-full bg-surface-2 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
+                    className="w-full bg-surface-2 border border-[var(--color-border-subtle)] rounded-xl px-3 py-2.5 text-sm text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
                   />
                 </div>
               </>
             )}
           </div>
 
-          <div className="px-6 pb-6 flex gap-3 border-t border-white/5 pt-4">
-            <Button type="button" onClick={onClose} variant="outline" className="flex-1 rounded-xl h-10 border-white/10 text-sm">
+          <div className="px-6 pb-6 flex gap-3 border-t border-[var(--color-border-subtle)] pt-4">
+            <Button type="button" onClick={onClose} variant="outline" className="flex-1 rounded-xl h-10 border-[var(--color-border-subtle)] text-sm">
               Cancel
             </Button>
             {activeTab === 'basic' ? (

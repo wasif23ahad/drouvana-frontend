@@ -27,7 +27,7 @@ export default function AssistantPage() {
         </div>
         <div className="hidden md:flex items-center gap-3">
           {CAPABILITIES.map((cap, i) => (
-            <div key={i} className="flex flex-col items-center gap-1 p-3 rounded-xl bg-surface-2/50 border border-white/5 min-w-[80px] text-center">
+            <div key={i} className="flex flex-col items-center gap-1 p-3 rounded-xl bg-surface-2/50 border border-[var(--color-border-subtle)] min-w-[80px] text-center">
               <cap.icon className="w-4 h-4 text-primary" />
               <span className="text-[10px] font-bold font-jetbrains text-text-main">{cap.label}</span>
               <span className="text-[9px] text-text-muted leading-tight">{cap.desc}</span>

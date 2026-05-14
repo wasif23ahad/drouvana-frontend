@@ -29,7 +29,7 @@ const Step2JDAnalysis = () => {
   return (
     <div className="space-y-12 max-w-4xl mx-auto">
       {/* Neural Insight Header */}
-      <div className="flex flex-col md:flex-row items-center gap-8 p-10 bg-surface-2/30 rounded-4xl border border-white/5 relative overflow-hidden shadow-2xl">
+      <div className="flex flex-col md:flex-row items-center gap-8 p-10 bg-surface-2/30 rounded-4xl border border-[var(--color-border-subtle)] relative overflow-hidden shadow-2xl">
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[50px] rounded-full pointer-events-none"></div>
         <div className="w-20 h-20 rounded-3xl bg-primary/20 flex items-center justify-center shrink-0 border border-primary/20">
           <ShieldCheck className="text-primary w-10 h-10" />
@@ -58,7 +58,7 @@ const Step2JDAnalysis = () => {
               {section.data.map((item: string, i: number) => (
                 <span 
                   key={i} 
-                  className="px-4 py-2 rounded-xl bg-surface-2 border border-white/5 text-xs font-jetbrains text-text-sub hover:border-primary/50 hover:text-text-main transition-all cursor-default shadow-md"
+                  className="px-4 py-2 rounded-xl bg-surface-2 border border-[var(--color-border-subtle)] text-xs font-jetbrains text-text-sub hover:border-primary/50 hover:text-text-main transition-all cursor-default shadow-md"
                 >
                   {item}
                 </span>
@@ -69,7 +69,7 @@ const Step2JDAnalysis = () => {
       </div>
 
       {/* Intelligence Summary */}
-      <div className="p-10 bg-surface-2/50 rounded-4xl border border-white/5 space-y-4 relative overflow-hidden shadow-xl">
+      <div className="p-10 bg-surface-2/50 rounded-4xl border border-[var(--color-border-subtle)] space-y-4 relative overflow-hidden shadow-xl">
         <div className="flex items-center gap-3">
           <Info className="w-5 h-5 text-primary" />
           <h4 className="font-hanken font-bold text-lg text-text-main tracking-tight">Organization Profile Summary</h4>
@@ -80,11 +80,11 @@ const Step2JDAnalysis = () => {
       </div>
 
       {/* Navigation Loop */}
-      <div className="flex flex-col sm:flex-row justify-between items-center pt-10 border-t border-white/5 gap-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center pt-10 border-t border-[var(--color-border-subtle)] gap-6">
         <Button 
           variant="outline" 
           onClick={() => setStep(1)} 
-          className="rounded-2xl h-14 px-8 border-white/10 bg-surface-2 hover:bg-white/5 text-text-main font-hanken font-bold shadow-lg gap-2"
+          className="rounded-2xl h-14 px-8 border-[var(--color-border-subtle)] bg-surface-2 hover:bg-black/5 dark:hover:bg-white/5 text-text-main font-hanken font-bold shadow-lg gap-2"
         >
           <ChevronLeft className="w-4 h-4" /> Back to Parameters
         </Button>

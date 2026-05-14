@@ -65,7 +65,7 @@ export default function PricingPage() {
             key={plan.name}
             className={cn(
               "bg-surface-2/50 backdrop-blur-xl border rounded-4xl p-10 flex flex-col relative overflow-hidden transition-all duration-500 hover:scale-[1.02]",
-              plan.highlight ? "border-primary/50 shadow-2xl shadow-primary/10 md:-translate-y-4" : "border-white/5 shadow-xl"
+              plan.highlight ? "border-primary/50 shadow-2xl shadow-primary/10 md:-translate-y-4" : "border-[var(--color-border-subtle)] shadow-xl"
             )}
           >
             {plan.highlight && (
@@ -99,7 +99,7 @@ export default function PricingPage() {
 
             <Button className={cn(
               "w-full h-14 rounded-2xl font-hanken font-bold text-lg shadow-lg border-none transition-all active:scale-95",
-              plan.highlight ? "bg-primary text-white shadow-primary/20" : "bg-surface-2 text-text-main hover:bg-white/5"
+              plan.highlight ? "bg-primary text-white shadow-primary/20" : "bg-surface-2 text-text-main hover:bg-black/5 dark:hover:bg-white/5"
             )}>
               {plan.button}
             </Button>
@@ -113,11 +113,11 @@ export default function PricingPage() {
            <p className="font-jetbrains text-[10px] uppercase tracking-[0.4em] text-secondary font-black">Strategic Breakdown</p>
            <h2 className="text-4xl font-hanken font-bold text-text-main tracking-tight">Compare Plan Capabilities</h2>
         </div>
-        <div className="bg-surface-2 rounded-4xl border border-white/5 overflow-hidden shadow-2xl">
+        <div className="bg-surface-2 rounded-4xl border border-[var(--color-border-subtle)] overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-white/10 bg-surface/50">
+                <tr className="border-b border-[var(--color-border-subtle)] bg-surface/50">
                   <th className="py-6 px-10 font-jetbrains text-[10px] uppercase tracking-[0.2em] text-text-muted">Capabilities</th>
                   <th className="py-6 px-10 font-hanken font-bold text-lg text-text-main ">Free</th>
                   <th className="py-6 px-10 font-hanken font-bold text-lg text-primary bg-primary/5">Pro</th>
@@ -126,7 +126,7 @@ export default function PricingPage() {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {COMPARISON.map((row) => (
-                  <tr key={row.f} className="hover:bg-white/5 transition-colors">
+                  <tr key={row.f} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                     <td className="py-6 px-10 font-sans text-text-main">{row.f}</td>
                     <td className="py-6 px-10 font-jetbrains text-[11px] text-text-muted uppercase tracking-wider">
                       {typeof row.free === 'boolean' ? (row.free ? <Check className="w-5 h-5 text-primary" /> : <X className="w-5 h-5 text-error opacity-30" />) : row.free}
@@ -155,7 +155,7 @@ export default function PricingPage() {
             { q: 'Is there a free trial?', a: 'Our Free plan is free forever. You can experience the core platform without any commitment.' },
             { q: 'How do I cancel?', a: 'Cancel anytime from your account settings. You will maintain access until the end of your billing cycle.' }
           ].map((item) => (
-            <div key={item.q} className="bg-surface-2/50 border border-white/5 rounded-2xl p-8 space-y-4 hover:border-primary/30 transition-all shadow-lg">
+            <div key={item.q} className="bg-surface-2/50 border border-[var(--color-border-subtle)] rounded-2xl p-8 space-y-4 hover:border-primary/30 transition-all shadow-lg">
               <h4 className="font-hanken font-bold text-text-main ">{item.q}</h4>
               <p className="text-sm text-text-sub leading-relaxed ">{item.a}</p>
             </div>

@@ -240,7 +240,7 @@ export default function ChatInterface() {
             >
               <div className={cn(
                 "h-9 w-9 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden border",
-                m.role === 'assistant' ? "bg-primary/10 text-primary border-primary/10" : "bg-surface-2 text-text-muted border-white/5"
+                m.role === 'assistant' ? "bg-primary/10 text-primary border-primary/10" : "bg-surface-2 text-text-muted border-[var(--color-border-subtle)]"
               )}>
                 {m.role === 'assistant' ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
               </div>
@@ -361,14 +361,14 @@ const renderMarkdown = (text: string) => {
         }
         if (trimmed.startsWith('## ')) {
           return (
-            <h3 key={lineIdx} className="font-bold text-white text-lg mt-3 mb-1 border-b border-white/10 pb-1">
+            <h3 key={lineIdx} className="font-bold text-white text-lg mt-3 mb-1 border-b border-[var(--color-border-subtle)] pb-1">
               {formatInline(trimmed.replace(/^##\s+/, ''))}
             </h3>
           );
         }
         if (trimmed.startsWith('# ')) {
           return (
-            <h2 key={lineIdx} className="font-bold text-white text-xl mt-4 mb-1 border-b border-white/10 pb-1">
+            <h2 key={lineIdx} className="font-bold text-white text-xl mt-4 mb-1 border-b border-[var(--color-border-subtle)] pb-1">
               {formatInline(trimmed.replace(/^#\s+/, ''))}
             </h2>
           );

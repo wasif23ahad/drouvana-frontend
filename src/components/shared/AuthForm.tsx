@@ -96,7 +96,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
   };
 
   return (
-    <div className="relative z-10 w-full max-w-[1000px] min-h-[600px] bg-surface/50 backdrop-blur-2xl rounded-(--radius-premium) border border-white/5 flex flex-col md:flex-row shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-500">
+    <div className="relative z-10 w-full max-w-[1000px] min-h-[600px] bg-surface/50 backdrop-blur-2xl rounded-(--radius-premium) border border-[var(--color-border-subtle)] flex flex-col md:flex-row shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-500">
       
       {/* Left Side: Branding / Abstract */}
       <div className="hidden md:flex w-1/2 relative p-12 flex-col justify-between overflow-hidden bg-surface-2/30">
@@ -114,7 +114,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
           </p>
         </div>
         <div className="relative z-10">
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-surface/50 backdrop-blur-md border border-white/5 inline-flex">
+          <div className="flex items-center gap-2 p-3 rounded-xl bg-surface/50 backdrop-blur-md border border-[var(--color-border-subtle)] inline-flex">
             <Sparkles className="w-4 h-4 text-primary fill-primary/20" />
             <span className="font-jetbrains text-[10px] uppercase tracking-widest text-primary font-bold">Operational AI Ecosystem</span>
           </div>
@@ -122,7 +122,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
       </div>
 
       {/* Right Side: Auth Card */}
-      <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-surface border-l border-white/5 relative z-10">
+      <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-surface border-l border-[var(--color-border-subtle)] relative z-10">
         {/* Mobile Logo */}
         <div className="flex md:hidden items-center justify-center gap-2 mb-8">
           <Image src="/Drouvana_logo.png" alt="Drouvana" width={28} height={28} className="rounded-lg" />
@@ -134,7 +134,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
           <button 
             onClick={() => router.push('/login')}
             className={`w-1/2 py-2.5 rounded-lg font-jetbrains text-[10px] uppercase tracking-widest transition-all ${
-              mode === 'login' ? 'bg-surface text-text-main shadow-sm border border-white/5' : 'text-text-muted hover:text-text-main'
+              mode === 'login' ? 'bg-surface text-text-main shadow-sm border border-[var(--color-border-subtle)]' : 'text-text-muted hover:text-text-main'
             }`}
           >
             Login
@@ -142,7 +142,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
           <button 
             onClick={() => router.push('/register')}
             className={`w-1/2 py-2.5 rounded-lg font-jetbrains text-[10px] uppercase tracking-widest transition-all ${
-              mode === 'register' ? 'bg-surface text-text-main shadow-sm border border-white/5' : 'text-text-muted hover:text-text-main'
+              mode === 'register' ? 'bg-surface text-text-main shadow-sm border border-[var(--color-border-subtle)]' : 'text-text-muted hover:text-text-main'
             }`}
           >
             Sign Up

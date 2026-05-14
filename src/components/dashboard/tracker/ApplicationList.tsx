@@ -135,7 +135,7 @@ export function ApplicationList({ searchQuery }: { searchQuery: string }) {
         <div className="flex justify-center items-center gap-2 pt-2">
           <Button
             variant="outline" size="icon"
-            className="w-8 h-8 rounded-lg border-white/5 bg-surface-2 text-text-muted hover:text-primary disabled:opacity-30"
+            className="w-8 h-8 rounded-lg border-[var(--color-border-subtle)] bg-surface-2 text-text-muted hover:text-primary disabled:opacity-30"
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
           >
@@ -145,7 +145,7 @@ export function ApplicationList({ searchQuery }: { searchQuery: string }) {
             <Button
               key={i}
               variant={page === i + 1 ? 'default' : 'outline'}
-              className={`w-8 h-8 rounded-lg text-xs border-white/5 ${page === i + 1 ? 'bg-primary text-white' : 'bg-surface-2 text-text-sub hover:text-primary'}`}
+              className={`w-8 h-8 rounded-lg text-xs border-[var(--color-border-subtle)] ${page === i + 1 ? 'bg-primary text-white' : 'bg-surface-2 text-text-sub hover:text-primary'}`}
               onClick={() => setPage(i + 1)}
             >
               {i + 1}
@@ -153,7 +153,7 @@ export function ApplicationList({ searchQuery }: { searchQuery: string }) {
           ))}
           <Button
             variant="outline" size="icon"
-            className="w-8 h-8 rounded-lg border-white/5 bg-surface-2 text-text-muted hover:text-primary disabled:opacity-30"
+            className="w-8 h-8 rounded-lg border-[var(--color-border-subtle)] bg-surface-2 text-text-muted hover:text-primary disabled:opacity-30"
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
           >

@@ -19,7 +19,7 @@ export default function HelpPage() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
           <Input 
             placeholder="Search help articles, guides, and FAQs..." 
-            className="h-16 pl-12 rounded-[24px] text-lg bg-white/5 border-white/10"
+            className="h-16 pl-12 rounded-[24px] text-lg bg-white/5 border-[var(--color-border-subtle)]"
           />
         </div>
       </div>
@@ -31,7 +31,7 @@ export default function HelpPage() {
           { icon: FileText, title: 'Policies', count: '4 Articles' },
           { icon: MessageCircle, title: 'Support', count: 'Live Chat' },
         ].map((c, i) => (
-          <div key={i} className="glass-card p-6 rounded-[32px] text-center space-y-2 border-white/5 bg-white/5 hover:border-primary/20 transition-all cursor-pointer group">
+          <div key={i} className="glass-card p-6 rounded-[32px] text-center space-y-2 border-[var(--color-border-subtle)] bg-white/5 hover:border-primary/20 transition-all cursor-pointer group">
             <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
               <c.icon className="w-6 h-6 text-primary" />
             </div>
@@ -49,7 +49,7 @@ export default function HelpPage() {
         </div>
         <div className="space-y-4">
           {FAQS.map((faq, i) => (
-            <div key={i} className="glass-card p-8 rounded-[32px] border-white/5 bg-white/5 space-y-2 group hover:bg-white/[0.07] transition-all">
+            <div key={i} className="glass-card p-8 rounded-[32px] border-[var(--color-border-subtle)] bg-white/5 space-y-2 group hover:bg-white/[0.07] transition-all">
               <h4 className="font-bold text-lg group-hover:text-primary transition-colors">{faq.q}</h4>
               <p className="text-muted-foreground leading-relaxed">{faq.a}</p>
             </div>

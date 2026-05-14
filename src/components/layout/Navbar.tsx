@@ -108,7 +108,7 @@ const Navbar = () => {
                       <p className="text-[10px] font-jetbrains uppercase tracking-widest text-text-muted">{session.user?.email}</p>
                     </div>
                   </div>
-                  <DropdownMenuSeparator className="bg-white/5" />
+                  <DropdownMenuSeparator className="bg-[var(--color-border-subtle)]" />
                   <DropdownMenuItem onClick={() => router.push('/dashboard')} className="rounded-lg p-3 focus:bg-primary/10 cursor-pointer">
                     <LayoutDashboard className="mr-3 h-4 w-4 text-primary" />
                     <span className="text-xs font-bold uppercase tracking-widest font-jetbrains">Dashboard</span>
@@ -121,7 +121,7 @@ const Navbar = () => {
                     <Settings className="mr-3 h-4 w-4 text-primary" />
                     <span className="text-xs font-bold uppercase tracking-widest font-jetbrains">Settings</span>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-white/5" />
+                  <DropdownMenuSeparator className="bg-[var(--color-border-subtle)]" />
                   <DropdownMenuItem onClick={() => signOut()} className="rounded-lg p-3 text-error focus:bg-error/10 cursor-pointer">
                     <LogOut className="mr-3 h-4 w-4" />
                     <span className="text-xs font-bold uppercase tracking-widest font-jetbrains">Log out</span>
@@ -176,7 +176,7 @@ const Navbar = () => {
               </Link>
             ))}
             {!session && (
-              <div className="flex flex-col gap-3 pt-4 border-t border-white/5">
+              <div className="flex flex-col gap-3 pt-4 border-t border-[var(--color-border-subtle)]">
                 <Link href="/login?switch=true" onClick={() => setIsOpen(false)}>
                   <Button variant="outline" className="w-full h-12 rounded-full font-bold uppercase tracking-widest text-xs border-primary text-primary">Login</Button>
                 </Link>

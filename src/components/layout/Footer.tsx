@@ -24,7 +24,7 @@ const GithubIcon = () => (
 
 export default function Footer() {
   return (
-    <footer className="w-full glass-card py-12 border-t border-[#334155] mt-auto relative z-10">
+    <footer className="w-full glass-card py-12 border-t border-[var(--color-border-subtle)] mt-auto relative z-10">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
           {/* Brand */}

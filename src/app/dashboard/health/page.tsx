@@ -106,7 +106,7 @@ export default function PipelineHealthPage() {
           onClick={() => fetchHealthMetrics(true)} 
           disabled={refreshing}
           variant="outline" 
-          className="rounded-xl gap-2 border-white/10 hover:bg-surface-2"
+          className="rounded-xl gap-2 border-[var(--color-border-subtle)] hover:bg-surface-2"
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-primary' : ''}`} />
           {refreshing ? 'Analyzing Cache...' : 'Bypass Cache Refresh'}
@@ -115,7 +115,7 @@ export default function PipelineHealthPage() {
 
       {/* Top summary row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl relative overflow-hidden">
+        <Card className="bg-surface/50 border-[var(--color-border-subtle)] backdrop-blur-md rounded-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-1 h-full bg-emerald-400" />
           <CardContent className="p-5">
             <span className="text-[11px] font-jetbrains uppercase text-text-muted block mb-1">Health Metric Score</span>
@@ -127,7 +127,7 @@ export default function PipelineHealthPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
+        <Card className="bg-surface/50 border-[var(--color-border-subtle)] backdrop-blur-md rounded-2xl">
           <CardContent className="p-5">
             <span className="text-[11px] font-jetbrains uppercase text-text-muted block mb-1">Total Monitored Tasks</span>
             <span className="text-3xl font-bold font-hanken text-primary">{stats?.total}</span>
@@ -135,7 +135,7 @@ export default function PipelineHealthPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
+        <Card className="bg-surface/50 border-[var(--color-border-subtle)] backdrop-blur-md rounded-2xl">
           <CardContent className="p-5">
             <span className="text-[11px] font-jetbrains uppercase text-text-muted block mb-1">Response Conversion</span>
             <span className="text-3xl font-bold font-hanken text-text-main">{stats?.responseRate}%</span>
@@ -143,7 +143,7 @@ export default function PipelineHealthPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
+        <Card className="bg-surface/50 border-[var(--color-border-subtle)] backdrop-blur-md rounded-2xl">
           <CardContent className="p-5">
             <span className="text-[11px] font-jetbrains uppercase text-text-muted block mb-1">Screening Ratio</span>
             <span className="text-3xl font-bold font-hanken text-text-main">{stats?.interviewConversion}%</span>
@@ -157,8 +157,8 @@ export default function PipelineHealthPage() {
         
         {/* Left Side: Extracted AI Narrative Insights */}
         <div className="lg:col-span-7 flex flex-col gap-6">
-          <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
-            <CardHeader className="pb-3 border-b border-white/5 flex flex-row items-center justify-between">
+          <Card className="bg-surface/50 border-[var(--color-border-subtle)] backdrop-blur-md rounded-2xl">
+            <CardHeader className="pb-3 border-b border-[var(--color-border-subtle)] flex flex-row items-center justify-between">
               <div>
                 <CardTitle className="text-sm font-bold font-hanken text-text-main">AI Diagnostics Narrative</CardTitle>
                 <CardDescription className="text-xs">Agent funnel trajectory monitoring summary</CardDescription>
@@ -169,7 +169,7 @@ export default function PipelineHealthPage() {
             </CardHeader>
             <CardContent className="p-6 space-y-4">
               {stats?.insights.map((ins: any, idx: number) => (
-                <div key={idx} className="flex gap-3.5 items-start p-3 rounded-xl bg-surface-2 border border-white/5">
+                <div key={idx} className="flex gap-3.5 items-start p-3 rounded-xl bg-surface-2 border border-[var(--color-border-subtle)]">
                   <div className={`p-2 rounded-lg mt-0.5 shrink-0 ${ins.type === 'positive' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'}`}>
                     {ins.type === 'positive' ? <ShieldCheck className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
                   </div>
@@ -185,8 +185,8 @@ export default function PipelineHealthPage() {
 
         {/* Right Side: Proactive Action Items */}
         <div className="lg:col-span-5 flex flex-col gap-6">
-          <Card className="bg-surface/50 border-white/5 backdrop-blur-md rounded-2xl">
-            <CardHeader className="pb-3 border-b border-white/5">
+          <Card className="bg-surface/50 border-[var(--color-border-subtle)] backdrop-blur-md rounded-2xl">
+            <CardHeader className="pb-3 border-b border-[var(--color-border-subtle)]">
               <CardTitle className="text-sm font-bold font-hanken text-text-main flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-primary" /> Proactive Next Steps
               </CardTitle>
@@ -194,7 +194,7 @@ export default function PipelineHealthPage() {
             </CardHeader>
             <CardContent className="p-6 space-y-3">
               {stats?.actionItems.map((act: string, aIdx: number) => (
-                <div key={aIdx} className="p-3.5 rounded-xl bg-surface-2 border border-white/5 flex items-start gap-3 group">
+                <div key={aIdx} className="p-3.5 rounded-xl bg-surface-2 border border-[var(--color-border-subtle)] flex items-start gap-3 group">
                   <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5 font-jetbrains">
                     {aIdx + 1}
                   </span>

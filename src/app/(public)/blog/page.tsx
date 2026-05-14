@@ -58,7 +58,7 @@ export default function BlogPage() {
                   "px-6 py-2 rounded-xl border font-mono text-[10px] uppercase tracking-widest transition-all",
                   i === 0 
                     ? "bg-primary text-on-primary border-primary shadow-lg shadow-primary/20" 
-                    : "border-white/10 text-on-surface-variant hover:border-primary/50 hover:text-on-surface"
+                    : "border-[var(--color-border-subtle)] text-on-surface-variant hover:border-primary/50 hover:text-on-surface"
                 )}
               >
                 {c}
@@ -73,14 +73,14 @@ export default function BlogPage() {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" />
         <Input 
           placeholder="Search articles, insights, or guides..." 
-          className="h-14 pl-12 rounded-2xl bg-surface-container-low border-white/5 text-on-surface focus:border-primary transition-all shadow-xl"
+          className="h-14 pl-12 rounded-2xl bg-surface-container-low border-[var(--color-border-subtle)] text-on-surface focus:border-primary transition-all shadow-xl"
         />
       </div>
 
       {/* Grid Listing */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 pb-20">
         {POSTS.map((post, i) => (
-          <div key={i} className="bg-surface-container-low/50 backdrop-blur-xl rounded-[2.5rem] overflow-hidden group border border-white/5 hover:border-primary/40 transition-all duration-500 flex flex-col h-full shadow-2xl">
+          <div key={i} className="bg-surface-container-low/50 backdrop-blur-xl rounded-[2.5rem] overflow-hidden group border border-[var(--color-border-subtle)] hover:border-primary/40 transition-all duration-500 flex flex-col h-full shadow-2xl">
             <div className="relative aspect-video overflow-hidden">
               <img 
                 src={post.image} 
@@ -107,14 +107,14 @@ export default function BlogPage() {
       </div>
 
       {/* Newsletter Section */}
-      <section className="bg-surface-container-low border border-white/10 rounded-[3rem] p-12 md:p-20 text-center space-y-8 relative overflow-hidden shadow-2xl">
+      <section className="bg-surface-container-low border border-[var(--color-border-subtle)] rounded-[3rem] p-12 md:p-20 text-center space-y-8 relative overflow-hidden shadow-2xl">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-primary/5 rounded-full blur-3xl pointer-events-none" />
         <div className="space-y-4 max-w-2xl mx-auto relative z-10">
           <h2 className="text-4xl font-heading font-bold text-on-surface tracking-tight">Stay ahead of the curve</h2>
           <p className="font-sans text-on-surface-variant ">Join 10,000+ professionals receiving weekly AI-driven career strategies.</p>
         </div>
         <form className="flex flex-col sm:flex-row justify-center gap-4 relative z-10 max-w-lg mx-auto">
-          <Input placeholder="Enter your email" className="h-14 bg-surface-container rounded-2xl border-white/10 px-6 font-sans" />
+          <Input placeholder="Enter your email" className="h-14 bg-surface-container rounded-2xl border-[var(--color-border-subtle)] px-6 font-sans" />
           <button className="h-14 px-10 rounded-2xl bg-gradient-primary text-white font-heading font-bold shadow-xl shadow-primary/20 whitespace-nowrap">
             Join Protocol
           </button>

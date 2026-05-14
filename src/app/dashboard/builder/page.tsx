@@ -325,7 +325,7 @@ export default function ResumeBuilderPage() {
             {([['name', 'Full Name'], ['title', 'Professional Title'], ['email', 'Email'], ['phone', 'Phone'], ['location', 'Location'], ['linkedin', 'LinkedIn'], ['github', 'GitHub'], ['portfolio', 'Portfolio'], ['x', 'X / Twitter']] as [keyof ResumeData['personal'], string][]).map(([f, label]) => (
               <div key={f} className={f === 'name' || f === 'title' ? 'col-span-2' : ''}>
                 <Label className="text-[10px] text-text-muted uppercase tracking-wider font-jetbrains mb-1 block">{label}</Label>
-                <Input value={data.personal[f]} onChange={e => setData(p => ({ ...p, personal: { ...p.personal, [f]: e.target.value } }))} className="h-8 text-xs bg-surface border-white/10 rounded-lg" />
+                <Input value={data.personal[f]} onChange={e => setData(p => ({ ...p, personal: { ...p.personal, [f]: e.target.value } }))} className="h-8 text-xs bg-surface border-[var(--color-border-subtle)] rounded-lg" />
               </div>
             ))}
           </div>
@@ -333,90 +333,90 @@ export default function ResumeBuilderPage() {
       case 'summary':
         return (
           <div className="pt-3">
-            <textarea value={data.summary} onChange={e => setData(p => ({ ...p, summary: e.target.value }))} rows={4} placeholder="A compelling professional summary..." className="w-full bg-surface border border-white/10 rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
+            <textarea value={data.summary} onChange={e => setData(p => ({ ...p, summary: e.target.value }))} rows={4} placeholder="A compelling professional summary..." className="w-full bg-surface border border-[var(--color-border-subtle)] rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
           </div>
         );
       case 'experience':
         return (
           <div className="pt-3 space-y-3">
             {data.experience.map((exp, idx) => (
-              <div key={exp.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+              <div key={exp.id} className="p-3 bg-surface rounded-xl border border-[var(--color-border-subtle)] space-y-2 relative group">
                 <Button variant="ghost" size="icon" type="button" onClick={() => delExp(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
                 <div className="grid grid-cols-2 gap-2 pr-6">
-                  <Input placeholder="Job Title" value={exp.role} onChange={e => updExp(idx, 'role', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                  <Input placeholder="Company" value={exp.company} onChange={e => updExp(idx, 'company', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                  <Input placeholder="Location" value={exp.location} onChange={e => updExp(idx, 'location', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                  <Input placeholder="Dates (MM/YYYY – Present)" value={exp.dates} onChange={e => updExp(idx, 'dates', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Job Title" value={exp.role} onChange={e => updExp(idx, 'role', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="Company" value={exp.company} onChange={e => updExp(idx, 'company', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="Location" value={exp.location} onChange={e => updExp(idx, 'location', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="Dates (MM/YYYY – Present)" value={exp.dates} onChange={e => updExp(idx, 'dates', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
                 </div>
-                <textarea value={exp.bullets} onChange={e => updExp(idx, 'bullets', e.target.value)} rows={3} placeholder="• Led team of 5 engineers...&#10;• Reduced latency by 40%..." className="w-full bg-surface-2 border border-white/5 rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
+                <textarea value={exp.bullets} onChange={e => updExp(idx, 'bullets', e.target.value)} rows={3} placeholder="• Led team of 5 engineers...&#10;• Reduced latency by 40%..." className="w-full bg-surface-2 border border-[var(--color-border-subtle)] rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
               </div>
             ))}
-            <Button onClick={addExp} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Experience</Button>
+            <Button onClick={addExp} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-[var(--color-border-subtle)] rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Experience</Button>
           </div>
         );
       case 'education':
         return (
           <div className="pt-3 space-y-3">
             {data.education.map((edu, idx) => (
-              <div key={edu.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+              <div key={edu.id} className="p-3 bg-surface rounded-xl border border-[var(--color-border-subtle)] space-y-2 relative group">
                 <Button variant="ghost" size="icon" type="button" onClick={() => delEdu(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
-                <Input placeholder="Institution" value={edu.institution} onChange={e => updEdu(idx, 'institution', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                <Input placeholder="Institution" value={edu.institution} onChange={e => updEdu(idx, 'institution', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
                 <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="Degree (e.g. B.S.)" value={edu.degree} onChange={e => updEdu(idx, 'degree', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                  <Input placeholder="Field of Study" value={edu.field} onChange={e => updEdu(idx, 'field', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                  <Input placeholder="Dates" value={edu.dates} onChange={e => updEdu(idx, 'dates', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                  <Input placeholder="GPA (optional)" value={edu.gpa} onChange={e => updEdu(idx, 'gpa', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Degree (e.g. B.S.)" value={edu.degree} onChange={e => updEdu(idx, 'degree', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="Field of Study" value={edu.field} onChange={e => updEdu(idx, 'field', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="Dates" value={edu.dates} onChange={e => updEdu(idx, 'dates', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="GPA (optional)" value={edu.gpa} onChange={e => updEdu(idx, 'gpa', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
                 </div>
               </div>
             ))}
-            <Button onClick={addEdu} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Education</Button>
+            <Button onClick={addEdu} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-[var(--color-border-subtle)] rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Education</Button>
           </div>
         );
       case 'skills':
         return (
           <div className="pt-3 space-y-2">
             {data.skills.map((grp, idx) => (
-              <div key={grp.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+              <div key={grp.id} className="p-3 bg-surface rounded-xl border border-[var(--color-border-subtle)] space-y-2 relative group">
                 <Button variant="ghost" size="icon" type="button" onClick={() => delSkillGroup(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
-                <Input placeholder="Category (e.g. Languages, Frameworks)" value={grp.category} onChange={e => updSkill(idx, 'category', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg pr-8" />
-                <Input placeholder="React, Node.js, TypeScript, PostgreSQL..." value={grp.items} onChange={e => updSkill(idx, 'items', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                <Input placeholder="Category (e.g. Languages, Frameworks)" value={grp.category} onChange={e => updSkill(idx, 'category', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg pr-8" />
+                <Input placeholder="React, Node.js, TypeScript, PostgreSQL..." value={grp.items} onChange={e => updSkill(idx, 'items', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
               </div>
             ))}
-            <Button onClick={addSkillGroup} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Skill Group</Button>
+            <Button onClick={addSkillGroup} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-[var(--color-border-subtle)] rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Skill Group</Button>
           </div>
         );
       case 'projects':
         return (
           <div className="pt-3 space-y-3">
             {data.projects.map((proj, idx) => (
-              <div key={proj.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+              <div key={proj.id} className="p-3 bg-surface rounded-xl border border-[var(--color-border-subtle)] space-y-2 relative group">
                 <Button variant="ghost" size="icon" type="button" onClick={() => delProj(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
                 <div className="grid grid-cols-2 gap-2 pr-6">
-                  <Input placeholder="Project Name" value={proj.name} onChange={e => updProj(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                  <Input placeholder="Dates" value={proj.dates} onChange={e => updProj(idx, 'dates', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Project Name" value={proj.name} onChange={e => updProj(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="Dates" value={proj.dates} onChange={e => updProj(idx, 'dates', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
                 </div>
-                <Input placeholder="Tech stack (React, Node.js, Docker...)" value={proj.tech} onChange={e => updProj(idx, 'tech', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                <Input placeholder="URL (optional)" value={proj.url} onChange={e => updProj(idx, 'url', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                <textarea value={proj.description} onChange={e => updProj(idx, 'description', e.target.value)} rows={2} placeholder="• What you built and the impact..." className="w-full bg-surface-2 border border-white/5 rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
+                <Input placeholder="Tech stack (React, Node.js, Docker...)" value={proj.tech} onChange={e => updProj(idx, 'tech', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                <Input placeholder="URL (optional)" value={proj.url} onChange={e => updProj(idx, 'url', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                <textarea value={proj.description} onChange={e => updProj(idx, 'description', e.target.value)} rows={2} placeholder="• What you built and the impact..." className="w-full bg-surface-2 border border-[var(--color-border-subtle)] rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
               </div>
             ))}
-            <Button onClick={addProj} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Project</Button>
+            <Button onClick={addProj} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-[var(--color-border-subtle)] rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Project</Button>
           </div>
         );
       case 'certifications':
         return (
           <div className="pt-3 space-y-2">
             {data.certifications.map((c, idx) => (
-              <div key={c.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+              <div key={c.id} className="p-3 bg-surface rounded-xl border border-[var(--color-border-subtle)] space-y-2 relative group">
                 <Button variant="ghost" size="icon" type="button" onClick={() => delCert(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
-                <Input placeholder="Certification Name" value={c.name} onChange={e => updCert(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg pr-8" />
+                <Input placeholder="Certification Name" value={c.name} onChange={e => updCert(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg pr-8" />
                 <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="Issuer" value={c.issuer} onChange={e => updCert(idx, 'issuer', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                  <Input placeholder="Date (MM/YYYY)" value={c.date} onChange={e => updCert(idx, 'date', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Issuer" value={c.issuer} onChange={e => updCert(idx, 'issuer', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="Date (MM/YYYY)" value={c.date} onChange={e => updCert(idx, 'date', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
                 </div>
               </div>
             ))}
-            <Button onClick={addCert} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Certification</Button>
+            <Button onClick={addCert} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-[var(--color-border-subtle)] rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Certification</Button>
           </div>
         );
       case 'languages':
@@ -424,31 +424,31 @@ export default function ResumeBuilderPage() {
           <div className="pt-3 space-y-2">
             {data.languages.map((l, idx) => (
               <div key={l.id} className="flex gap-2 items-center relative group">
-                <Input placeholder="Language" value={l.language} onChange={e => updLang(idx, 'language', e.target.value)} className="h-8 text-xs bg-surface border-white/10 rounded-lg flex-1" />
-                <select value={l.proficiency} onChange={e => updLang(idx, 'proficiency', e.target.value)} className="h-8 text-xs bg-surface border border-white/10 rounded-lg px-2 text-text-sub focus:outline-none">
+                <Input placeholder="Language" value={l.language} onChange={e => updLang(idx, 'language', e.target.value)} className="h-8 text-xs bg-surface border-[var(--color-border-subtle)] rounded-lg flex-1" />
+                <select value={l.proficiency} onChange={e => updLang(idx, 'proficiency', e.target.value)} className="h-8 text-xs bg-surface border border-[var(--color-border-subtle)] rounded-lg px-2 text-text-sub focus:outline-none">
                   {['Native', 'Fluent', 'Professional', 'Conversational', 'Basic'].map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
                 <Button variant="ghost" size="icon" onClick={() => delLang(idx)} className="h-7 w-7 p-0 text-error opacity-0 group-hover:opacity-100 rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
               </div>
             ))}
-            <Button onClick={addLang} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Language</Button>
+            <Button onClick={addLang} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-[var(--color-border-subtle)] rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Language</Button>
           </div>
         );
       case 'references':
         return (
           <div className="pt-3 space-y-2">
             {data.references.map((r, idx) => (
-              <div key={r.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+              <div key={r.id} className="p-3 bg-surface rounded-xl border border-[var(--color-border-subtle)] space-y-2 relative group">
                 <Button variant="ghost" size="icon" type="button" onClick={() => delRef(idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
                 <div className="grid grid-cols-2 gap-2 pr-6">
-                  <Input placeholder="Full Name" value={r.name} onChange={e => updRef(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                  <Input placeholder="Job Title" value={r.title} onChange={e => updRef(idx, 'title', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                  <Input placeholder="Company" value={r.company} onChange={e => updRef(idx, 'company', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
-                  <Input placeholder="Email / Phone" value={r.contact} onChange={e => updRef(idx, 'contact', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg" />
+                  <Input placeholder="Full Name" value={r.name} onChange={e => updRef(idx, 'name', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="Job Title" value={r.title} onChange={e => updRef(idx, 'title', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="Company" value={r.company} onChange={e => updRef(idx, 'company', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
+                  <Input placeholder="Email / Phone" value={r.contact} onChange={e => updRef(idx, 'contact', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg" />
                 </div>
               </div>
             ))}
-            <Button onClick={addRef} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Reference</Button>
+            <Button onClick={addRef} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-[var(--color-border-subtle)] rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Reference</Button>
           </div>
         );
       case 'custom': {
@@ -456,13 +456,13 @@ export default function ResumeBuilderPage() {
         return (
           <div className="pt-3 space-y-2">
             {items.map((item, idx) => (
-              <div key={item.id} className="p-3 bg-surface rounded-xl border border-white/5 space-y-2 relative group">
+              <div key={item.id} className="p-3 bg-surface rounded-xl border border-[var(--color-border-subtle)] space-y-2 relative group">
                 <Button variant="ghost" size="icon" type="button" onClick={() => delCustomItem(id, idx)} className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 text-error rounded-full transition-opacity"><Trash2 className="w-3 h-3" /></Button>
-                <Input placeholder="Heading (optional)" value={item.heading} onChange={e => updCustomItem(id, idx, 'heading', e.target.value)} className="h-8 text-xs bg-surface-2 border-white/5 rounded-lg pr-8" />
-                <textarea value={item.body} onChange={e => updCustomItem(id, idx, 'body', e.target.value)} rows={2} placeholder="Content..." className="w-full bg-surface-2 border border-white/5 rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
+                <Input placeholder="Heading (optional)" value={item.heading} onChange={e => updCustomItem(id, idx, 'heading', e.target.value)} className="h-8 text-xs bg-surface-2 border-[var(--color-border-subtle)] rounded-lg pr-8" />
+                <textarea value={item.body} onChange={e => updCustomItem(id, idx, 'body', e.target.value)} rows={2} placeholder="Content..." className="w-full bg-surface-2 border border-[var(--color-border-subtle)] rounded-lg p-2 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none" />
               </div>
             ))}
-            <Button onClick={() => addCustomItem(id)} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Item</Button>
+            <Button onClick={() => addCustomItem(id)} size="sm" variant="ghost" className="w-full h-8 text-xs border border-dashed border-[var(--color-border-subtle)] rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-1.5"><Plus className="w-3 h-3" /> Add Item</Button>
           </div>
         );
       }
@@ -493,10 +493,10 @@ export default function ResumeBuilderPage() {
           <p className="text-text-sub text-sm">Build, style, and export professional resumes. 5 templates, custom sections, full control.</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <Button onClick={() => saveVersion()} variant="outline" className="rounded-xl gap-1.5 border-white/10 h-9 text-xs">
+          <Button onClick={() => saveVersion()} variant="outline" className="rounded-xl gap-1.5 border-[var(--color-border-subtle)] h-9 text-xs">
             <Save className="h-3.5 w-3.5" /> Save Version
           </Button>
-          <Button onClick={() => { toast.info('Opening print dialog...'); window.print(); }} variant="outline" className="rounded-xl gap-1.5 border-white/10 h-9 text-xs">
+          <Button onClick={() => { toast.info('Opening print dialog...'); window.print(); }} variant="outline" className="rounded-xl gap-1.5 border-[var(--color-border-subtle)] h-9 text-xs">
             <Download className="h-3.5 w-3.5" /> Export PDF
           </Button>
           <Button onClick={syncToCloud} disabled={saving} className="rounded-xl gap-1.5 border-none shadow-lg shadow-primary/20 h-9 text-xs">
@@ -512,7 +512,7 @@ export default function ResumeBuilderPage() {
         <div className="lg:col-span-4 flex flex-col gap-4">
 
           {/* Tab bar */}
-          <div className="flex bg-surface-2 p-1 rounded-2xl border border-white/5 gap-1">
+          <div className="flex bg-surface-2 p-1 rounded-2xl border border-[var(--color-border-subtle)] gap-1">
             {[
               { id: 'sections', icon: Layers, label: 'Sections' },
               { id: 'design', icon: Palette, label: 'Design' },
@@ -537,7 +537,7 @@ export default function ResumeBuilderPage() {
                   const isExpanded = expandedSection === sec.id;
                   const isCustom = sec.id.startsWith('custom_');
                   return (
-                    <div key={sec.id} className={`rounded-xl border transition-all ${isExpanded ? 'border-primary/30 bg-surface/70' : 'border-white/5 bg-surface/40'}`}>
+                    <div key={sec.id} className={`rounded-xl border transition-all ${isExpanded ? 'border-primary/30 bg-surface/70' : 'border-[var(--color-border-subtle)] bg-surface/40'}`}>
                       {/* Section row */}
                       <div className="flex items-center gap-2 px-3 py-2">
                         <GripVertical className="w-3.5 h-3.5 text-text-muted shrink-0 cursor-grab" />
@@ -570,7 +570,7 @@ export default function ResumeBuilderPage() {
                       </div>
                       {/* Expanded editor */}
                       {isExpanded && (
-                        <div className="px-3 pb-3 border-t border-white/5">
+                        <div className="px-3 pb-3 border-t border-[var(--color-border-subtle)]">
                           {renderEditor(sec)}
                         </div>
                       )}
@@ -579,7 +579,7 @@ export default function ResumeBuilderPage() {
                 })}
               </div>
 
-              <Button onClick={addCustomSection} variant="ghost" className="w-full h-9 text-xs border border-dashed border-white/10 rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-2">
+              <Button onClick={addCustomSection} variant="ghost" className="w-full h-9 text-xs border border-dashed border-[var(--color-border-subtle)] rounded-xl text-text-muted hover:border-primary/40 hover:text-primary gap-2">
                 <Plus className="w-3.5 h-3.5" /> Add Custom Section
               </Button>
 
@@ -594,16 +594,16 @@ export default function ResumeBuilderPage() {
             <div className="flex flex-col gap-4">
 
               {/* Template picker */}
-              <Card className="bg-surface/50 border-white/5 rounded-2xl">
+              <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-xs font-jetbrains uppercase text-primary tracking-wider">Template</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 gap-2">
                   {TEMPLATES.map(t => (
                     <button key={t.id} onClick={() => setAppearance(a => ({ ...a, template: t.id }))}
-                      className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${template === t.id ? 'border-primary bg-primary/10' : 'border-white/5 bg-surface hover:border-white/20'}`}>
+                      className={`flex items-center gap-3 p-3 rounded-xl border text-left transition-all ${template === t.id ? 'border-primary bg-primary/10' : 'border-[var(--color-border-subtle)] bg-surface hover:border-[var(--color-border-strong)]'}`}>
                       {/* Mini template thumbnail */}
-                      <div className="w-10 h-12 rounded border border-white/10 overflow-hidden shrink-0 bg-white relative">
+                      <div className="w-10 h-12 rounded border border-[var(--color-border-subtle)] overflow-hidden shrink-0 bg-white relative">
                         <TemplateThumbnail id={t.id} color={accentColor} />
                       </div>
                       <div>
@@ -617,7 +617,7 @@ export default function ResumeBuilderPage() {
               </Card>
 
               {/* Accent color */}
-              <Card className="bg-surface/50 border-white/5 rounded-2xl p-4">
+              <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-jetbrains uppercase text-primary tracking-wider font-bold">Accent Color</span>
                   <div className="flex items-center gap-2">
@@ -628,7 +628,7 @@ export default function ResumeBuilderPage() {
                 <div className="grid grid-cols-4 gap-1.5">
                   {ACCENT_PRESETS.map(c => (
                     <button key={c.hex} onClick={() => setAppearance(a => ({ ...a, accentColor: c.hex }))}
-                      className={`h-8 rounded-lg text-[10px] font-bold transition-all border flex items-center justify-center gap-1 ${accentColor === c.hex ? 'border-white scale-105' : 'border-white/10 hover:border-white/30'}`}
+                      className={`h-8 rounded-lg text-[10px] font-bold transition-all border flex items-center justify-center gap-1 ${accentColor === c.hex ? 'border-white scale-105' : 'border-[var(--color-border-subtle)] hover:border-white/30'}`}
                       style={{ backgroundColor: `${c.hex}25` }}>
                       <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: c.hex }} />
                       <span className="text-text-muted">{c.label}</span>
@@ -638,7 +638,7 @@ export default function ResumeBuilderPage() {
               </Card>
 
               {/* Typography & spacing */}
-              <Card className="bg-surface/50 border-white/5 rounded-2xl p-4 space-y-4">
+              <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl p-4 space-y-4">
                 <span className="text-xs font-jetbrains uppercase text-primary tracking-wider font-bold block">Typography & Spacing</span>
 
                 <div>
@@ -646,7 +646,7 @@ export default function ResumeBuilderPage() {
                   <div className="grid grid-cols-2 gap-1.5">
                     {[['sans-serif', 'Sans-serif'], ['Georgia, serif', 'Serif'], ['"Courier New", monospace', 'Mono'], ['"Arial", sans-serif', 'Arial']].map(([val, label]) => (
                       <button key={val} onClick={() => setAppearance(a => ({ ...a, fontFamily: val }))}
-                        className={`py-1.5 rounded-lg text-[11px] border transition-all ${fontFamily === val ? 'border-primary bg-primary/10 text-primary font-bold' : 'border-white/5 bg-surface text-text-muted hover:border-white/20'}`}
+                        className={`py-1.5 rounded-lg text-[11px] border transition-all ${fontFamily === val ? 'border-primary bg-primary/10 text-primary font-bold' : 'border-[var(--color-border-subtle)] bg-surface text-text-muted hover:border-[var(--color-border-strong)]'}`}
                         style={{ fontFamily: val }}>{label}</button>
                     ))}
                   </div>
@@ -678,7 +678,7 @@ export default function ResumeBuilderPage() {
 
                 <div>
                   <Label className="text-[10px] text-text-muted uppercase tracking-wider mb-2 block">Header Alignment</Label>
-                  <div className="flex bg-surface p-1 rounded-xl border border-white/5">
+                  <div className="flex bg-surface p-1 rounded-xl border border-[var(--color-border-subtle)]">
                     {[['left', AlignLeft], ['center', AlignCenter], ['right', AlignRight]].map(([val, Icon]) => {
                       const I = Icon as React.ElementType;
                       return (
@@ -702,13 +702,13 @@ export default function ResumeBuilderPage() {
               </Button>
 
               {savedVersions.length === 0 ? (
-                <div className="text-center py-12 border border-dashed border-white/10 rounded-2xl">
+                <div className="text-center py-12 border border-dashed border-[var(--color-border-subtle)] rounded-2xl">
                   <p className="text-xs text-text-muted">No saved versions yet.</p>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {savedVersions.map(v => (
-                    <div key={v.id} className="p-3 bg-surface-2 rounded-xl border border-white/5 flex items-center justify-between group">
+                    <div key={v.id} className="p-3 bg-surface-2 rounded-xl border border-[var(--color-border-subtle)] flex items-center justify-between group">
                       <div className="min-w-0 mr-3">
                         <p className="text-xs font-bold text-text-main truncate">{v.name}</p>
                         <p className="text-[10px] text-text-muted">{v.date} · <span className="capitalize">{v.appearance.template}</span></p>
@@ -729,7 +729,7 @@ export default function ResumeBuilderPage() {
         <div className="lg:col-span-8 flex flex-col gap-3">
 
           {/* Zoom controls */}
-          <div className="flex items-center justify-between bg-surface-2 px-4 py-2 rounded-xl border border-white/5">
+          <div className="flex items-center justify-between bg-surface-2 px-4 py-2 rounded-xl border border-[var(--color-border-subtle)]">
             <span className="text-xs text-text-sub font-medium flex items-center gap-1.5">
               <Sliders className="w-3.5 h-3.5 text-primary" /> Preview Zoom
             </span>

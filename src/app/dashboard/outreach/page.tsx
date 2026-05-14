@@ -135,7 +135,7 @@ export default function OutreachPage() {
           <Button
             onClick={() => setResult(null)}
             variant="outline"
-            className="rounded-xl gap-2 border-white/10 text-xs h-9"
+            className="rounded-xl gap-2 border-[var(--color-border-subtle)] text-xs h-9"
           >
             <RefreshCw className="w-3.5 h-3.5" /> New Draft
           </Button>
@@ -145,7 +145,7 @@ export default function OutreachPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left: Form */}
         <div className="lg:col-span-5 flex flex-col gap-5">
-          <Card className="bg-surface/50 border-white/5 rounded-2xl">
+          <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold font-hanken text-primary">Email Type</CardTitle>
             </CardHeader>
@@ -157,7 +157,7 @@ export default function OutreachPage() {
                   className={`w-full p-3.5 rounded-xl border text-left transition-all ${
                     params.outreachType === opt.id
                       ? 'border-primary bg-primary/10'
-                      : 'border-white/5 bg-surface/30 hover:border-white/15'
+                      : 'border-[var(--color-border-subtle)] bg-surface/30 hover:border-[var(--color-border-strong)]'
                   }`}
                 >
                   <span className="text-xs font-bold text-text-main block">{opt.label}</span>
@@ -167,7 +167,7 @@ export default function OutreachPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-surface/50 border-white/5 rounded-2xl">
+          <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold font-hanken text-primary">Target Details</CardTitle>
             </CardHeader>
@@ -178,7 +178,7 @@ export default function OutreachPage() {
                   value={params.jobTitle}
                   onChange={e => setParams({ ...params, jobTitle: e.target.value })}
                   placeholder="e.g. Senior Software Engineer"
-                  className="bg-surface border-white/10 rounded-xl text-xs h-10"
+                  className="bg-surface border-[var(--color-border-subtle)] rounded-xl text-xs h-10"
                 />
               </div>
 
@@ -188,7 +188,7 @@ export default function OutreachPage() {
                   value={params.companyName}
                   onChange={e => setParams({ ...params, companyName: e.target.value })}
                   placeholder="e.g. Stripe"
-                  className="bg-surface border-white/10 rounded-xl text-xs h-10"
+                  className="bg-surface border-[var(--color-border-subtle)] rounded-xl text-xs h-10"
                 />
               </div>
 
@@ -198,7 +198,7 @@ export default function OutreachPage() {
                   value={params.recipientName}
                   onChange={e => setParams({ ...params, recipientName: e.target.value })}
                   placeholder="e.g. Alex Chen"
-                  className="bg-surface border-white/10 rounded-xl text-xs h-10"
+                  className="bg-surface border-[var(--color-border-subtle)] rounded-xl text-xs h-10"
                 />
               </div>
 
@@ -209,7 +209,7 @@ export default function OutreachPage() {
                   onChange={e => setParams({ ...params, context: e.target.value })}
                   rows={3}
                   placeholder="e.g. I applied 3 days ago via LinkedIn. Key skills: Node.js, React, 5 years exp."
-                  className="w-full bg-surface border border-white/10 rounded-xl p-2.5 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
+                  className="w-full bg-surface border border-[var(--color-border-subtle)] rounded-xl p-2.5 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
                 />
               </div>
 
@@ -228,7 +228,7 @@ export default function OutreachPage() {
         {/* Right: Output */}
         <div className="lg:col-span-7 flex flex-col gap-5">
           {loading ? (
-            <Card className="bg-surface/30 border-white/5 rounded-2xl h-[450px] flex flex-col items-center justify-center gap-4">
+            <Card className="bg-surface/30 border-[var(--color-border-subtle)] rounded-2xl h-[450px] flex flex-col items-center justify-center gap-4">
               <div className="relative">
                 <div className="w-14 h-14 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
                 <Mail className="absolute inset-0 m-auto w-5 h-5 text-primary" />
@@ -241,7 +241,7 @@ export default function OutreachPage() {
           ) : result ? (
             <div className="flex flex-col gap-5">
               {/* Subject lines */}
-              <Card className="bg-surface/50 border-white/5 rounded-2xl">
+              <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-sm font-bold font-hanken flex items-center gap-2">
@@ -261,11 +261,11 @@ export default function OutreachPage() {
                       className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-between group ${
                         result.selectedSubjectIndex === sIdx
                           ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-white/5 bg-surface-2 hover:border-white/20 text-text-sub'
+                          : 'border-[var(--color-border-subtle)] bg-surface-2 hover:border-[var(--color-border-strong)] text-text-sub'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center text-[10px] font-bold shrink-0 ${result.selectedSubjectIndex === sIdx ? 'border-primary text-primary bg-primary/20' : 'border-white/20 text-text-muted'}`}>
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center text-[10px] font-bold shrink-0 ${result.selectedSubjectIndex === sIdx ? 'border-primary text-primary bg-primary/20' : 'border-[var(--color-border-strong)] text-text-muted'}`}>
                           {sIdx + 1}
                         </div>
                         <span className="text-xs font-medium truncate">{subj}</span>
@@ -279,19 +279,19 @@ export default function OutreachPage() {
               </Card>
 
               {/* Email body */}
-              <Card className="bg-surface/50 border-white/5 rounded-2xl overflow-hidden">
-                <div className="bg-surface-2 px-5 py-3 border-b border-white/5 flex items-center justify-between">
+              <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl overflow-hidden">
+                <div className="bg-surface-2 px-5 py-3 border-b border-[var(--color-border-subtle)] flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <User className="w-4 h-4 text-primary" />
                     <span className="text-xs font-bold text-text-main">Email Body</span>
                     <div className="flex items-center gap-2">
                       {result.tone && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-surface text-text-muted font-jetbrains border border-white/5 capitalize">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-surface text-text-muted font-jetbrains border border-[var(--color-border-subtle)] capitalize">
                           {result.tone}
                         </span>
                       )}
                       {result.word_count && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-surface text-text-muted font-jetbrains border border-white/5">
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-surface text-text-muted font-jetbrains border border-[var(--color-border-subtle)]">
                           {result.word_count} words
                         </span>
                       )}
@@ -325,7 +325,7 @@ export default function OutreachPage() {
                     rows={12}
                     className="w-full bg-transparent border-none p-0 text-xs text-text-sub focus:outline-none resize-none font-sans leading-relaxed selection:bg-primary/20"
                   />
-                  <div className="pt-4 border-t border-white/5 mt-2 flex items-center justify-between text-[10px] text-text-muted font-jetbrains">
+                  <div className="pt-4 border-t border-[var(--color-border-subtle)] mt-2 flex items-center justify-between text-[10px] text-text-muted font-jetbrains">
                     <span>Body is fully editable — personalize before sending</span>
                     <span>{result.body.split(/\s+/).filter(Boolean).length} words</span>
                   </div>
@@ -333,7 +333,7 @@ export default function OutreachPage() {
               </Card>
             </div>
           ) : (
-            <Card className="bg-surface/20 border-white/5 rounded-2xl h-[450px] flex flex-col items-center justify-center p-8 text-center">
+            <Card className="bg-surface/20 border-[var(--color-border-subtle)] rounded-2xl h-[450px] flex flex-col items-center justify-center p-8 text-center">
               <Send className="w-14 h-14 text-text-muted mb-5 opacity-30" />
               <h3 className="text-sm font-bold font-hanken text-text-sub mb-2">Ready to Draft</h3>
               <p className="text-xs text-text-muted max-w-xs leading-relaxed">

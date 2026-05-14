@@ -100,7 +100,7 @@ export default function PipelineHealthCard() {
           <div className="space-y-3">
             {data.insights.map((insight, i) => (
               <div key={i} className="flex gap-3 group cursor-pointer">
-                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/5 group-hover:border-primary/40 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-[var(--color-border-subtle)] group-hover:border-primary/40 transition-colors">
                   <Activity className="w-4 h-4 text-primary" />
                 </div>
                 <div>
@@ -119,7 +119,7 @@ export default function PipelineHealthCard() {
           </h5>
           <div className="space-y-2">
             {data.action_items.map((item, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs text-white/70 bg-white/5 p-2 rounded-xl border border-transparent hover:border-white/10 transition-all">
+              <div key={i} className="flex items-center gap-2 text-xs text-white/70 bg-white/5 p-2 rounded-xl border border-transparent hover:border-[var(--color-border-subtle)] transition-all">
                 <div className="w-1.5 h-1.5 rounded-full bg-success" />
                 <span className="flex-1">{item}</span>
                 <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />

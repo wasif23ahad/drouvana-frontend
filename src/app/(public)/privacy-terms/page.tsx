@@ -50,8 +50,8 @@ export default function PrivacyTermsPage() {
       {/* Content Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto pb-24">
         {sections.map((section, i) => (
-          <div key={i} className="bg-surface-2/50 backdrop-blur-xl rounded-4xl p-10 border border-white/5 hover:border-primary/30 transition-all group shadow-xl">
-            <div className="w-14 h-14 rounded-2xl bg-surface-2 flex items-center justify-center mb-6 border border-white/10 group-hover:border-primary/50 transition-colors">
+          <div key={i} className="bg-surface-2/50 backdrop-blur-xl rounded-4xl p-10 border border-[var(--color-border-subtle)] hover:border-primary/30 transition-all group shadow-xl">
+            <div className="w-14 h-14 rounded-2xl bg-surface-2 flex items-center justify-center mb-6 border border-[var(--color-border-subtle)] group-hover:border-primary/50 transition-colors">
               <section.icon className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-2xl font-hanken font-bold text-text-main mb-4">{section.title}</h3>
@@ -67,7 +67,7 @@ export default function PrivacyTermsPage() {
             <Lock className="w-4 h-4" />
             Security Architecture
           </div>
-          <div className="bg-surface-2 border border-white/10 rounded-[2.5rem] p-10 md:p-14 space-y-8 shadow-2xl">
+          <div className="bg-surface-2 border border-[var(--color-border-subtle)] rounded-[2.5rem] p-10 md:p-14 space-y-8 shadow-2xl">
             <h4 className="text-3xl font-hanken font-bold text-text-main tracking-tight">Technical Safeguards</h4>
             <div className="space-y-6 text-text-sub font-sans leading-relaxed text-lg">
               <p>
@@ -91,7 +91,7 @@ export default function PrivacyTermsPage() {
               { label: 'System Uptime', val: '99.98%' },
               { label: 'Data Encryption', val: 'AES-256' }
             ].map((stat, i) => (
-              <div key={i} className="bg-surface-2/30 border border-white/5 rounded-2xl p-6 text-center">
+              <div key={i} className="bg-surface-2/30 border border-[var(--color-border-subtle)] rounded-2xl p-6 text-center">
                 <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-text-muted mb-2">{stat.label}</p>
                 <p className="text-xl font-hanken font-bold text-text-main ">{stat.val}</p>
               </div>

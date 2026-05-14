@@ -51,7 +51,7 @@ export default function LandingPage() {
                     </Button>
                   </Link>
                   <Link href="#features">
-                    <Button variant="outline" size="lg" className="w-full sm:w-auto rounded-full h-12 px-8 bg-surface/50 backdrop-blur-sm border-white/5">
+                    <Button variant="outline" size="lg" className="w-full sm:w-auto rounded-full h-12 px-8 bg-surface/50 backdrop-blur-sm border-[var(--color-border-subtle)]">
                       How it works
                     </Button>
                   </Link>
@@ -66,7 +66,7 @@ export default function LandingPage() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="flex-1 hidden lg:block relative"
             >
-              <div className="relative z-10 rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-primary/20 bg-surface/30 backdrop-blur-xl group aspect-video">
+              <div className="relative z-10 rounded-3xl overflow-hidden border border-[var(--color-border-subtle)] shadow-2xl shadow-primary/20 bg-surface/30 backdrop-blur-xl group aspect-video">
                 <div className="absolute inset-0 bg-linear-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <Image 
                   src="/drouvana-dashboard.png" 
@@ -301,7 +301,7 @@ export default function LandingPage() {
                   { q: "Can I export my resume to PDF?", a: "Absolutely. Once your resume is tailored, you can export it as a professional, ATS-optimized PDF ready for submission." },
                   { q: "Does Drouvana track my interview status?", a: "Yes, our Kanban board allows you to move applications through stages like 'Applied', 'Screening', 'Interview', and 'Offer', keeping your entire search organized." }
                 ].map((faq, i) => (
-                  <div key={i} className="p-6 rounded-2xl glass-card border-white/5 hover:border-primary/20 transition-all cursor-pointer group">
+                  <div key={i} className="p-6 rounded-2xl glass-card border-[var(--color-border-subtle)] hover:border-primary/20 transition-all cursor-pointer group">
                     <h3 className="text-lg font-bold font-hanken text-text-main mb-2 flex items-center justify-between">
                       {faq.q}
                       <ChevronRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
@@ -317,7 +317,7 @@ export default function LandingPage() {
         {/* 8. Newsletter Section */}
         <section className="w-full py-20 bg-transparent">
           <div className="container mx-auto px-4 md:px-6">
-            <div className="max-w-5xl mx-auto rounded-(--radius-premium) bg-surface-2/30 backdrop-blur-xl border border-white/5 p-12 relative overflow-hidden text-center">
+            <div className="max-w-5xl mx-auto rounded-(--radius-premium) bg-surface-2/30 backdrop-blur-xl border border-[var(--color-border-subtle)] p-12 relative overflow-hidden text-center">
               <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px] -mr-32 -mt-32" />
               <div className="relative z-10">
                 <Mail className="w-12 h-12 text-primary mx-auto mb-6 opacity-80" />
@@ -327,7 +327,7 @@ export default function LandingPage() {
                   <input 
                     type="email" 
                     placeholder="Enter your work email" 
-                    className="flex-1 bg-bg-base border border-white/10 rounded-full px-6 h-12 outline-none focus:border-primary transition-colors text-sm"
+                    className="flex-1 bg-bg-base border border-[var(--color-border-subtle)] rounded-full px-6 h-12 outline-none focus:border-primary transition-colors text-sm"
                   />
                   <Button className="rounded-full h-12 px-8 font-bold">Subscribe</Button>
                 </div>
@@ -350,7 +350,7 @@ export default function LandingPage() {
                 { name: "Pro", price: "$19/mo", features: ["Unlimited Applications", "Advanced AI Tailoring", "Cover Letter Generator", "Priority Support"], button: "Go Pro", popular: true },
                 { name: "Premium", price: "$49/mo", features: ["Everything in Pro", "AI Interview Coach", "Career Strategy Sessions", "Custom Templates"], button: "Get Premium", popular: false }
               ].map((plan, i) => (
-                <div key={i} className={`relative p-8 rounded-(--radius-premium) glass-card flex flex-col ${plan.popular ? 'border-primary/50 ring-1 ring-primary/20 scale-105 z-10 bg-surface-2/40' : 'border-white/5'}`}>
+                <div key={i} className={`relative p-8 rounded-(--radius-premium) glass-card flex flex-col ${plan.popular ? 'border-primary/50 ring-1 ring-primary/20 scale-105 z-10 bg-surface-2/40' : 'border-[var(--color-border-subtle)]'}`}>
                   {plan.popular && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white px-3 py-1">Most Popular</Badge>}
                   <h3 className="text-xl font-bold font-hanken mb-2">{plan.name}</h3>
                   <div className="text-3xl font-bold mb-6 font-hanken">{plan.price}</div>

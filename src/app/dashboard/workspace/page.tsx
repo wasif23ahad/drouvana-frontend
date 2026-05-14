@@ -62,7 +62,7 @@ const WorkspacePage = () => {
       </div>
 
       {/* Modern Stepper */}
-      <div className="bg-surface/50 backdrop-blur-xl border border-white/5 rounded-4xl p-8 md:p-10 shadow-2xl relative overflow-hidden">
+      <div className="bg-surface/50 backdrop-blur-xl border border-[var(--color-border-subtle)] rounded-4xl p-8 md:p-10 shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-3xl pointer-events-none -z-10" />
         <div className="flex justify-between items-center relative px-4">
           <div className="absolute left-10 right-10 top-1/2 -translate-y-1/2 h-0.5 bg-white/5 -z-10" />
@@ -72,7 +72,7 @@ const WorkspacePage = () => {
                 "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-700 border-2 relative z-10",
                 step > s.id ? "bg-secondary border-secondary text-white shadow-lg shadow-secondary/20" :
                 step === s.id ? "bg-primary border-primary text-white shadow-xl shadow-primary/30 scale-110" :
-                "bg-surface-2 border-white/5 text-text-muted/40"
+                "bg-surface-2 border-[var(--color-border-subtle)] text-text-muted/40"
               )}>
                 {step > s.id ? <Check className="w-6 h-6 stroke-3" /> : <span className="font-hanken font-bold text-lg">{s.id}</span>}
                 {step === s.id && (
@@ -88,7 +88,7 @@ const WorkspacePage = () => {
         </div>
       </div>
 
-      <div className="bg-surface/50 backdrop-blur-2xl border border-white/5 rounded-[3rem] p-10 md:p-16 min-h-[600px] shadow-2xl relative">
+      <div className="bg-surface/50 backdrop-blur-2xl border border-[var(--color-border-subtle)] rounded-[3rem] p-10 md:p-16 min-h-[600px] shadow-2xl relative">
         <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent pointer-events-none" />
         <AnimatePresence mode="wait">
           <motion.div

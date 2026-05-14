@@ -288,7 +288,7 @@ export default function SettingsPage() {
                     {savingPassword ? 'Updating...' : 'Update Password'}
                   </Button>
                 </div>
-                <div className="mt-6 pt-6 border-t border-white/5">
+                <div className="mt-6 pt-6 border-t border-[var(--color-border-subtle)]">
                   <h4 className="text-sm font-bold text-red-400 mb-2 flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4" />
                     Danger Zone

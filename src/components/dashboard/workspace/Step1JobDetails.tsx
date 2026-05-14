@@ -89,7 +89,7 @@ const Step1JobDetails = () => {
         <div className="relative group">
           <div className="absolute inset-0 bg-primary/5 rounded-4xl blur-2xl group-focus-within:bg-primary/10 transition-colors pointer-events-none" />
           <textarea
-            className="w-full h-80 p-8 rounded-4xl bg-surface-2 border border-white/5 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all resize-none text-text-sub leading-relaxed relative z-10 "
+            className="w-full h-80 p-8 rounded-4xl bg-surface-2 border border-[var(--color-border-subtle)] focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all resize-none text-text-sub leading-relaxed relative z-10 "
             placeholder="Initialize semantic intake: paste the job description protocol here..."
             value={jdText}
             onChange={(e) => setJdText(e.target.value)}

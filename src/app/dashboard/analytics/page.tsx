@@ -157,7 +157,7 @@ export default function AnalyticsPage() {
           {/* Metrics Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {metrics.map((m, i) => (
-              <div key={i} className="bg-surface-container-low/50 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 space-y-6 group hover:border-primary/40 transition-all duration-500 shadow-2xl relative overflow-hidden">
+              <div key={i} className="bg-surface-container-low/50 backdrop-blur-xl border border-[var(--color-border-subtle)] rounded-[2.5rem] p-8 space-y-6 group hover:border-primary/40 transition-all duration-500 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-3xl pointer-events-none -z-10" />
                 <div className="flex justify-between items-start">
                   <div className={cn(
@@ -188,7 +188,7 @@ export default function AnalyticsPage() {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             {/* Velocity Chart */}
-            <div className="lg:col-span-2 bg-surface-container-low/50 backdrop-blur-xl border border-white/5 rounded-[3rem] p-10 shadow-2xl space-y-8 relative overflow-hidden">
+            <div className="lg:col-span-2 bg-surface-container-low/50 backdrop-blur-xl border border-[var(--color-border-subtle)] rounded-[3rem] p-10 shadow-2xl space-y-8 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/5 blur-[100px] pointer-events-none -z-10" />
               <div className="flex justify-between items-center px-2">
                 <h3 className="text-2xl font-heading font-bold text-on-surface tracking-tight">Application Velocity</h3>
@@ -217,7 +217,7 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Status Distribution */}
-            <div className="bg-surface-container-low/50 backdrop-blur-xl border border-white/5 rounded-[3rem] p-10 shadow-2xl space-y-10 flex flex-col relative overflow-hidden">
+            <div className="bg-surface-container-low/50 backdrop-blur-xl border border-[var(--color-border-subtle)] rounded-[3rem] p-10 shadow-2xl space-y-10 flex flex-col relative overflow-hidden">
               <div className="absolute top-0 right-0 w-48 h-48 bg-tertiary/5 blur-[80px] pointer-events-none -z-10" />
               <h3 className="text-2xl font-heading font-bold text-on-surface tracking-tight">Status Distribution</h3>
               {statusData.length === 0 ? (
@@ -238,7 +238,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="w-full grid grid-cols-2 gap-3 mt-6">
                     {statusData.map((s, i) => (
-                      <div key={i} className="flex flex-col gap-1 px-3 py-2 bg-surface-container rounded-2xl border border-white/5">
+                      <div key={i} className="flex flex-col gap-1 px-3 py-2 bg-surface-container rounded-2xl border border-[var(--color-border-subtle)]">
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
                           <span className="font-mono text-[9px] uppercase tracking-widest text-on-surface-variant font-bold truncate">{s.name}</span>
@@ -253,7 +253,7 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Platform Stats */}
-          <div className="bg-surface-container-low/50 backdrop-blur-xl border border-white/5 rounded-[3rem] p-10 shadow-2xl space-y-8 relative overflow-hidden">
+          <div className="bg-surface-container-low/50 backdrop-blur-xl border border-[var(--color-border-subtle)] rounded-[3rem] p-10 shadow-2xl space-y-8 relative overflow-hidden">
             <div className="flex items-center gap-4 mb-2">
               <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center border border-secondary/20">
                 <TrendingUp className="text-secondary w-5 h-5" />
@@ -270,7 +270,7 @@ export default function AnalyticsPage() {
                       <span className="font-heading font-bold text-on-surface">{p.name}</span>
                       <span className="font-mono text-[10px] text-on-surface-variant font-bold">{p.count} apps</span>
                     </div>
-                    <div className="h-2 w-full bg-surface-container rounded-full overflow-hidden border border-white/5 shadow-inner">
+                    <div className="h-2 w-full bg-surface-container rounded-full overflow-hidden border border-[var(--color-border-subtle)] shadow-inner">
                       <div
                         className={cn(
                           "h-full rounded-full transition-all duration-1000",

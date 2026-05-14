@@ -81,7 +81,7 @@ const DashboardNavbar = () => {
           {/* Hamburger — mobile only */}
           <button
             onClick={() => setMobileOpen(true)}
-            className="lg:hidden p-2 text-text-muted hover:text-text-main transition-colors rounded-xl hover:bg-white/5"
+            className="lg:hidden p-2 text-text-muted hover:text-text-main transition-colors rounded-xl hover:bg-black/5 dark:hover:bg-white/5"
             aria-label="Open navigation"
           >
             <Menu className="w-5 h-5" />
@@ -114,13 +114,13 @@ const DashboardNavbar = () => {
             <input
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-surface-2 border border-white/5 text-text-main text-xs rounded-xl pl-9 pr-4 py-2 focus:border-primary focus:outline-none transition-all placeholder:text-text-muted/50"
+              className="w-full bg-surface-2 border border-[var(--color-border-subtle)] text-text-main text-xs rounded-xl pl-9 pr-4 py-2 focus:border-primary focus:outline-none transition-all placeholder:text-text-muted/50"
               placeholder="Search applications..."
               type="text"
             />
           </form>
 
-          <button className="text-text-muted hover:text-primary transition-colors relative p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5">
+          <button className="text-text-muted hover:text-primary transition-colors relative p-2 rounded-full hover:bg-black/5 dark:hover:bg-black/5 dark:hover:bg-white/5">
             <Bell className="w-5 h-5" />
             <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-[var(--bg-base)]"></span>
           </button>
@@ -149,8 +149,8 @@ const DashboardNavbar = () => {
             </button>
 
             {profileOpen && (
-              <div className="absolute right-0 mt-3 w-56 bg-surface border border-white/5 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden z-50 animate-in fade-in slide-in-from-top-1">
-                <div className="p-3 border-b border-white/5">
+              <div className="absolute right-0 mt-3 w-56 bg-surface border border-[var(--color-border-subtle)] rounded-2xl shadow-2xl shadow-black/40 overflow-hidden z-50 animate-in fade-in slide-in-from-top-1">
+                <div className="p-3 border-b border-[var(--color-border-subtle)]">
                   <p className="text-sm font-bold text-text-main truncate">{session?.user?.name}</p>
                   <p className="text-xs text-text-muted truncate">{session?.user?.email}</p>
                 </div>
@@ -162,7 +162,7 @@ const DashboardNavbar = () => {
                     <Settings className="w-4 h-4" />Settings
                   </Link>
                 </div>
-                <div className="p-2 border-t border-white/5">
+                <div className="p-2 border-t border-[var(--color-border-subtle)]">
                   <button
                     onClick={() => signOut({ callbackUrl: '/' })}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-error hover:bg-error/10 transition-colors"
@@ -192,7 +192,7 @@ const DashboardNavbar = () => {
                 <Image src="/Drouvana_logo.png" alt="Drouvana" width={26} height={26} className="rounded-lg" />
                 <span className="text-lg font-bold font-hanken tracking-tight text-text-main">Drouvana</span>
               </Link>
-              <button onClick={() => setMobileOpen(false)} className="p-1.5 text-text-muted hover:text-text-main rounded-lg hover:bg-white/5">
+              <button onClick={() => setMobileOpen(false)} className="p-1.5 text-text-muted hover:text-text-main rounded-lg hover:bg-black/5 dark:hover:bg-white/5">
                 <X className="w-5 h-5" />
               </button>
             </div>

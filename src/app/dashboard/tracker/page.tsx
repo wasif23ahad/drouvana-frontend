@@ -39,7 +39,7 @@ function TrackerContent() {
             />
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <div className="flex bg-surface rounded-xl border border-white/5 p-1 shadow-lg">
+            <div className="flex bg-surface rounded-xl border border-[var(--color-border-subtle)] p-1 shadow-lg">
               <button
                 onClick={() => setView('kanban')}
                 className={`p-2.5 rounded-lg transition-all ${view === 'kanban' ? 'bg-surface-2 text-primary shadow-sm' : 'text-text-muted hover:text-text-main'}`}

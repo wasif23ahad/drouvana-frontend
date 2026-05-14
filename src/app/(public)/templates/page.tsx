@@ -75,7 +75,7 @@ export default function TemplatesExplorePage() {
       </div>
 
       {/* Filters Row - Design Alignment */}
-      <div className="flex flex-col lg:flex-row gap-4 bg-surface-container-high/50 p-4 rounded-xl border border-white/5 backdrop-blur-md">
+      <div className="flex flex-col lg:flex-row gap-4 bg-surface-container-high/50 p-4 rounded-xl border border-[var(--color-border-subtle)] backdrop-blur-md">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant" />
           <Input 
@@ -91,7 +91,7 @@ export default function TemplatesExplorePage() {
             <SelectTrigger className="w-full sm:w-40 h-11 rounded-lg bg-surface-container border-outline-variant/30 text-on-surface font-sans text-sm">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
-            <SelectContent className="glass border-white/10">
+            <SelectContent className="glass border-[var(--color-border-subtle)]">
               <SelectItem value="ALL">All Categories</SelectItem>
               <SelectItem value="TECH">Engineering</SelectItem>
               <SelectItem value="CREATIVE">Creative</SelectItem>
@@ -104,7 +104,7 @@ export default function TemplatesExplorePage() {
             <SelectTrigger className="w-full sm:w-40 h-11 rounded-lg bg-surface-container border-outline-variant/30 text-on-surface font-sans text-sm">
               <SelectValue placeholder="ATS Score" />
             </SelectTrigger>
-            <SelectContent className="glass border-white/10">
+            <SelectContent className="glass border-[var(--color-border-subtle)]">
               <SelectItem value="0">Any Score</SelectItem>
               <SelectItem value="70">70%+ Match</SelectItem>
               <SelectItem value="80">80%+ Match</SelectItem>
@@ -116,7 +116,7 @@ export default function TemplatesExplorePage() {
             <SelectTrigger className="w-full sm:w-40 h-11 rounded-lg bg-surface-container border-outline-variant/30 text-on-surface font-sans text-sm">
               <SelectValue placeholder="Sort By" />
             </SelectTrigger>
-            <SelectContent className="glass border-white/10">
+            <SelectContent className="glass border-[var(--color-border-subtle)]">
               <SelectItem value="newest">Newest First</SelectItem>
               <SelectItem value="POPULAR">Most Popular</SelectItem>
               <SelectItem value="RATING_DESC">Highest Match</SelectItem>
@@ -145,7 +145,7 @@ export default function TemplatesExplorePage() {
         ) : templates.length > 0 ? (
           templates.map((t) => (
             <Link href={`/templates/${t.id}`} key={t.id} className="group flex flex-col h-full animate-in fade-in zoom-in duration-300">
-              <div className="bg-surface-container/80 backdrop-blur-lg rounded-xl overflow-hidden border border-white/5 flex flex-col h-full hover:border-primary/50 hover:shadow-primary/5 transition-all">
+              <div className="bg-surface-container/80 backdrop-blur-lg rounded-xl overflow-hidden border border-[var(--color-border-subtle)] flex flex-col h-full hover:border-primary/50 hover:shadow-primary/5 transition-all">
                 <div className="relative aspect-3/4 overflow-hidden">
                   <img 
                     src={t.previewImage} 
@@ -172,8 +172,8 @@ export default function TemplatesExplorePage() {
             </Link>
           ))
         ) : (
-          <div className="col-span-full py-20 text-center space-y-6 bg-surface-container-low rounded-3xl border border-white/5">
-            <div className="w-20 h-20 bg-surface-container rounded-full flex items-center justify-center mx-auto border border-white/5">
+          <div className="col-span-full py-20 text-center space-y-6 bg-surface-container-low rounded-3xl border border-[var(--color-border-subtle)]">
+            <div className="w-20 h-20 bg-surface-container rounded-full flex items-center justify-center mx-auto border border-[var(--color-border-subtle)]">
               <Search className="w-8 h-8 text-on-surface-variant" />
             </div>
             <div className="space-y-2">

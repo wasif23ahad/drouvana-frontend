@@ -61,7 +61,7 @@ export default function TemplateDetailsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
         {/* Visual Side */}
         <div className="lg:col-span-7 space-y-8">
-          <div className="bg-surface-container-low rounded-[40px] overflow-hidden border border-white/10 aspect-3/4 relative group shadow-2xl shadow-primary/5">
+          <div className="bg-surface-container-low rounded-[40px] overflow-hidden border border-[var(--color-border-subtle)] aspect-3/4 relative group shadow-2xl shadow-primary/5">
             <img 
               src={template.previewImage} 
               alt={template.title} 
@@ -71,12 +71,12 @@ export default function TemplateDetailsPage() {
           </div>
           <div className="grid grid-cols-4 gap-4">
             {template.images?.length > 0 ? template.images.map((img: string, i: number) => (
-              <div key={i} className="aspect-square rounded-2xl bg-surface-container border border-white/5 overflow-hidden cursor-pointer hover:border-primary transition-all group">
+              <div key={i} className="aspect-square rounded-2xl bg-surface-container border border-[var(--color-border-subtle)] overflow-hidden cursor-pointer hover:border-primary transition-all group">
                 <img src={img} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all scale-110 group-hover:scale-100" />
               </div>
             )) : (
                Array.from({ length: 4 }).map((_, i) => (
-                 <div key={i} className="aspect-square rounded-2xl bg-surface-container border border-white/5 flex items-center justify-center opacity-20">
+                 <div key={i} className="aspect-square rounded-2xl bg-surface-container border border-[var(--color-border-subtle)] flex items-center justify-center opacity-20">
                    <Layout className="w-6 h-6" />
                  </div>
                ))
@@ -100,7 +100,7 @@ export default function TemplateDetailsPage() {
           </div>
 
           {/* Technical Specs */}
-          <div className="grid grid-cols-2 gap-y-10 gap-x-6 py-10 border-y border-white/5">
+          <div className="grid grid-cols-2 gap-y-10 gap-x-6 py-10 border-y border-[var(--color-border-subtle)]">
             {[
               { icon: Layout, label: 'Visual Style', val: template.style },
               { icon: FileText, label: 'Deployments', val: `${template.usageCount}+ Used` },
@@ -108,7 +108,7 @@ export default function TemplateDetailsPage() {
               { icon: Clock, label: 'Last Update', val: 'Oct 2024' },
             ].map((s, i) => (
               <div key={i} className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary border border-white/5 group hover:border-primary/50 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-primary border border-[var(--color-border-subtle)] group hover:border-primary/50 transition-all">
                   <s.icon className="w-5 h-5" />
                 </div>
                 <div>
@@ -135,7 +135,7 @@ export default function TemplateDetailsPage() {
             <Button className="h-16 px-10 rounded-2xl bg-gradient-primary text-white text-lg font-heading font-bold flex-1 gap-3 shadow-xl shadow-primary/20 border-none transition-all hover:scale-[1.02] active:scale-95">
               Launch Builder <Rocket className="w-6 h-6" />
             </Button>
-            <Button variant="outline" size="icon" className="h-16 w-16 rounded-2xl border-white/10 bg-surface-container hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all">
+            <Button variant="outline" size="icon" className="h-16 w-16 rounded-2xl border-[var(--color-border-subtle)] bg-surface-container hover:bg-black/5 dark:hover:bg-white/5 text-on-surface-variant hover:text-primary transition-all">
               <Share2 className="w-6 h-6" />
             </Button>
           </div>
@@ -150,7 +150,7 @@ export default function TemplateDetailsPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="bg-surface-container-low rounded-2xl border border-white/5 overflow-hidden group hover:border-primary/30 transition-all">
+            <div key={i} className="bg-surface-container-low rounded-2xl border border-[var(--color-border-subtle)] overflow-hidden group hover:border-primary/30 transition-all">
               <div className="aspect-video bg-surface-container overflow-hidden">
                 <div className="w-full h-full bg-primary/5 animate-pulse" />
               </div>
@@ -172,7 +172,7 @@ export default function TemplateDetailsPage() {
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {template.reviews?.length > 0 ? template.reviews.slice(0, 3).map((r: any, i: number) => (
-            <div key={i} className="bg-surface-container-low p-8 rounded-[32px] border border-white/5 space-y-6 relative group overflow-hidden">
+            <div key={i} className="bg-surface-container-low p-8 rounded-[32px] border border-[var(--color-border-subtle)] space-y-6 relative group overflow-hidden">
               <div className="absolute -top-4 -right-4 w-24 h-24 bg-linear-to-br from-primary/20 to-transparent rounded-full blur-2xl group-hover:from-primary/30 transition-colors" />
               <div className="flex gap-1">
                 {Array.from({ length: 5 }).map((_, s) => (
@@ -180,7 +180,7 @@ export default function TemplateDetailsPage() {
                 ))}
               </div>
               <p className="text-on-surface-variant leading-relaxed font-sans text-sm">"{r.comment}"</p>
-              <div className="flex items-center gap-4 pt-4 border-t border-white/5">
+              <div className="flex items-center gap-4 pt-4 border-t border-[var(--color-border-subtle)]">
                 <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-tertiary flex items-center justify-center font-bold text-xs text-white">
                   {r.user?.name?.charAt(0) || 'U'}
                 </div>
@@ -191,7 +191,7 @@ export default function TemplateDetailsPage() {
               </div>
             </div>
           )) : (
-            <div className="col-span-full py-12 text-center bg-surface-container-low rounded-3xl border border-dashed border-white/10">
+            <div className="col-span-full py-12 text-center bg-surface-container-low rounded-3xl border border-dashed border-[var(--color-border-subtle)]">
               <p className="text-on-surface-variant font-sans">Strategic assessments pending for this design architecture.</p>
             </div>
           )}

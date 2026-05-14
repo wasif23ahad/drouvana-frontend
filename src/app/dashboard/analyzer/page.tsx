@@ -171,7 +171,7 @@ function FileDropZone({ onTextExtracted }: { onTextExtracted: (text: string, fil
       onClick={() => inputRef.current?.click()}
       className={cn(
         'relative flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed cursor-pointer transition-all min-h-[200px] p-8 text-center',
-        dragging ? 'border-primary bg-primary/5 scale-[1.01]' : 'border-white/10 bg-surface/30 hover:border-primary/40 hover:bg-surface/50'
+        dragging ? 'border-primary bg-primary/5 scale-[1.01]' : 'border-[var(--color-border-subtle)] bg-surface/30 hover:border-primary/40 hover:bg-surface/50'
       )}
     >
       <input ref={inputRef} type="file" accept=".pdf,.docx,.txt" className="hidden" onChange={onFileChange} />
@@ -199,7 +199,7 @@ function FileDropZone({ onTextExtracted }: { onTextExtracted: (text: string, fil
         </>
       ) : (
         <>
-          <div className="w-14 h-14 rounded-2xl bg-surface-2 border border-white/10 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-2xl bg-surface-2 border border-[var(--color-border-subtle)] flex items-center justify-center">
             <UploadCloud className="w-7 h-7 text-text-muted" />
           </div>
           <div>
@@ -208,7 +208,7 @@ function FileDropZone({ onTextExtracted }: { onTextExtracted: (text: string, fil
           </div>
           <div className="flex gap-2">
             {['PDF', 'DOCX', 'TXT'].map(fmt => (
-              <span key={fmt} className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-surface-2 border border-white/10 text-text-muted">
+              <span key={fmt} className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-surface-2 border border-[var(--color-border-subtle)] text-text-muted">
                 {fmt}
               </span>
             ))}
@@ -459,7 +459,7 @@ export default function AtsAnalyzerPage() {
           <Button
             onClick={() => { setResult(null); setResumeText(''); setJobDescription(''); setJobTitle(''); setCompanyName(''); setBuilderLoaded(false); setResumePreviewOpen(false); }}
             variant="outline"
-            className="rounded-xl gap-2 border-white/10 text-xs h-9"
+            className="rounded-xl gap-2 border-[var(--color-border-subtle)] text-xs h-9"
           >
             <RefreshCw className="w-3.5 h-3.5" /> New Analysis
           </Button>
@@ -471,7 +471,7 @@ export default function AtsAnalyzerPage() {
         <div className="flex flex-col gap-5">
 
           {/* Resume Source */}
-          <Card className="bg-surface/50 border-white/5 rounded-2xl overflow-hidden">
+          <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl overflow-hidden">
             <CardHeader className="pb-0 pt-5 px-5">
               <CardTitle className="text-sm font-bold font-hanken text-text-main flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-primary" /> Resume Source
@@ -490,7 +490,7 @@ export default function AtsAnalyzerPage() {
                     className={cn(
                       'flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all',
                       resumeSource === tab.id
-                        ? 'bg-surface text-primary shadow-sm border border-white/10'
+                        ? 'bg-surface text-primary shadow-sm border border-[var(--color-border-subtle)]'
                         : 'text-text-muted hover:text-text-sub'
                     )}
                   >
@@ -527,7 +527,7 @@ export default function AtsAnalyzerPage() {
                         </div>
                       </div>
                       {resumePreviewOpen && (
-                        <div className="rounded-xl bg-surface border border-white/8 p-3 max-h-48 overflow-y-auto">
+                        <div className="rounded-xl bg-surface border border-[var(--color-border-subtle)] p-3 max-h-48 overflow-y-auto">
                           <p className="text-[10px] text-text-muted font-jetbrains uppercase tracking-wider mb-2">Extracted Content Preview</p>
                           <pre className="text-[11px] text-text-sub font-mono whitespace-pre-wrap leading-relaxed">{resumeText.slice(0, 1200)}{resumeText.length > 1200 ? '\n…' : ''}</pre>
                         </div>
@@ -580,7 +580,7 @@ export default function AtsAnalyzerPage() {
                     onChange={e => setResumeText(e.target.value)}
                     rows={9}
                     placeholder="Paste your resume content here — summary, experience, skills, education..."
-                    className="w-full bg-surface border border-white/10 rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans leading-relaxed"
+                    className="w-full bg-surface border border-[var(--color-border-subtle)] rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans leading-relaxed"
                   />
                   <span className="text-[10px] text-text-muted font-jetbrains">{resumeText.split(/\s+/).filter(Boolean).length} words</span>
                 </div>
@@ -589,7 +589,7 @@ export default function AtsAnalyzerPage() {
           </Card>
 
           {/* Job Details */}
-          <Card className="bg-surface/50 border-white/5 rounded-2xl">
+          <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold font-hanken text-text-main flex items-center gap-2">
                 <Target className="w-4 h-4 text-primary" /> Target Job
@@ -604,7 +604,7 @@ export default function AtsAnalyzerPage() {
                     value={jobTitle}
                     onChange={e => setJobTitle(e.target.value)}
                     placeholder="e.g. Senior Software Engineer"
-                    className="w-full h-9 bg-surface border border-white/10 rounded-xl px-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 transition-colors"
+                    className="w-full h-9 bg-surface border border-[var(--color-border-subtle)] rounded-xl px-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 transition-colors"
                   />
                 </div>
                 <div>
@@ -615,7 +615,7 @@ export default function AtsAnalyzerPage() {
                     value={companyName}
                     onChange={e => setCompanyName(e.target.value)}
                     placeholder="e.g. Acme Corp"
-                    className="w-full h-9 bg-surface border border-white/10 rounded-xl px-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 transition-colors"
+                    className="w-full h-9 bg-surface border border-[var(--color-border-subtle)] rounded-xl px-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 transition-colors"
                   />
                 </div>
               </div>
@@ -624,7 +624,7 @@ export default function AtsAnalyzerPage() {
                 onChange={e => setJobDescription(e.target.value)}
                 rows={9}
                 placeholder="Paste the full job description — requirements, responsibilities, qualifications, tech stack..."
-                className="w-full bg-surface border border-white/10 rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans leading-relaxed"
+                className="w-full bg-surface border border-[var(--color-border-subtle)] rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans leading-relaxed"
               />
               <span className="text-[10px] text-text-muted font-jetbrains">{jobDescription.split(/\s+/).filter(Boolean).length} words</span>
             </CardContent>
@@ -648,7 +648,7 @@ export default function AtsAnalyzerPage() {
         {/* ── RIGHT: Results ── */}
         <div className="flex flex-col gap-5">
           {loading && !result ? (
-            <Card className="bg-surface/30 border-white/5 rounded-2xl min-h-[500px] flex flex-col items-center justify-center gap-6 p-8">
+            <Card className="bg-surface/30 border-[var(--color-border-subtle)] rounded-2xl min-h-[500px] flex flex-col items-center justify-center gap-6 p-8">
               <div className="relative">
                 <div className="w-20 h-20 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
                 <Sparkles className="absolute inset-0 m-auto w-8 h-8 text-primary" />
@@ -663,7 +663,7 @@ export default function AtsAnalyzerPage() {
           ) : result ? (
             <>
               {/* Score Card */}
-              <Card className="bg-surface/50 border-white/5 rounded-2xl relative overflow-hidden">
+              <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
                 <CardContent className="p-6">
                   <div className="flex flex-col sm:flex-row items-center gap-8">
@@ -675,7 +675,7 @@ export default function AtsAnalyzerPage() {
                       ))}
                     </div>
                   </div>
-                  <div className="mt-5 pt-5 border-t border-white/5 grid grid-cols-3 gap-3">
+                  <div className="mt-5 pt-5 border-t border-[var(--color-border-subtle)] grid grid-cols-3 gap-3">
                     <div className="bg-surface-2 rounded-xl p-3 text-center">
                       <p className="text-[10px] text-text-muted mb-1 font-jetbrains">Keyword Match</p>
                       <p className="text-xl font-bold text-primary">{Math.round((result.keyword_match_rate || 0) * 100)}%</p>
@@ -694,7 +694,7 @@ export default function AtsAnalyzerPage() {
 
               {/* Score Breakdown */}
               {result.breakdown && (
-                <Card className="bg-surface/50 border-white/5 rounded-2xl">
+                <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-bold font-hanken flex items-center gap-2">
                       <BarChart3 className="w-4 h-4 text-primary" /> Score Breakdown
@@ -736,7 +736,7 @@ export default function AtsAnalyzerPage() {
 
               {/* Strengths */}
               {result.strengths?.length > 0 && (
-                <Card className="bg-surface/50 border-white/5 rounded-2xl">
+                <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-bold font-hanken flex items-center gap-2">
                       <Award className="w-4 h-4 text-emerald-400" /> Strengths
@@ -755,7 +755,7 @@ export default function AtsAnalyzerPage() {
 
               {/* Missing Keywords */}
               {result.missing_keywords?.length > 0 && (
-                <Card className="bg-surface/50 border-white/5 rounded-2xl">
+                <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-bold font-hanken flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 text-amber-400" /> Missing Keywords
@@ -781,7 +781,7 @@ export default function AtsAnalyzerPage() {
 
               {/* AI Suggested Summary */}
               {result.suggested_summary && (
-                <Card className="bg-surface/50 border-white/5 rounded-2xl">
+                <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm font-bold font-hanken flex items-center gap-2">
@@ -799,7 +799,7 @@ export default function AtsAnalyzerPage() {
                     <p className="text-xs text-text-muted">AI-rewritten summary optimized for this role.</p>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-xs text-text-sub leading-relaxed bg-surface-2 p-4 rounded-xl border border-white/5 italic">
+                    <p className="text-xs text-text-sub leading-relaxed bg-surface-2 p-4 rounded-xl border border-[var(--color-border-subtle)] italic">
                       {result.suggested_summary}
                     </p>
                   </CardContent>
@@ -808,7 +808,7 @@ export default function AtsAnalyzerPage() {
 
               {/* Bullet Rewrites */}
               {result.suggested_bullet_rewrites?.length > 0 && (
-                <Card className="bg-surface/50 border-white/5 rounded-2xl">
+                <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-bold font-hanken flex items-center gap-2">
                       <Zap className="w-4 h-4 text-primary" /> AI Bullet Rewrites
@@ -819,7 +819,7 @@ export default function AtsAnalyzerPage() {
                     {result.suggested_bullet_rewrites.map((item, idx) => (
                       <div key={idx} className={cn(
                         'p-4 rounded-xl border space-y-3 transition-all',
-                        item.applied ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-surface-2 border-white/5'
+                        item.applied ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-surface-2 border-[var(--color-border-subtle)]'
                       )}>
                         {/* Impact badge */}
                         <div className="flex items-center justify-between">
@@ -853,7 +853,7 @@ export default function AtsAnalyzerPage() {
 
                         {/* Reason */}
                         {item.reason && (
-                          <p className="text-[10px] text-text-muted italic border-l-2 border-white/10 pl-3 leading-relaxed">{item.reason}</p>
+                          <p className="text-[10px] text-text-muted italic border-l-2 border-[var(--color-border-subtle)] pl-3 leading-relaxed">{item.reason}</p>
                         )}
 
                         {/* Actions */}
@@ -861,7 +861,7 @@ export default function AtsAnalyzerPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="h-7 text-xs rounded-lg gap-1.5 border-white/10 flex-1"
+                            className="h-7 text-xs rounded-lg gap-1.5 border-[var(--color-border-subtle)] flex-1"
                             onClick={() => handleCopyRewrite(idx, item.improved)}
                           >
                             {item.copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -886,7 +886,7 @@ export default function AtsAnalyzerPage() {
 
               {/* Improvement Tips */}
               {result.overall_suggestions?.length > 0 && (
-                <Card className="bg-surface/50 border-white/5 rounded-2xl">
+                <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-bold font-hanken flex items-center gap-2">
                       <TrendingUp className="w-4 h-4 text-secondary" /> Improvement Tips
@@ -894,7 +894,7 @@ export default function AtsAnalyzerPage() {
                   </CardHeader>
                   <CardContent className="space-y-2.5">
                     {result.overall_suggestions.map((s, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-surface-2 border border-white/5">
+                      <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-surface-2 border border-[var(--color-border-subtle)]">
                         <span className="text-[10px] font-bold text-primary font-jetbrains w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
                         <p className="text-xs text-text-sub leading-relaxed">{s}</p>
                       </div>
@@ -904,8 +904,8 @@ export default function AtsAnalyzerPage() {
               )}
             </>
           ) : (
-            <Card className="bg-surface/20 border-white/5 rounded-2xl min-h-[500px] flex flex-col items-center justify-center p-10 text-center gap-5">
-              <div className="w-20 h-20 rounded-2xl bg-surface-2 border border-white/5 flex items-center justify-center">
+            <Card className="bg-surface/20 border-[var(--color-border-subtle)] rounded-2xl min-h-[500px] flex flex-col items-center justify-center p-10 text-center gap-5">
+              <div className="w-20 h-20 rounded-2xl bg-surface-2 border border-[var(--color-border-subtle)] flex items-center justify-center">
                 <BarChart3 className="w-10 h-10 text-text-muted opacity-40" />
               </div>
               <div className="space-y-2">

@@ -95,7 +95,7 @@ function SortableItem({ app }: { app: any }) {
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-1 border-t border-white/5">
+          <div className="flex items-center justify-between pt-1 border-t border-[var(--color-border-subtle)]">
             <span className={`text-[10px] font-medium flex items-center gap-1 ${dateColor}`}>
               <Calendar className="h-3 w-3" />
               {daysSinceApplied === 0 ? 'Today' : `${daysSinceApplied}d ago`}

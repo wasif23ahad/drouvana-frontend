@@ -241,7 +241,7 @@ export default function MasterResumePage() {
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               activeSection === s.key
                 ? 'bg-primary/20 text-primary border border-primary/30'
-                : 'text-text-muted hover:text-text-main border border-transparent hover:border-white/10'
+                : 'text-text-muted hover:text-text-main border border-transparent hover:border-[var(--color-border-subtle)]'
             }`}
           >
             <Icon className="w-3.5 h-3.5" />
@@ -280,7 +280,7 @@ export default function MasterResumePage() {
         <div
           {...getRootProps()}
           className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-300 ${
-            isDragActive ? 'border-primary bg-primary/5' : parsing ? 'border-primary/50 bg-primary/5' : 'border-white/10 hover:border-primary/30 bg-surface/20'
+            isDragActive ? 'border-primary bg-primary/5' : parsing ? 'border-primary/50 bg-primary/5' : 'border-[var(--color-border-subtle)] hover:border-primary/30 bg-surface/20'
           }`}
         >
           <input {...getInputProps()} />
@@ -344,7 +344,7 @@ export default function MasterResumePage() {
 
         {/* Personal Info */}
         {activeSection === 'personal' && (
-          <Card className="border-white/5 shadow-xl">
+          <Card className="border-[var(--color-border-subtle)] shadow-xl">
             <CardHeader>
               <CardTitle className="font-hanken text-lg flex items-center gap-2">
                 <Globe className="w-5 h-5 text-primary" /> Personal Information
@@ -397,7 +397,7 @@ export default function MasterResumePage() {
 
         {/* Summary */}
         {activeSection === 'summary' && (
-          <Card className="border-white/5 shadow-xl">
+          <Card className="border-[var(--color-border-subtle)] shadow-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
                 <CardTitle className="font-hanken text-lg flex items-center gap-2">
@@ -423,7 +423,7 @@ export default function MasterResumePage() {
 
         {/* Experience */}
         {activeSection === 'experience' && (
-          <Card className="border-white/5 shadow-xl">
+          <Card className="border-[var(--color-border-subtle)] shadow-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
                 <CardTitle className="font-hanken text-lg flex items-center gap-2">
@@ -438,10 +438,10 @@ export default function MasterResumePage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {expFields.fields.map((field, index) => (
-                <div key={field.id} className="relative p-5 rounded-2xl border border-white/5 bg-surface/30 group hover:border-primary/20 transition-all">
+                <div key={field.id} className="relative p-5 rounded-2xl border border-[var(--color-border-subtle)] bg-surface/30 group hover:border-primary/20 transition-all">
                   <Button
                     variant="ghost" size="icon" type="button" onClick={() => expFields.remove(index)}
-                    className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-opacity bg-surface border border-white/10 text-error hover:text-error rounded-full h-7 w-7"
+                    className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-opacity bg-surface border border-[var(--color-border-subtle)] text-error hover:text-error rounded-full h-7 w-7"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
@@ -527,7 +527,7 @@ export default function MasterResumePage() {
                 </div>
               ))}
               {expFields.fields.length === 0 && (
-                <div className="text-center py-8 border border-dashed border-white/10 rounded-2xl">
+                <div className="text-center py-8 border border-dashed border-[var(--color-border-subtle)] rounded-2xl">
                   <p className="text-sm text-text-muted mb-3">No experience entries yet</p>
                   <Button type="button" size="sm" onClick={() => expFields.append({ id: Math.random().toString(), company: '', role: '', dates: '', description: '' })}>
                     <Plus className="w-3.5 h-3.5 mr-1" /> Add Experience
@@ -540,7 +540,7 @@ export default function MasterResumePage() {
 
         {/* Education */}
         {activeSection === 'education' && (
-          <Card className="border-white/5 shadow-xl">
+          <Card className="border-[var(--color-border-subtle)] shadow-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
                 <CardTitle className="font-hanken text-lg flex items-center gap-2">
@@ -555,9 +555,9 @@ export default function MasterResumePage() {
             </CardHeader>
             <CardContent className="space-y-5">
               {eduFields.fields.map((field, index) => (
-                <div key={field.id} className="relative p-5 rounded-2xl border border-white/5 bg-surface/30 group hover:border-primary/20 transition-all">
+                <div key={field.id} className="relative p-5 rounded-2xl border border-[var(--color-border-subtle)] bg-surface/30 group hover:border-primary/20 transition-all">
                   <Button variant="ghost" size="icon" type="button" onClick={() => eduFields.remove(index)}
-                    className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 bg-surface border border-white/10 text-error rounded-full h-7 w-7">
+                    className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 bg-surface border border-[var(--color-border-subtle)] text-error rounded-full h-7 w-7">
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -601,7 +601,7 @@ export default function MasterResumePage() {
                 </div>
               ))}
               {eduFields.fields.length === 0 && (
-                <div className="text-center py-8 border border-dashed border-white/10 rounded-2xl">
+                <div className="text-center py-8 border border-dashed border-[var(--color-border-subtle)] rounded-2xl">
                   <p className="text-sm text-text-muted mb-3">No education entries yet</p>
                   <Button type="button" size="sm" onClick={() => eduFields.append({ id: Math.random().toString(), institution: '', degree: '', field: '', startDate: '', endDate: '', gpa: '' })}>
                     <Plus className="w-3.5 h-3.5 mr-1" /> Add Education
@@ -614,7 +614,7 @@ export default function MasterResumePage() {
 
         {/* Skills */}
         {activeSection === 'skills' && (
-          <Card className="border-white/5 shadow-xl">
+          <Card className="border-[var(--color-border-subtle)] shadow-xl">
             <CardHeader>
               <CardTitle className="font-hanken text-lg flex items-center gap-2">
                 <Code2 className="w-5 h-5 text-emerald-400" /> Skills
@@ -645,7 +645,7 @@ export default function MasterResumePage() {
 
         {/* Projects */}
         {activeSection === 'projects' && (
-          <Card className="border-white/5 shadow-xl">
+          <Card className="border-[var(--color-border-subtle)] shadow-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
                 <CardTitle className="font-hanken text-lg flex items-center gap-2">
@@ -660,9 +660,9 @@ export default function MasterResumePage() {
             </CardHeader>
             <CardContent className="space-y-5">
               {projFields.fields.map((field, index) => (
-                <div key={field.id} className="relative p-5 rounded-2xl border border-white/5 bg-surface/30 group hover:border-primary/20 transition-all">
+                <div key={field.id} className="relative p-5 rounded-2xl border border-[var(--color-border-subtle)] bg-surface/30 group hover:border-primary/20 transition-all">
                   <Button variant="ghost" size="icon" type="button" onClick={() => projFields.remove(index)}
-                    className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 bg-surface border border-white/10 text-error rounded-full h-7 w-7">
+                    className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 bg-surface border border-[var(--color-border-subtle)] text-error rounded-full h-7 w-7">
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -691,7 +691,7 @@ export default function MasterResumePage() {
                 </div>
               ))}
               {projFields.fields.length === 0 && (
-                <div className="text-center py-8 border border-dashed border-white/10 rounded-2xl">
+                <div className="text-center py-8 border border-dashed border-[var(--color-border-subtle)] rounded-2xl">
                   <p className="text-sm text-text-muted mb-3">No projects added yet</p>
                   <Button type="button" size="sm" onClick={() => projFields.append({ id: Math.random().toString(), name: '', description: '', techStack: '', url: '' })}>
                     <Plus className="w-3.5 h-3.5 mr-1" /> Add Project
@@ -704,7 +704,7 @@ export default function MasterResumePage() {
 
         {/* Certifications */}
         {activeSection === 'certifications' && (
-          <Card className="border-white/5 shadow-xl">
+          <Card className="border-[var(--color-border-subtle)] shadow-xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
                 <CardTitle className="font-hanken text-lg flex items-center gap-2">
@@ -719,9 +719,9 @@ export default function MasterResumePage() {
             </CardHeader>
             <CardContent className="space-y-5">
               {certFields.fields.map((field, index) => (
-                <div key={field.id} className="relative p-5 rounded-2xl border border-white/5 bg-surface/30 group hover:border-primary/20 transition-all">
+                <div key={field.id} className="relative p-5 rounded-2xl border border-[var(--color-border-subtle)] bg-surface/30 group hover:border-primary/20 transition-all">
                   <Button variant="ghost" size="icon" type="button" onClick={() => certFields.remove(index)}
-                    className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 bg-surface border border-white/10 text-error rounded-full h-7 w-7">
+                    className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 bg-surface border border-[var(--color-border-subtle)] text-error rounded-full h-7 w-7">
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -751,7 +751,7 @@ export default function MasterResumePage() {
                 </div>
               ))}
               {certFields.fields.length === 0 && (
-                <div className="text-center py-8 border border-dashed border-white/10 rounded-2xl">
+                <div className="text-center py-8 border border-dashed border-[var(--color-border-subtle)] rounded-2xl">
                   <p className="text-sm text-text-muted mb-3">No certifications added yet</p>
                   <Button type="button" size="sm" onClick={() => certFields.append({ id: Math.random().toString(), name: '', issuer: '', date: '', url: '' })}>
                     <Plus className="w-3.5 h-3.5 mr-1" /> Add Certification
@@ -768,7 +768,7 @@ export default function MasterResumePage() {
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : saved ? <CheckCircle2 className="h-4 w-4" /> : <Save className="h-4 w-4" />}
             {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Resume'}
           </Button>
-          <Button type="button" variant="outline" className="rounded-xl gap-2 border-white/10" onClick={() => setActiveSection(SECTIONS[(SECTIONS.findIndex(s => s.key === activeSection) + 1) % SECTIONS.length].key)}>
+          <Button type="button" variant="outline" className="rounded-xl gap-2 border-[var(--color-border-subtle)]" onClick={() => setActiveSection(SECTIONS[(SECTIONS.findIndex(s => s.key === activeSection) + 1) % SECTIONS.length].key)}>
             Next Section <ChevronRight className="w-3.5 h-3.5" />
           </Button>
         </div>
@@ -777,8 +777,8 @@ export default function MasterResumePage() {
       {/* PDF Preview Modal */}
       {pdfModalOpen && uploadedPdfBase64 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setPdfModalOpen(false)}>
-          <div className="relative w-full max-w-4xl h-[85vh] bg-surface rounded-3xl border border-white/10 overflow-hidden flex flex-col shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-6 py-4 bg-surface-2 border-b border-white/10">
+          <div className="relative w-full max-w-4xl h-[85vh] bg-surface rounded-3xl border border-[var(--color-border-subtle)] overflow-hidden flex flex-col shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 bg-surface-2 border-b border-[var(--color-border-subtle)]">
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-error" />
                 <span className="text-sm font-bold text-text-main truncate">{uploadedFileName}</span>

@@ -179,7 +179,7 @@ export default function AdminDashboard() {
           <div key={i} className="bg-surface-2/40 backdrop-blur-xl border border-border-color rounded-(--radius-premium) p-8 relative overflow-hidden group hover:border-primary/30 transition-all shadow-lg">
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors" />
             <div className="flex items-center justify-between mb-6">
-              <div className={`p-3 rounded-2xl bg-surface-2 border border-white/10 ${m.color}`}>
+              <div className={`p-3 rounded-2xl bg-surface-2 border border-[var(--color-border-subtle)] ${m.color}`}>
                 <m.icon className="w-6 h-6" />
               </div>
               <div className={`flex items-center gap-1 text-[10px] font-bold font-mono ${m.up ? 'text-success' : 'text-error'}`}>
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
                 onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
               />
             </div>
-            <Button variant="outline" size="icon" className="border-white/10 bg-surface-2 h-11 w-11 rounded-xl hover:bg-white/5">
+            <Button variant="outline" size="icon" className="border-[var(--color-border-subtle)] bg-surface-2 h-11 w-11 rounded-xl hover:bg-black/5 dark:hover:bg-white/5">
               <Filter className="w-4 h-4" />
             </Button>
           </div>
@@ -277,7 +277,7 @@ export default function AdminDashboard() {
                 </tr>
               ) : (
                 paginatedLogs.map((log: any, idx: number) => (
-                  <tr key={log.id ?? idx} className="hover:bg-white/5 transition-colors group">
+                  <tr key={log.id ?? idx} className="hover:bg-black/5 dark:hover:bg-white/5 transition-colors group">
                     <td className="px-8 py-5 font-hanken font-bold text-text-main text-base">
                       {FEATURE_LABEL[log.feature] ?? log.feature}
                     </td>
@@ -321,7 +321,7 @@ export default function AdminDashboard() {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              className="h-9 px-4 rounded-lg border-white/10 text-xs disabled:opacity-50"
+              className="h-9 px-4 rounded-lg border-[var(--color-border-subtle)] text-xs disabled:opacity-50"
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
             >
@@ -329,7 +329,7 @@ export default function AdminDashboard() {
             </Button>
             <Button
               variant="outline"
-              className="h-9 px-4 rounded-lg border-white/10 text-xs disabled:opacity-50"
+              className="h-9 px-4 rounded-lg border-[var(--color-border-subtle)] text-xs disabled:opacity-50"
               onClick={() => setPage(p => p + 1)}
               disabled={page * itemsPerPage >= filteredLogs.length}
             >

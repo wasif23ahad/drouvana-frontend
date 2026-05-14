@@ -80,7 +80,7 @@ const Step3ResumeGen = () => {
             onClick={() => setTemplateId(tpl.id)}
             className={cn(
               "group cursor-pointer relative rounded-[3rem] overflow-hidden border-4 transition-all duration-700 bg-surface shadow-2xl",
-              templateId === tpl.id ? "border-primary scale-[1.02] shadow-primary/20" : "border-white/5 hover:border-primary/30"
+              templateId === tpl.id ? "border-primary scale-[1.02] shadow-primary/20" : "border-[var(--color-border-subtle)] hover:border-primary/30"
             )}
           >
             <div className="aspect-3/4 relative">

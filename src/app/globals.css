@@ -23,10 +23,12 @@
   --color-background: var(--bg-base);
   --color-surface: var(--bg-surface);
   --color-surface-2: var(--bg-surface-2);
+  --color-elevated: var(--bg-elevated);
   --color-text-main: var(--text-primary);
   --color-text-sub: var(--text-secondary);
   --color-text-muted: var(--text-muted);
   --color-border-subtle: var(--border-color);
+  --color-border-strong: var(--border-strong);
 
   --font-hanken: var(--font-hanken);
   --font-inter: var(--font-inter);
@@ -35,28 +37,45 @@
 
 @layer base {
   :root {
-    --bg-base: #0B0F1A;
-    --bg-surface: #131B2D;
-    --bg-surface-2: #1E293B;
-    --bg-glass: rgba(19, 27, 45, 0.7);
-    --text-primary: #F1F5F9;
-    --text-secondary: #94A3B8;
-    --text-muted: #64748B;
-    --border-color: rgba(99, 102, 241, 0.15);
-    --mesh-opacity: 0.12;
+    /* Modern dark — deeper midnight base, elevated surfaces, indigo-tinted borders */
+    --bg-base: #07090F;            /* deepest canvas — true midnight */
+    --bg-surface: #0E1424;         /* sidebars, navbars, primary cards */
+    --bg-surface-2: #18213A;       /* hover states, inputs, secondary surfaces */
+    --bg-elevated: #1F2A47;        /* dropdowns, modals, popovers */
+    --bg-glass: rgba(14, 20, 36, 0.72);
+    --text-primary: #F8FAFC;       /* near-white, modern */
+    --text-secondary: #CBD5E1;     /* readable secondary, modernized */
+    --text-muted: #94A3B8;         /* meta text */
+    --border-color: rgba(99, 102, 241, 0.14);
+    --border-strong: rgba(148, 163, 184, 0.18);
+    --shadow-color: 0 0 0;
+    --shadow-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 1px rgba(0, 0, 0, 0.2);
+    --shadow-elevation-2: 0 4px 8px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-elevation-3: 0 12px 24px rgba(0, 0, 0, 0.45), 0 4px 8px rgba(0, 0, 0, 0.3);
+    --shadow-glow-primary: 0 0 28px rgba(99, 102, 241, 0.25);
+    --mesh-opacity: 0.14;
+    --radius-premium: 1.25rem;
   }
 
   .light {
-    --bg-base: #FFFFFF;
-    --bg-surface: #EEF1F6;
-    --bg-surface-2: #DDE3EC;
-    --bg-glass: rgba(238, 241, 246, 0.85);
-    --text-primary: #0B1424;
-    --text-secondary: #1E293B;
-    --text-muted: #475569;
-    --border-color: rgba(15, 23, 42, 0.10);
-    --mesh-opacity: 0.06;
-    --radius-premium: 2.5rem;
+    /* Modern light — Linear/Vercel pattern: cool-gray canvas with white elevated surfaces */
+    --bg-base: #F5F7FA;            /* canvas — light cool gray, never harsh white */
+    --bg-surface: #FFFFFF;         /* sidebars, navbars, cards POP off canvas */
+    --bg-surface-2: #EEF2F7;       /* hover, inputs, secondary fill */
+    --bg-elevated: #FFFFFF;        /* dropdowns, modals — same as surface but with shadow */
+    --bg-glass: rgba(255, 255, 255, 0.82);
+    --text-primary: #0B1424;       /* deep slate — true ink */
+    --text-secondary: #334155;     /* readable, AAA-grade body text */
+    --text-muted: #64748B;         /* meta text */
+    --border-color: rgba(15, 23, 42, 0.08);
+    --border-strong: rgba(15, 23, 42, 0.14);
+    --shadow-color: 15 23 42;
+    --shadow-elevation-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+    --shadow-elevation-2: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+    --shadow-elevation-3: 0 16px 32px rgba(15, 23, 42, 0.12), 0 6px 12px rgba(15, 23, 42, 0.06);
+    --shadow-glow-primary: 0 0 24px rgba(99, 102, 241, 0.18);
+    --mesh-opacity: 0.05;
+    --radius-premium: 1.25rem;
   }
 
   * {
@@ -92,13 +111,67 @@
 
 @layer utilities {
   .mesh-gradient {
-    background: radial-gradient(at 0% 0%, rgba(99, 102, 241, var(--mesh-opacity)) 0px, transparent 50%), 
+    background: radial-gradient(at 0% 0%, rgba(99, 102, 241, var(--mesh-opacity)) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(139, 92, 246, var(--mesh-opacity)) 0px, transparent 50%);
   }
   .glass-card {
     background: var(--bg-glass);
     backdrop-filter: blur(12px);
     border: 1px solid var(--border-color);
+  }
+  /* Modern card — same size, radius, and visual style across both themes */
+  .modern-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-elevation-1);
+    transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+  }
+  .modern-card:hover {
+    box-shadow: var(--shadow-elevation-2);
+    border-color: var(--border-strong);
+  }
+  .modern-card-interactive:hover {
+    transform: translateY(-2px);
+    border-color: rgba(99, 102, 241, 0.30);
+  }
+  /* Soft theme-aware divider */
+  .soft-border {
+    border-color: var(--border-color);
+  }
+  .strong-border {
+    border-color: var(--border-strong);
+  }
+  /* Modern elevation utilities */
+  .shadow-elev-1 { box-shadow: var(--shadow-elevation-1); }
+  .shadow-elev-2 { box-shadow: var(--shadow-elevation-2); }
+  .shadow-elev-3 { box-shadow: var(--shadow-elevation-3); }
+  .shadow-glow-primary { box-shadow: var(--shadow-glow-primary); }
+  /* Modern subtle hover overlay that works in both themes */
+  .hover-overlay {
+    transition: background-color 150ms ease;
+  }
+  .hover-overlay:hover {
+    background-color: rgb(99 102 241 / 0.08);
+  }
+  /* Premium gradient border for hero CTAs and feature cards */
+  .gradient-border {
+    position: relative;
+    background: var(--bg-surface);
+    border: 1px solid transparent;
+    background-clip: padding-box;
+  }
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, #6366F1, #8B5CF6, #0EA5E9);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
   }
   .status-interview {
     background: rgba(139, 92, 246, 0.2);

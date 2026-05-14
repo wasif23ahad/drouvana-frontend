@@ -200,7 +200,7 @@ export default function CoverLetterPage() {
           <Button
             onClick={() => { setVariants([]); }}
             variant="outline"
-            className="rounded-xl gap-2 border-white/10 text-xs h-9"
+            className="rounded-xl gap-2 border-[var(--color-border-subtle)] text-xs h-9"
           >
             <RefreshCw className="w-3.5 h-3.5" /> New Generation
           </Button>
@@ -210,7 +210,7 @@ export default function CoverLetterPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left: Form */}
         <div className="lg:col-span-4 flex flex-col gap-5">
-          <Card className="bg-surface/50 border-white/5 rounded-2xl">
+          <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold font-hanken text-primary">Job Details</CardTitle>
             </CardHeader>
@@ -221,7 +221,7 @@ export default function CoverLetterPage() {
                   value={params.jobTitle}
                   onChange={e => setParams({ ...params, jobTitle: e.target.value })}
                   placeholder="e.g. Senior Backend Engineer"
-                  className="bg-surface border-white/10 rounded-xl text-xs h-10"
+                  className="bg-surface border-[var(--color-border-subtle)] rounded-xl text-xs h-10"
                 />
               </div>
 
@@ -231,7 +231,7 @@ export default function CoverLetterPage() {
                   value={params.companyName}
                   onChange={e => setParams({ ...params, companyName: e.target.value })}
                   placeholder="e.g. Stripe"
-                  className="bg-surface border-white/10 rounded-xl text-xs h-10"
+                  className="bg-surface border-[var(--color-border-subtle)] rounded-xl text-xs h-10"
                 />
               </div>
 
@@ -241,7 +241,7 @@ export default function CoverLetterPage() {
                   value={params.hiringManager}
                   onChange={e => setParams({ ...params, hiringManager: e.target.value })}
                   placeholder="e.g. Sarah Chen"
-                  className="bg-surface border-white/10 rounded-xl text-xs h-10"
+                  className="bg-surface border-[var(--color-border-subtle)] rounded-xl text-xs h-10"
                 />
               </div>
 
@@ -252,7 +252,7 @@ export default function CoverLetterPage() {
                     <button
                       key={t.id}
                       onClick={() => setParams({ ...params, tone: t.id })}
-                      className={`py-1.5 rounded-lg text-[11px] font-bold capitalize border transition-all ${params.tone === t.id ? 'bg-primary/20 border-primary text-primary' : 'bg-surface border-white/5 text-text-muted hover:border-white/20'}`}
+                      className={`py-1.5 rounded-lg text-[11px] font-bold capitalize border transition-all ${params.tone === t.id ? 'bg-primary/20 border-primary text-primary' : 'bg-surface border-[var(--color-border-subtle)] text-text-muted hover:border-[var(--color-border-strong)]'}`}
                     >
                       {t.label}
                     </button>
@@ -262,7 +262,7 @@ export default function CoverLetterPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-surface/50 border-white/5 rounded-2xl">
+          <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold font-hanken text-primary">Job Description</CardTitle>
               <p className="text-xs text-text-muted">Optional but improves tailoring significantly.</p>
@@ -273,12 +273,12 @@ export default function CoverLetterPage() {
                 onChange={e => setParams({ ...params, jobDescription: e.target.value })}
                 rows={4}
                 placeholder="Paste the job description here..."
-                className="w-full bg-surface border border-white/10 rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
+                className="w-full bg-surface border border-[var(--color-border-subtle)] rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
               />
             </CardContent>
           </Card>
 
-          <Card className="bg-surface/50 border-white/5 rounded-2xl">
+          <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-bold font-hanken text-primary">Custom Instructions</CardTitle>
               <p className="text-xs text-text-muted">Any specific points to emphasize.</p>
@@ -289,7 +289,7 @@ export default function CoverLetterPage() {
                 onChange={e => setParams({ ...params, customInstructions: e.target.value })}
                 rows={3}
                 placeholder="e.g. Emphasize my experience with distributed systems and team leadership..."
-                className="w-full bg-surface border border-white/10 rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
+                className="w-full bg-surface border border-[var(--color-border-subtle)] rounded-xl p-3 text-xs text-text-sub focus:outline-none focus:border-primary/50 resize-none font-sans"
               />
             </CardContent>
           </Card>
@@ -312,7 +312,7 @@ export default function CoverLetterPage() {
         {/* Right: Output */}
         <div className="lg:col-span-8 flex flex-col gap-5">
           {loading && !variants.length ? (
-            <Card className="bg-surface/30 border-white/5 rounded-2xl h-[500px] flex flex-col items-center justify-center gap-5 p-8">
+            <Card className="bg-surface/30 border-[var(--color-border-subtle)] rounded-2xl h-[500px] flex flex-col items-center justify-center gap-5 p-8">
               <div className="relative">
                 <div className="w-16 h-16 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
                 <FileText className="absolute inset-0 m-auto w-6 h-6 text-primary" />
@@ -322,7 +322,7 @@ export default function CoverLetterPage() {
                 <p className="text-xs text-text-muted">Tailoring 3 distinct variants to match the role</p>
               </div>
               {streamingText && (
-                <div className="w-full max-w-sm bg-surface-2 rounded-xl p-3 border border-white/5">
+                <div className="w-full max-w-sm bg-surface-2 rounded-xl p-3 border border-[var(--color-border-subtle)]">
                   <p className="text-[10px] text-text-muted font-jetbrains mb-1 uppercase">Writing</p>
                   <p className="text-xs text-text-sub font-mono leading-relaxed">{streamingText}</p>
                 </div>
@@ -336,7 +336,7 @@ export default function CoverLetterPage() {
                   <button
                     key={i}
                     onClick={() => setActiveVariant(i)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all ${activeVariant === i ? 'bg-primary/20 border-primary text-primary' : 'bg-surface border-white/5 text-text-muted hover:border-white/20'}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold border transition-all ${activeVariant === i ? 'bg-primary/20 border-primary text-primary' : 'bg-surface border-[var(--color-border-subtle)] text-text-muted hover:border-[var(--color-border-strong)]'}`}
                   >
                     <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center text-[10px]">{i + 1}</span>
                     {v.label || v.type || `Variant ${i + 1}`}
@@ -345,16 +345,16 @@ export default function CoverLetterPage() {
               </div>
 
               {currentVariant && (
-                <Card className="bg-surface/50 border-white/5 rounded-2xl overflow-hidden">
+                <Card className="bg-surface/50 border-[var(--color-border-subtle)] rounded-2xl overflow-hidden">
                   {/* Header */}
-                  <div className="bg-surface-2 px-5 py-3 border-b border-white/5 flex items-center justify-between">
+                  <div className="bg-surface-2 px-5 py-3 border-b border-[var(--color-border-subtle)] flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-1.5">
                         <span className="text-xs font-bold text-text-main">{currentVariant.label || currentVariant.type}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {currentVariant.word_count > 0 && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-surface text-text-muted font-jetbrains border border-white/5">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-surface text-text-muted font-jetbrains border border-[var(--color-border-subtle)]">
                             {currentVariant.word_count} words
                           </span>
                         )}
@@ -411,7 +411,7 @@ export default function CoverLetterPage() {
                   <button
                     key={i}
                     onClick={() => setActiveVariant(i)}
-                    className={`p-3 rounded-xl border text-left transition-all ${activeVariant === i ? 'border-primary/50 bg-primary/5' : 'border-white/5 bg-surface/30 hover:border-white/15'}`}
+                    className={`p-3 rounded-xl border text-left transition-all ${activeVariant === i ? 'border-primary/50 bg-primary/5' : 'border-[var(--color-border-subtle)] bg-surface/30 hover:border-[var(--color-border-strong)]'}`}
                   >
                     <p className="text-[11px] font-bold text-text-main mb-1">{v.label || `Variant ${i + 1}`}</p>
                     <p className="text-[10px] text-text-muted line-clamp-2 leading-relaxed">{v.opening_line || v.content?.slice(0, 80)}...</p>
@@ -420,7 +420,7 @@ export default function CoverLetterPage() {
               </div>
             </div>
           ) : (
-            <Card className="bg-surface/20 border-white/5 rounded-2xl h-[500px] flex flex-col items-center justify-center p-8 text-center">
+            <Card className="bg-surface/20 border-[var(--color-border-subtle)] rounded-2xl h-[500px] flex flex-col items-center justify-center p-8 text-center">
               <Layers className="w-14 h-14 text-text-muted mb-5 opacity-30" />
               <h3 className="text-sm font-bold font-hanken text-text-sub mb-2">3 Variants Ready to Generate</h3>
               <p className="text-xs text-text-muted max-w-xs leading-relaxed">

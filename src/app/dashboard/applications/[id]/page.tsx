@@ -142,7 +142,7 @@ export default function ApplicationDetailPage() {
       </div>
 
       {/* Header */}
-      <Card className="border-white/10 bg-white/[0.03]">
+      <Card className="border-[var(--color-border-subtle)] bg-white/[0.03]">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div className="space-y-3">
@@ -154,7 +154,7 @@ export default function ApplicationDetailPage() {
                   {app.status}
                 </span>
                 {app.platform && (
-                  <span className="text-xs bg-white/5 border border-white/10 text-text-sub px-3 py-1 rounded-full uppercase tracking-widest">
+                  <span className="text-xs bg-white/5 border border-[var(--color-border-subtle)] text-text-sub px-3 py-1 rounded-full uppercase tracking-widest">
                     {app.platform.replace(/_/g, ' ')}
                   </span>
                 )}
@@ -200,7 +200,7 @@ export default function ApplicationDetailPage() {
             </div>
 
             {app.jobUrl && (
-              <Button asChild size="sm" variant="outline" className="border-white/10 rounded-xl gap-2 shrink-0">
+              <Button asChild size="sm" variant="outline" className="border-[var(--color-border-subtle)] rounded-xl gap-2 shrink-0">
                 <a href={app.jobUrl} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="w-3.5 h-3.5" /> View Job
                 </a>
@@ -217,7 +217,7 @@ export default function ApplicationDetailPage() {
 
           {/* AI Skills Analysis */}
           {parsed && (parsed.requiredSkills?.length || parsed.preferredSkills?.length || parsed.atsKeywords?.length) && (
-            <Card className="border-white/10 bg-white/[0.03]">
+            <Card className="border-[var(--color-border-subtle)] bg-white/[0.03]">
               <CardHeader className="pb-4">
                 <CardTitle className="text-base font-hanken flex items-center gap-2">
                   <Zap className="w-4 h-4 text-primary" /> AI Skills Analysis
@@ -261,7 +261,7 @@ export default function ApplicationDetailPage() {
                   </div>
                 )}
                 {parsed.roleInsights && (
-                  <div className="pt-2 border-t border-white/5">
+                  <div className="pt-2 border-t border-[var(--color-border-subtle)]">
                     <p className="text-[10px] text-text-muted uppercase tracking-widest mb-1 font-mono">Role Insights</p>
                     <p className="text-sm text-text-sub">{parsed.roleInsights}</p>
                   </div>
@@ -271,7 +271,7 @@ export default function ApplicationDetailPage() {
           )}
 
           {/* Application Pipeline */}
-          <Card className="border-white/10 bg-white/[0.03]">
+          <Card className="border-[var(--color-border-subtle)] bg-white/[0.03]">
             <CardHeader className="pb-4">
               <CardTitle className="text-base font-hanken flex items-center gap-2">
                 <Target className="w-4 h-4 text-primary" /> Application Pipeline
@@ -289,7 +289,7 @@ export default function ApplicationDetailPage() {
                           'w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all',
                           isCurrent ? 'border-primary bg-primary text-white'
                             : isActive ? 'border-primary/50 bg-primary/20 text-primary'
-                            : 'border-white/10 bg-white/5 text-text-muted',
+                            : 'border-[var(--color-border-subtle)] bg-white/5 text-text-muted',
                         )}>
                           {i + 1}
                         </div>
@@ -325,7 +325,7 @@ export default function ApplicationDetailPage() {
 
           {/* Job Description */}
           {app.jobDescription && (
-            <Card className="border-white/10 bg-white/[0.03]">
+            <Card className="border-[var(--color-border-subtle)] bg-white/[0.03]">
               <CardHeader className="pb-4 flex flex-row items-center justify-between">
                 <CardTitle className="text-base font-hanken flex items-center gap-2">
                   <FileText className="w-4 h-4 text-primary" /> Job Description
@@ -352,7 +352,7 @@ export default function ApplicationDetailPage() {
 
           {/* Activity Log */}
           {!!app.activities?.length && (
-            <Card className="border-white/10 bg-white/[0.03]">
+            <Card className="border-[var(--color-border-subtle)] bg-white/[0.03]">
               <CardHeader className="pb-4">
                 <CardTitle className="text-base font-hanken flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-primary" /> Activity Log
@@ -376,7 +376,7 @@ export default function ApplicationDetailPage() {
 
           {/* Notes */}
           {app.notes && (
-            <Card className="border-white/10 bg-white/[0.03]">
+            <Card className="border-[var(--color-border-subtle)] bg-white/[0.03]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-hanken flex items-center gap-2">
                   <Tag className="w-4 h-4 text-primary" /> Notes
@@ -392,14 +392,14 @@ export default function ApplicationDetailPage() {
         {/* Right Sidebar */}
         <div className="space-y-4">
           {/* Quick Actions */}
-          <Card className="border-white/10 bg-white/[0.03]">
+          <Card className="border-[var(--color-border-subtle)] bg-white/[0.03]">
             <CardHeader className="pb-3">
               <CardTitle className="text-xs font-mono text-text-muted uppercase tracking-widest">
                 Quick Actions
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Button asChild className="w-full justify-between rounded-xl h-11 border-white/10" variant="outline">
+              <Button asChild className="w-full justify-between rounded-xl h-11 border-[var(--color-border-subtle)]" variant="outline">
                 <Link href={`/dashboard/workspace?appId=${app.id}`}>
                   <span className="flex items-center gap-2 text-sm">
                     <Award className="w-4 h-4 text-primary" /> Tailor Resume
@@ -407,7 +407,7 @@ export default function ApplicationDetailPage() {
                   <ArrowRight className="w-3.5 h-3.5 text-text-muted" />
                 </Link>
               </Button>
-              <Button asChild className="w-full justify-between rounded-xl h-11 border-white/10" variant="outline">
+              <Button asChild className="w-full justify-between rounded-xl h-11 border-[var(--color-border-subtle)]" variant="outline">
                 <Link href={`/dashboard/cover-letter?jobTitle=${encodeURIComponent(app.jobTitle)}&company=${encodeURIComponent(app.company)}`}>
                   <span className="flex items-center gap-2 text-sm">
                     <FileText className="w-4 h-4 text-sky-400" /> Cover Letter
@@ -415,7 +415,7 @@ export default function ApplicationDetailPage() {
                   <ArrowRight className="w-3.5 h-3.5 text-text-muted" />
                 </Link>
               </Button>
-              <Button asChild className="w-full justify-between rounded-xl h-11 border-white/10" variant="outline">
+              <Button asChild className="w-full justify-between rounded-xl h-11 border-[var(--color-border-subtle)]" variant="outline">
                 <Link href={`/dashboard/outreach?jobTitle=${encodeURIComponent(app.jobTitle)}&company=${encodeURIComponent(app.company)}`}>
                   <span className="flex items-center gap-2 text-sm">
                     <MessageSquare className="w-4 h-4 text-violet-400" /> Email Draft
@@ -423,7 +423,7 @@ export default function ApplicationDetailPage() {
                   <ArrowRight className="w-3.5 h-3.5 text-text-muted" />
                 </Link>
               </Button>
-              <Button asChild className="w-full justify-between rounded-xl h-11 border-white/10" variant="outline">
+              <Button asChild className="w-full justify-between rounded-xl h-11 border-[var(--color-border-subtle)]" variant="outline">
                 <Link href="/dashboard/assistant">
                   <span className="flex items-center gap-2 text-sm">
                     <Briefcase className="w-4 h-4 text-amber-400" /> Ask Coach
@@ -435,7 +435,7 @@ export default function ApplicationDetailPage() {
           </Card>
 
           {/* Meta Info */}
-          <Card className="border-white/10 bg-white/[0.03]">
+          <Card className="border-[var(--color-border-subtle)] bg-white/[0.03]">
             <CardContent className="p-4 space-y-3">
               {[
                 { label: 'Added', value: formatDate(app.createdAt) },

@@ -99,7 +99,7 @@ export default function AdminUsersPage() {
           onClick={() => fetchUsers(pagination.page)}
           variant="outline"
           size="sm"
-          className="gap-2 border-white/10 text-xs"
+          className="gap-2 border-[var(--color-border-subtle)] text-xs"
           disabled={loading}
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -115,18 +115,18 @@ export default function AdminUsersPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by name or email..."
-            className="pl-10 bg-surface border-white/10 rounded-xl text-sm h-10"
+            className="pl-10 bg-surface border-[var(--color-border-subtle)] rounded-xl text-sm h-10"
           />
         </div>
         <Button type="submit" size="sm" className="rounded-xl px-4 h-10 text-xs">Search</Button>
       </form>
 
       {/* Table */}
-      <div className="bg-surface-container-low/50 border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+      <div className="bg-surface-container-low/50 border border-[var(--color-border-subtle)] rounded-3xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/5 bg-surface-container/50">
+              <tr className="border-b border-[var(--color-border-subtle)] bg-surface-container/50">
                 <th className="text-left px-6 py-4 text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">User</th>
                 <th className="text-left px-6 py-4 text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">Role</th>
                 <th className="text-left px-6 py-4 text-[10px] font-mono uppercase tracking-widest text-on-surface-variant hidden md:table-cell">Apps</th>
@@ -146,10 +146,10 @@ export default function AdminUsersPage() {
                   <td colSpan={5} className="py-20 text-center text-on-surface-variant text-sm">No users found</td>
                 </tr>
               ) : users.map(user => (
-                <tr key={user.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                <tr key={user.id} className="border-b border-[var(--color-border-subtle)] hover:bg-white/[0.02] transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <Avatar className="w-8 h-8 border border-white/10 shrink-0">
+                      <Avatar className="w-8 h-8 border border-[var(--color-border-subtle)] shrink-0">
                         <AvatarImage src="" />
                         <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
                           {(user.name || user.email).charAt(0).toUpperCase()}
@@ -167,7 +167,7 @@ export default function AdminUsersPage() {
                       className={
                         user.role === 'ADMIN'
                           ? 'border-primary/30 bg-primary/10 text-primary text-[10px] font-mono'
-                          : 'border-white/10 bg-white/5 text-on-surface-variant text-[10px] font-mono'
+                          : 'border-[var(--color-border-subtle)] bg-white/5 text-on-surface-variant text-[10px] font-mono'
                       }
                     >
                       {user.role}
@@ -220,7 +220,7 @@ export default function AdminUsersPage() {
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-white/5 flex items-center justify-between">
+          <div className="px-6 py-4 border-t border-[var(--color-border-subtle)] flex items-center justify-between">
             <span className="text-xs text-on-surface-variant font-mono">
               Page {pagination.page} of {pagination.totalPages} · {pagination.total} users
             </span>
@@ -230,7 +230,7 @@ export default function AdminUsersPage() {
                 disabled={pagination.page <= 1 || loading}
                 variant="outline"
                 size="sm"
-                className="h-7 px-2 border-white/10"
+                className="h-7 px-2 border-[var(--color-border-subtle)]"
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
@@ -239,7 +239,7 @@ export default function AdminUsersPage() {
                 disabled={pagination.page >= pagination.totalPages || loading}
                 variant="outline"
                 size="sm"
-                className="h-7 px-2 border-white/10"
+                className="h-7 px-2 border-[var(--color-border-subtle)]"
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>

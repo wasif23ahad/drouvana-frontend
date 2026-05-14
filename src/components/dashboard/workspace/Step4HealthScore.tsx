@@ -116,7 +116,7 @@ export default function Step4HealthScore() {
             />
           </div>
 
-          <div className="p-8 bg-surface-2 rounded-4xl border border-white/5 text-[11px] text-left font-jetbrains text-text-muted/40 line-clamp-3 h-24 overflow-hidden shadow-lg">
+          <div className="p-8 bg-surface-2 rounded-4xl border border-[var(--color-border-subtle)] text-[11px] text-left font-jetbrains text-text-muted/40 line-clamp-3 h-24 overflow-hidden shadow-lg">
             {streamingText || "Initializing ATS simulation engine: loading vector space..."}
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function Step4HealthScore() {
   return (
     <div className="space-y-16 max-w-5xl mx-auto animate-in slide-in-from-bottom-10 duration-700">
       {/* Score Header */}
-      <div className="flex flex-col md:flex-row items-center gap-12 bg-surface-2/30 p-12 rounded-[3rem] border border-white/5 relative overflow-hidden shadow-2xl">
+      <div className="flex flex-col md:flex-row items-center gap-12 bg-surface-2/30 p-12 rounded-[3rem] border border-[var(--color-border-subtle)] relative overflow-hidden shadow-2xl">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] pointer-events-none -z-10" />
         
         <div className="relative w-56 h-56 flex items-center justify-center shrink-0">
@@ -175,7 +175,7 @@ export default function Step4HealthScore() {
           </div>
           <div className="space-y-4">
             {(healthScore.strengths || []).map((s: string, i: number) => (
-              <div key={i} className="p-6 rounded-4xl bg-surface-2 border border-white/5 text-text-sub text-sm shadow-lg">
+              <div key={i} className="p-6 rounded-4xl bg-surface-2 border border-[var(--color-border-subtle)] text-text-sub text-sm shadow-lg">
                 {s}
               </div>
             ))}
@@ -198,7 +198,7 @@ export default function Step4HealthScore() {
       </div>
 
       {/* Recommendations */}
-      <div className="p-10 bg-surface-2 rounded-4xl border border-white/5 space-y-8 relative overflow-hidden shadow-2xl">
+      <div className="p-10 bg-surface-2 rounded-4xl border border-[var(--color-border-subtle)] space-y-8 relative overflow-hidden shadow-2xl">
         <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 blur-[60px] pointer-events-none" />
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
@@ -217,18 +217,18 @@ export default function Step4HealthScore() {
       </div>
 
       {/* Footer Actions */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-10 border-t border-white/5">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-10 border-t border-[var(--color-border-subtle)]">
         <Button 
           variant="outline" 
           onClick={startStreaming} 
-          className="rounded-2xl h-14 px-8 border-white/10 bg-surface-2 hover:bg-white/5 text-text-main font-hanken font-bold shadow-lg gap-3"
+          className="rounded-2xl h-14 px-8 border-[var(--color-border-subtle)] bg-surface-2 hover:bg-black/5 dark:hover:bg-white/5 text-text-main font-hanken font-bold shadow-lg gap-3"
         >
           <RefreshCw className="w-4 h-4" /> Re-execute Verification
         </Button>
         <div className="flex gap-4 w-full sm:w-auto">
           <Button 
             variant="outline" 
-            className="flex-1 sm:flex-none rounded-2xl h-14 px-8 border-white/10 bg-surface-2 text-text-main font-hanken font-bold " 
+            className="flex-1 sm:flex-none rounded-2xl h-14 px-8 border-[var(--color-border-subtle)] bg-surface-2 text-text-main font-hanken font-bold " 
             onClick={() => setStep(1)}
           >
             Adjust Target

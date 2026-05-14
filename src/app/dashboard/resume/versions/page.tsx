@@ -20,7 +20,7 @@ interface ResumeVersion {
 }
 
 function atsColor(score: number | null): string {
-  if (score === null) return 'border-white/10 bg-white/5 text-on-surface-variant';
+  if (score === null) return 'border-[var(--color-border-subtle)] bg-white/5 text-on-surface-variant';
   if (score >= 80) return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400';
   if (score >= 60) return 'border-amber-500/30 bg-amber-500/10 text-amber-400';
   return 'border-red-500/30 bg-red-500/10 text-red-400';
@@ -86,7 +86,7 @@ export default function ResumeVersionsPage() {
               variant="outline"
               size="sm"
               disabled={loading}
-              className="gap-2 border-white/10 text-xs rounded-xl"
+              className="gap-2 border-[var(--color-border-subtle)] text-xs rounded-xl"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
               Refresh
@@ -107,7 +107,7 @@ export default function ResumeVersionsPage() {
           <Loader2 className="w-8 h-8 animate-spin text-primary opacity-40" />
         </div>
       ) : versions.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-white/10 rounded-2xl">
+        <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-[var(--color-border-subtle)] rounded-2xl">
           <FileText className="w-14 h-14 text-text-muted mb-4 opacity-30" />
           <h3 className="text-sm font-bold font-hanken text-text-sub mb-2">No saved versions yet</h3>
           <p className="text-xs text-text-muted max-w-xs mb-6">
@@ -124,7 +124,7 @@ export default function ResumeVersionsPage() {
           {versions.map(v => (
             <div
               key={v.id}
-              className="bg-surface/50 border border-white/5 rounded-2xl p-5 hover:border-primary/20 transition-all group flex flex-col gap-4"
+              className="bg-surface/50 border border-[var(--color-border-subtle)] rounded-2xl p-5 hover:border-primary/20 transition-all group flex flex-col gap-4"
             >
               {/* Top: name + ATS badge */}
               <div className="flex items-start justify-between gap-3">
@@ -173,7 +173,7 @@ export default function ResumeVersionsPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-2 pt-2 border-t border-white/5 mt-auto">
+              <div className="flex items-center gap-2 pt-2 border-t border-[var(--color-border-subtle)] mt-auto">
                 <Button
                   onClick={() => handleDelete(v.id, v.name)}
                   disabled={deletingId === v.id}

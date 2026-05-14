@@ -16,7 +16,7 @@ interface StatCardProps {
 
 const StatCard = ({ title, value, icon: Icon, trend, description, color = 'primary' }: StatCardProps) => {
   return (
-    <div className="bg-surface-2/50 backdrop-blur-xl border border-white/5 rounded-4xl p-8 relative overflow-hidden group hover:border-primary/40 transition-all duration-500 shadow-2xl">
+    <div className="bg-surface-2/50 backdrop-blur-xl border border-[var(--color-border-subtle)] rounded-4xl p-8 relative overflow-hidden group hover:border-primary/40 transition-all duration-500 shadow-2xl">
       <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
         <Icon className={cn("w-24 h-24", 
           color === 'primary' ? 'text-primary' : 
@@ -26,7 +26,7 @@ const StatCard = ({ title, value, icon: Icon, trend, description, color = 'prima
       </div>
       
       <div className="space-y-6 relative z-10">
-        <div className="w-12 h-12 rounded-2xl bg-surface-2 flex items-center justify-center border border-white/5 shadow-lg group-hover:border-primary/50 transition-colors">
+        <div className="w-12 h-12 rounded-2xl bg-surface-2 flex items-center justify-center border border-[var(--color-border-subtle)] shadow-lg group-hover:border-primary/50 transition-colors">
           <Icon className={cn("w-6 h-6", 
             color === 'primary' ? 'text-primary' : 
             color === 'success' ? 'text-secondary' : 
