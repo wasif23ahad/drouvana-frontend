@@ -82,6 +82,11 @@ export default function AdminDashboard() {
         setLogs(logsRes.data?.data ?? logsRes.data ?? []);
       } catch (error) {
         console.error('Failed to fetch admin data:', error);
+        // toast imported dynamically to avoid SSR issue
+        if (typeof window !== 'undefined') {
+          const { toast } = await import('sonner');
+          toast.error('Failed to load admin data');
+        }
       } finally {
         setLoading(false);
       }

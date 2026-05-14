@@ -1,15 +1,7 @@
 import axios from 'axios';
 import { getSession, signOut } from 'next-auth/react';
 
-const getBaseURL = () => {
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    const configured = process.env.NEXT_PUBLIC_API_URL || '';
-    if (!configured || configured.includes('localhost')) {
-      return 'https://douvana-backend.vercel.app';
-    }
-  }
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-};
+const getBaseURL = () => process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 /**
  * Global API client for Drouvana

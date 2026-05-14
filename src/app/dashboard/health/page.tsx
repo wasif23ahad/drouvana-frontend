@@ -27,7 +27,7 @@ export default function PipelineHealthPage() {
 
       if (data) {
         // Normalize AI response into display format
-        const appsRes = await api.get('/api/applications').catch(() => ({ data: { data: [] } }));
+        const appsRes = await api.get('/api/applications?limit=200').catch(() => ({ data: { data: [] } }));
         const apps = appsRes.data?.data || [];
         const total = apps.length;
         const interviews = apps.filter((a: any) => a.status === 'INTERVIEW').length;
@@ -36,12 +36,22 @@ export default function PipelineHealthPage() {
         const responseRate = total > 0 ? Math.floor(((interviews + offers + rejections) / total) * 100) : 0;
         const interviewConversion = total > 0 ? Math.floor(((interviews + offers) / total) * 100) : 0;
 
+        // Compute average days between creation and last update for responded apps
+        const respondedApps = apps.filter((a: any) => ['INTERVIEW', 'OFFER', 'REJECTED', 'SCREENING'].includes(a.status));
+        const avgDaysToResponse = respondedApps.length > 0
+          ? Number((respondedApps.reduce((sum: number, a: any) => {
+              const created = new Date(a.createdAt).getTime();
+              const updated = new Date(a.updatedAt).getTime();
+              return sum + (updated - created) / (1000 * 60 * 60 * 24);
+            }, 0) / respondedApps.length).toFixed(1))
+          : null;
+
         setStats({
           score: data.health_score ?? 0,
           total,
           responseRate,
           interviewConversion,
-          avgDaysToResponse: 6.2,
+          avgDaysToResponse,
           lastComputed: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           insights: (data.insights || []).map((ins: any) => ({
             type: ins.icon === '⚠️' || ins.icon?.includes('warning') ? 'warning' : 'positive',
@@ -129,7 +139,7 @@ export default function PipelineHealthPage() {
           <CardContent className="p-5">
             <span className="text-[11px] font-jetbrains uppercase text-text-muted block mb-1">Response Conversion</span>
             <span className="text-3xl font-bold font-hanken text-text-main">{stats?.responseRate}%</span>
-            <p className="text-[10px] text-text-muted mt-1">~{stats?.avgDaysToResponse} day turnaround speed</p>
+            <p className="text-[10px] text-text-muted mt-1">{stats?.avgDaysToResponse != null ? `~${stats.avgDaysToResponse} day avg turnaround` : 'Not enough data yet'}</p>
           </CardContent>
         </Card>
 

@@ -26,7 +26,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card, CardContent } from '@/components/ui/card';
-import { Briefcase, Building2, Calendar, MoreHorizontal } from 'lucide-react';
+import { Briefcase, Building2, Calendar, MapPin, MoreHorizontal } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 
@@ -64,32 +64,50 @@ function SortableItem({ app }: { app: any }) {
     else if (daysSinceApplied > 7) dateColor = 'text-warning';
   }
 
+  const salaryStr = app.salaryMin && app.salaryMax
+    ? `$${Math.round(app.salaryMin / 1000)}k–$${Math.round(app.salaryMax / 1000)}k`
+    : app.salaryMin ? `$${Math.round(app.salaryMin / 1000)}k+` : null;
+
+  const priorityLabel = app.priority === 3 ? 'High' : app.priority === 1 ? 'Low' : null;
+  const priorityColor = app.priority === 3 ? 'text-error' : app.priority === 1 ? 'text-text-muted' : null;
+
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="touch-none pb-3">
       <Card className="hover:border-primary/50 transition-colors bg-surface border-border-subtle cursor-grab active:cursor-grabbing">
-        <CardContent className="p-4 flex flex-col gap-3">
+        <CardContent className="p-4 flex flex-col gap-2.5">
           <div className="flex justify-between items-start gap-2">
-            <div>
-              <h4 className="font-semibold text-sm leading-tight mb-1">{app.jobTitle}</h4>
+            <div className="min-w-0">
+              <h4 className="font-semibold text-sm leading-tight mb-1 truncate">{app.jobTitle}</h4>
               <div className="flex items-center text-xs text-text-sub">
-                <Building2 className="h-3 w-3 mr-1" /> {app.company}
+                <Building2 className="h-3 w-3 mr-1 shrink-0" />
+                <span className="truncate">{app.company}</span>
               </div>
             </div>
-            <Link href={`/dashboard/applications/${app.id}`} className="text-text-muted hover:text-text-main pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+            <Link href={`/dashboard/applications/${app.id}`} className="text-text-muted hover:text-primary transition-colors pointer-events-auto shrink-0" onClick={(e) => e.stopPropagation()}>
               <MoreHorizontal className="h-4 w-4" />
             </Link>
           </div>
-          
-          <div className="flex items-center justify-between mt-1">
-            <span className={`text-[10px] font-medium flex items-center ${dateColor}`}>
-              <Calendar className="h-3 w-3 mr-1" />
-              {daysSinceApplied}d ago
+
+          {app.location && (
+            <div className="flex items-center text-[11px] text-text-muted gap-1">
+              <MapPin className="h-3 w-3 shrink-0" />
+              <span className="truncate">{app.location}</span>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-1 border-t border-white/5">
+            <span className={`text-[10px] font-medium flex items-center gap-1 ${dateColor}`}>
+              <Calendar className="h-3 w-3" />
+              {daysSinceApplied === 0 ? 'Today' : `${daysSinceApplied}d ago`}
             </span>
-            {app.platform && (
-              <span className="text-[10px] bg-surface-2 text-text-sub px-2 py-0.5 rounded-full">
-                {app.platform}
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {salaryStr && (
+                <span className="text-[10px] text-success font-medium">{salaryStr}</span>
+              )}
+              {priorityLabel && (
+                <span className={`text-[10px] font-bold ${priorityColor}`}>{priorityLabel}</span>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -109,11 +127,19 @@ function Column({ col, applications }: { col: typeof COLUMNS[0], applications: a
         <h3 className="font-semibold text-sm">{col.title}</h3>
         <Badge variant="outline" className="bg-surface bg-opacity-50 text-[10px] py-0">{applications.length}</Badge>
       </div>
-      <div ref={setNodeRef} className="flex-1 p-3 overflow-y-auto min-h-[150px]">
+      <div ref={setNodeRef} className="flex-1 p-3 overflow-y-auto min-h-[200px]">
         <SortableContext items={applications.map(a => a.id)} strategy={verticalListSortingStrategy}>
           {applications.map(app => (
             <SortableItem key={app.id} app={app} />
           ))}
+          {applications.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-28 text-center">
+              <div className="w-8 h-8 rounded-xl bg-surface border border-border-subtle flex items-center justify-center mb-2 opacity-40">
+                <Briefcase className="w-4 h-4 text-text-muted" />
+              </div>
+              <p className="text-[10px] text-text-muted font-jetbrains uppercase tracking-widest">Drop here</p>
+            </div>
+          )}
         </SortableContext>
       </div>
     </div>

@@ -11,9 +11,13 @@ export interface Application {
   jobDescription?: string;
   platform: string;
   status: JobStatus;
+  salaryMin?: number;
+  salaryMax?: number;
   salaryRange?: string;
   location?: string;
   notes?: string;
+  priority?: number;
+  deadline?: string;
   dateApplied: string;
   lastUpdated: string;
 }

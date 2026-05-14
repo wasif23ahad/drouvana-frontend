@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { KanbanSquare, List, Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,24 +9,30 @@ import { KanbanBoard } from '@/components/dashboard/tracker/KanbanBoard';
 import { ApplicationList } from '@/components/dashboard/tracker/ApplicationList';
 import { AddApplicationModal } from '@/components/dashboard/tracker/AddApplicationModal';
 
-export default function TrackerPage() {
+function TrackerContent() {
+  const searchParams = useSearchParams();
   const [view, setView] = useState<'kanban' | 'list'>('kanban');
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(searchParams.get('search') || '');
   const [addOpen, setAddOpen] = useState(false);
+
+  useEffect(() => {
+    const s = searchParams.get('search');
+    if (s) setSearch(s);
+  }, [searchParams]);
 
   return (
     <div className="flex h-full flex-col gap-8 pb-20">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold font-hanken text-text-main">Job Tracker</h1>
-          <p className="text-text-sub text-sm">Visualize and manage your multi-vector deployment performance.</p>
+          <p className="text-text-sub text-sm">Track every application from saved to offer — drag cards to update status.</p>
         </div>
         
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           <div className="relative flex-1 min-w-[140px] sm:flex-none sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
             <Input
-              placeholder="Filter nodes..."
+              placeholder="Search applications..."
               className="pl-10 bg-surface-2 border-none rounded-xl h-11 focus-visible:ring-primary w-full"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -47,7 +54,7 @@ export default function TrackerPage() {
               </button>
             </div>
             <Button onClick={() => setAddOpen(true)} className="gap-2 rounded-xl h-11 px-4 sm:px-6 border-none shadow-lg shadow-primary/20">
-              <Plus className="h-4 w-4" /> Add Node
+              <Plus className="h-4 w-4" /> Add Application
             </Button>
           </div>
         </div>
@@ -63,5 +70,13 @@ export default function TrackerPage() {
 
       <AddApplicationModal open={addOpen} onClose={() => setAddOpen(false)} />
     </div>
+  );
+}
+
+export default function TrackerPage() {
+  return (
+    <Suspense fallback={<div className="flex h-full items-center justify-center text-text-muted text-sm">Loading...</div>}>
+      <TrackerContent />
+    </Suspense>
   );
 }

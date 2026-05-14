@@ -59,6 +59,21 @@ export default function DashboardOverview() {
   const offers = applications.filter(a => a.status === 'OFFER').length;
   const activeApps = applications.filter(a => !['REJECTED', 'WITHDRAWN', 'OFFER'].includes(a.status)).length;
 
+  const now = new Date();
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  const weeklyDelta = applications.filter(a => {
+    const d = new Date(a.dateApplied || a.lastUpdated);
+    return d >= oneWeekAgo;
+  }).length;
+
+  const upcomingDeadlines = applications.filter(a => {
+    if (!a.deadline) return false;
+    const d = new Date(a.deadline as string);
+    return d >= now && d <= oneWeekFromNow;
+  }).length;
+
   const statusData = [
     { name: 'Saved', value: applications.filter(a => a.status === 'SAVED').length },
     { name: 'Applied', value: applications.filter(a => a.status === 'APPLIED').length },
@@ -103,7 +118,7 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold font-hanken mb-1">{totalApps}</div>
-            <p className="text-xs text-text-muted ">+2 from last week</p>
+            <p className="text-xs text-text-muted">{weeklyDelta > 0 ? `+${weeklyDelta}` : weeklyDelta === 0 ? 'No change' : `${weeklyDelta}`} from last week</p>
           </CardContent>
         </Card>
         <Card className="hover:border-secondary/30 transition-colors group">
@@ -123,7 +138,7 @@ export default function DashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold font-hanken mb-1">{interviews}</div>
-            <p className="text-xs text-text-muted ">2 coming up this week</p>
+            <p className="text-xs text-text-muted">{upcomingDeadlines > 0 ? `${upcomingDeadlines} deadline${upcomingDeadlines > 1 ? 's' : ''} this week` : 'No upcoming deadlines'}</p>
           </CardContent>
         </Card>
         <Card className="hover:border-success/30 transition-colors group border-success/10 bg-success/5">

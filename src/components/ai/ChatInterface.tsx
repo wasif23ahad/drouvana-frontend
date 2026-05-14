@@ -15,23 +15,15 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  "Which applications need a follow-up?",
-  "How's my resume for a Backend Engineer role?",
-  "Write me a LinkedIn connection request for a recruiter at Stripe",
-  "How should I prep for my Google interview?",
+  "Which of my applications need a follow-up this week?",
+  "What are the top 5 things I should prepare for a technical interview?",
+  "Help me write a LinkedIn connection request to a recruiter at Stripe",
+  "What salary should I negotiate for a Senior Engineer role at a Series B startup?",
+  "Review my job search strategy and suggest improvements",
+  "How do I handle a rejection professionally and turn it into a networking opportunity?",
 ];
 
-const getBaseURL = () => {
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    const configured = process.env.NEXT_PUBLIC_API_URL || '';
-    if (!configured || configured.includes('localhost')) {
-      return 'https://douvana-backend.vercel.app';
-    }
-  }
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-};
-
-const API_URL = getBaseURL();
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function ChatInterface() {
   const { data: session } = useSession();
@@ -219,16 +211,19 @@ export default function ChatInterface() {
       >
         {/* Suggestion chips — only shown before first user message */}
         {messages.length === 1 && (
-          <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-            {SUGGESTIONS.map((s, i) => (
-              <button
-                key={i}
-                onClick={() => handleSend(s)}
-                className="text-left text-sm p-4 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary transition-all hover:scale-[1.02] active:scale-[0.98]"
-              >
-                {s}
-              </button>
-            ))}
+          <div className="mb-6 mt-2">
+            <p className="text-xs text-text-muted font-jetbrains uppercase tracking-widest mb-3">Suggested prompts</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {SUGGESTIONS.map((s, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSend(s)}
+                  className="text-left text-sm p-3.5 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary transition-all hover:scale-[1.01] active:scale-[0.99] leading-snug"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

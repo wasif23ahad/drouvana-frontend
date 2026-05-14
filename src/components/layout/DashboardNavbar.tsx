@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Bell,
   Search,
@@ -46,9 +46,11 @@ const NAV_LINKS = [
 
 const DashboardNavbar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const getPageTitle = () => {
@@ -98,14 +100,24 @@ const DashboardNavbar = () => {
         </div>
 
         <div className="flex items-center gap-3 sm:gap-4">
-          <div className="relative hidden md:block w-52 lg:w-64">
+          <form
+            className="relative hidden md:block w-52 lg:w-64"
+            onSubmit={e => {
+              e.preventDefault();
+              if (searchQuery.trim()) {
+                router.push(`/dashboard/tracker?search=${encodeURIComponent(searchQuery.trim())}`);
+              }
+            }}
+          >
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted w-3.5 h-3.5" />
             <input
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
               className="w-full bg-surface-2 border border-white/5 text-text-main text-xs rounded-xl pl-9 pr-4 py-2 focus:border-primary focus:outline-none transition-all placeholder:text-text-muted/50"
               placeholder="Search applications..."
               type="text"
             />
-          </div>
+          </form>
 
           <button className="text-text-muted hover:text-primary transition-colors relative p-2 rounded-full hover:bg-white/5">
             <Bell className="w-5 h-5" />

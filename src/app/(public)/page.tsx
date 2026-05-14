@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
-import { 
-  ArrowRight, BarChart3, Briefcase, CheckCircle2, 
-  FileText, LineChart, Mail, MessageSquare, 
-  ShieldCheck, Sparkles, Star, ChevronDown, ChevronRight
+import {
+  ArrowRight, BarChart3, Briefcase, CheckCircle2,
+  FileText, LineChart, Mail, MessageSquare,
+  ShieldCheck, Sparkles, Star, Target, ChevronDown, ChevronRight
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -218,27 +218,69 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* 6. Testimonials */}
-        <section id="testimonials" className="w-full py-20 bg-transparent">
+        {/* 6. AI Capabilities Showcase */}
+        <section id="capabilities" className="w-full py-20 bg-transparent">
           <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-3xl md:text-4xl font-hanken font-bold mb-12 text-center">Loved by Job Seekers</h2>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-hanken font-bold mb-4">Every tool you need. All AI-powered.</h2>
+              <p className="text-text-sub text-lg max-w-2xl mx-auto">From application tracking to interview prep — Drouvana handles the entire job search lifecycle.</p>
+            </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
-                { quote: "I was spending hours tweaking my resume for every application. Drouvana does it in seconds.", author: "Sarah J.", role: "Software Engineer" },
-                { quote: "The Kanban board is a lifesaver. I finally know exactly where I stand with my 40+ applications.", author: "Michael T.", role: "Product Manager" },
-                { quote: "The AI coach helped me prep for my interview at Google and I got the offer!", author: "Elena R.", role: "UX Designer" }
-              ].map((test, i) => (
-                <Card key={i} className="glass-card hover:bg-surface-2/30 transition-colors">
+                {
+                  icon: BarChart3,
+                  title: 'Smart Job Tracker',
+                  desc: 'Visualize your entire pipeline with a drag-and-drop Kanban board. Filter, search, and track every stage from Saved to Offer.',
+                  tag: 'Kanban + List View',
+                  color: 'text-primary bg-primary/10',
+                },
+                {
+                  icon: FileText,
+                  title: 'Resume Builder',
+                  desc: 'Build beautiful, ATS-optimized resumes with 5+ professional templates. AI enhances your bullet points and tailors content to each JD.',
+                  tag: 'FlowCV-style Editor',
+                  color: 'text-secondary bg-secondary/10',
+                },
+                {
+                  icon: Target,
+                  title: 'ATS Score Analyzer',
+                  desc: 'Upload your resume and a job description. Get instant keyword match scoring, missing skill identification, and rewrite suggestions.',
+                  tag: 'Keyword Intelligence',
+                  color: 'text-accent bg-accent/10',
+                },
+                {
+                  icon: Mail,
+                  title: 'Cover Letter Generator',
+                  desc: 'Generate tailored cover letters in multiple tones — Professional, Enthusiastic, Concise. One-click save and copy.',
+                  tag: 'Three Tone Variants',
+                  color: 'text-success bg-success/10',
+                },
+                {
+                  icon: MessageSquare,
+                  title: 'Email Outreach Writer',
+                  desc: 'Draft cold outreach, follow-up, and thank-you emails tuned to the specific job and company. Save drafts for later use.',
+                  tag: 'Context-Aware AI',
+                  color: 'text-primary bg-primary/10',
+                },
+                {
+                  icon: Sparkles,
+                  title: 'AI Career Coach',
+                  desc: 'Chat with an intelligent assistant that knows your applications. Get interview prep, salary negotiation tips, and career guidance.',
+                  tag: 'Live AI Chat',
+                  color: 'text-secondary bg-secondary/10',
+                },
+              ].map((cap, i) => (
+                <Card key={i} className="glass-card hover:border-primary/30 transition-all group flex flex-col">
                   <CardHeader>
-                    <div className="flex gap-1 mb-2">
-                       {[...Array(5)].map((_, j) => <Star key={j} className="h-4 w-4 fill-amber-500 text-amber-500" />)}
+                    <div className={`h-11 w-11 rounded-xl flex items-center justify-center mb-4 ${cap.color}`}>
+                      <cap.icon className="h-5 w-5" />
                     </div>
+                    <CardTitle className="text-lg font-hanken">{cap.title}</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-text-main mb-6 leading-relaxed">&quot;{test.quote}&quot;</p>
-                    <div>
-                      <p className="font-semibold font-hanken text-primary">{test.author}</p>
-                      <p className="text-sm text-text-muted font-jetbrains uppercase tracking-widest">{test.role}</p>
+                  <CardContent className="flex-1 flex flex-col gap-4">
+                    <CardDescription className="text-base text-text-sub leading-relaxed">{cap.desc}</CardDescription>
+                    <div className="mt-auto">
+                      <span className="text-[10px] font-jetbrains uppercase tracking-widest text-text-muted bg-surface-2 px-3 py-1 rounded-full">{cap.tag}</span>
                     </div>
                   </CardContent>
                 </Card>

@@ -225,13 +225,7 @@ export default function AtsAnalyzerPage() {
   const [result, setResult] = useState<ATSResult | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  const getAPIBase = () => {
-    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-      const configured = process.env.NEXT_PUBLIC_API_URL || '';
-      if (!configured || configured.includes('localhost')) return 'https://douvana-backend.vercel.app';
-    }
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  };
+  const getAPIBase = () => process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   const loadBuilderResume = async () => {
     setBuilderLoading(true);
